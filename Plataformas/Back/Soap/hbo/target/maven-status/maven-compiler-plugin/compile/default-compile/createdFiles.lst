@@ -1,0 +1,9 @@
+ar\edu\ubp\das\hbo\beans\ContenidoCatalogo.class
+ar\edu\ubp\das\hbo\beans\DireccionCatalogo.class
+ar\edu\ubp\das\hbo\utils\TokenGenerator.class
+ar\edu\ubp\das\hbo\beans\ActuacionCatalogo.class
+ar\edu\ubp\das\hbo\beans\Catalogo.class
+ar\edu\ubp\das\hbo\app\Server.class
+ar\edu\ubp\das\hbo\beans\Codigo.class
+ar\edu\ubp\das\hbo\beans\RespuestaBean.class
+ar\edu\ubp\das\hbo\platforms\HBOWS.class

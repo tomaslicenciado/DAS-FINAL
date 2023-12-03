@@ -148,7 +148,7 @@ public class HBOWS {
 
             boolean usuario_logueado = stmt.getBoolean(2);
             if (!usuario_logueado){        
-                respuesta.setStatus(Codigo.ERROR);
+                respuesta.setStatus(Codigo.NO_ENCONTRADO);
                 respuesta.setBody("ERROR");
                 respuesta.setMensaje("El login asociado al transaction_id proporcionado no se ha completado");
                 return respuesta;
@@ -205,14 +205,11 @@ public class HBOWS {
         try (Connection conn = DriverManager.getConnection(sql_conection_string, sql_user, sql_pass)){
             conn.setAutoCommit(true);
             try (CallableStatement stmt = conn.prepareCall("{CALL dbo.obtener_sesion(?, ?, ?)}")){
+                String sesion = TokenGenerator.generateSession(token_viewer);
                 stmt.setString(1, token_viewer);
                 stmt.setString(2, token_servicio);
-                stmt.registerOutParameter(3, java.sql.Types.VARCHAR);
+                stmt.setString(3, sesion);
                 stmt.execute();
-                String sesion = stmt.getString(3);
-                if (sesion == null){
-                    return handleErrorResponse("Error al obtener la sesión", new Exception("Error SQL"));
-                }
                 Map<String, String> data = new HashMap<String, String>();
                 data.put("sesion", sesion);
                 return new RespuestaBean(Codigo.OK, "Sesion obtenida con éxito", new Gson().toJson(data));
@@ -285,7 +282,7 @@ public class HBOWS {
                 stmt.execute();
                 id_viewer = stmt.getInt(5);
                 if (id_viewer == 0)
-                    return handleErrorResponse("Error al insertar el nuevo usuario", new Exception("ERROR SQL"));
+                    return handleErrorResponse("Error al insertar el nuevo usuario. No hay login asociado", new Exception("ERROR SQL"));
             }
 
             return nuevoLogin(id_login, email, password, id_servicio, true);
