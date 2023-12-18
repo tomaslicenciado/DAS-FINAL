@@ -69,7 +69,9 @@ export class VisualizarContenidoComponent implements OnInit{
     this.reproducir = !this.reproducir;
   }
 
-  volver(){}
+  volver(){
+    this._router.navigate(['/']);
+  }
 
   seleccionarPlataforma(idPlataforma: number) {
     this.idPlataforma = idPlataforma;

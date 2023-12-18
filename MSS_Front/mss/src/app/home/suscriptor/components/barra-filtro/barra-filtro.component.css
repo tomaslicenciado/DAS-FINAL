@@ -2,5 +2,17 @@
     max-width: 1200px;
     margin: 0 auto;
     text-align: center;
-    margin-top: 90px;
+    margin-top: 20px;
+    position: fixed;
+    top: 60px; /* Altura del menú fijo */
+    width: 100%;
+    background-color: #333; /* Ajusta el color de fondo según tu diseño */
+    z-index: 1000;
+    left: 20%;
+}
+
+.filter-bar label,
+.filter-bar select,
+.filter-bar input {
+    margin-right: 10px; /* Ajusta según tus necesidades */
 }

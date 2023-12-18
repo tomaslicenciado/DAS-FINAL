@@ -1,4 +1,4 @@
-import { Component, Input, NgZone, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, NgZone, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { ActivatedRoute, ActivatedRouteSnapshot, NavigationStart, Router } from '@angular/router';
 import { IContenido } from 'src/app/api/models/i-contenido';
@@ -16,6 +16,21 @@ export class ListaContenidosComponent implements OnInit{
   filterForm: FormGroup;
   contenidosFiltrados: IContenido[] = [];
   searchTerm: string = "";
+  @Input() contenidoVisualizado: IContenido= {
+    url_imagen: "",
+    tipo_contenido: "",
+    actuaciones: [],
+    cont_x_plataforma: [],
+    descripcion: "",
+    direcciones: [],
+    eidr_contenido: "",
+    fecha_estreno: new Date,
+    genero: "",
+    pais: "",
+    titulo: ""
+  };
+  @Input() visualizando: boolean = false;
+  @Output() visualizandoChange: EventEmitter<boolean> = new EventEmitter<boolean>();
 
   constructor(private fb: FormBuilder, private _router: Router, private _ngZone: NgZone, private _msgSrv: MensajeService) {
     this.filterForm = this.fb.group({

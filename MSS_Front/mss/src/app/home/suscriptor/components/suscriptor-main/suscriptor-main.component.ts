@@ -3,6 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Codigo } from 'src/app/api/models/codigo';
 import { IBanner } from 'src/app/api/models/i-banner';
 import { IContenido } from 'src/app/api/models/i-contenido';
+import { IContenidoXPlataforma } from 'src/app/api/models/i-contenido-x-plataforma';
 import { IGeneroContenido } from 'src/app/api/models/i-genero-contenido';
 import { IPlataforma } from 'src/app/api/models/i-plataforma';
 import { IPublicacion } from 'src/app/api/models/i-publicacion';
@@ -46,6 +47,12 @@ export class SuscriptorMainComponent implements OnInit{
         if (getCodigo(respGeneros) == Codigo.OK){
           this.generos = JSON.parse(respGeneros.body!)
         }
+
+        this.catalogo.forEach((contenido: IContenido) => {
+          contenido.cont_x_plataforma.forEach((cxp: IContenidoXPlataforma)=>{
+            cxp.url_icono_plataforma = this.plataformas.filter((p: IPlataforma) => {return p.id_plataforma == cxp.id_plataforma})[0].url_icono
+          })
+        })
       },
       error: (error) => {
         this._ngZone.run(() => this._msgSrv.showMessage({title: "Error en login", text: error}), 0);

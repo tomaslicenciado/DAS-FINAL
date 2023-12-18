@@ -1077,7 +1077,7 @@ BEGIN
             FOR JSON AUTO
         ) AS direcciones,
         (
-            SELECT pc.id_plataforma_contenido, pc.eidr_contenido, pc.fecha_carga, pc.destacado
+            SELECT pc.id_plataforma, pc.eidr_contenido, pc.fecha_carga, pc.destacado
             FROM dbo.Plataformas_X_Contenido pc
             WHERE pc.eidr_contenido = c.eidr_contenido
             FOR JSON AUTO
@@ -2159,3 +2159,7 @@ values (2,1001,0,GETDATE(), DATEADD(MONTH, 1, GETDATE())),(3,2001,0,GETDATE(), D
 select * from dbo.Publicidades p left join dbo.Publicistas pl on p.id_publicista = pl.id_publicista
 
 exec dbo.obtener_publicidades_a_mostrar;
+
+exec dbo.obtener_banners
+
+exec dbo.obtener_contenidos_activos '8a6ceeb81add49d8bb97459c04d35bcc9f69687e2411b2e2ab3e568bf8a08d29';

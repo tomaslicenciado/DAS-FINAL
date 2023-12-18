@@ -1,7 +1,7 @@
 .contenido-card {
     position: relative;
-    width: 300px; 
-    height: 400px;
+    width: 240px; 
+    height: 350px;
     margin: 10px;
     overflow: hidden;
     cursor: pointer;
@@ -37,7 +37,7 @@
     position: absolute;
     bottom: 0;
     left: 0;
-    width: 100%;
+    width: 75%;
     padding: 10px;
     box-sizing: border-box;
     background: rgba(0, 0, 0, 0.5);
@@ -47,3 +47,42 @@
     color: #fff;
     text-shadow: 1px 1px 1px #000; /* Sombreado para contrastar con la imagen de fondo */
   }
+
+  .icono-plataforma{
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    border: none;
+    cursor: pointer;
+  }
+
+  .plataformas-list {
+    list-style-type: none;
+    padding: 5px;
+    margin: 0;
+    background-color: #ffffff00;
+    border: none;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    z-index: 1001;
+ }
+ 
+ .plataformas-list li {
+    padding: 5px;
+ }
+
+ .fondo-semi-transparente {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* Ajusta el valor alpha según la opacidad que desees */
+  z-index: 1000; /* Asegura que esté por debajo de .plataformas-list */
+  display: none; /* Por defecto, oculto cuando no está activo */
+}
+
+.mostrar-fondo {
+  display: block; /* Muestra el fondo cuando está activo */
+}

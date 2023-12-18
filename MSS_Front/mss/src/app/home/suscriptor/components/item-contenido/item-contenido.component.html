@@ -1,11 +1,15 @@
-<div class="contenido-card" (click)="verContenido()">
+<div class="contenido-card" (click)="togglePlataformas()">
     <div class="card-background" [style.background-image]="'url(' + contenido.url_imagen + ')'">
-      <div *ngFor="let plataforma of contenido.cont_x_plataforma" class="platform-badge">{{ plataforma.id_plataforma }}</div>
+      <ul *ngIf="mostrarPlataformas" class="plataformas-list">
+        <li *ngFor="let plataforma of contenido.cont_x_plataforma">
+          <img src="{{plataforma.url_icono_plataforma}}" alt="{{plataforma.id_plataforma}}" class="icono-plataforma" (click)="verContenido()">
+        </li>
+     </ul>
     </div>
     <div class="card-details">
       <div class="card-text">
         <h3>{{ contenido.titulo }}</h3>
-        <p>{{ contenido.descripcion }}</p>
       </div>
     </div>
-  </div>
+    <div class="fondo-semi-transparente" [ngClass]="{'mostrar-fondo': mostrarPlataformas}" (click)="togglePlataformas()"></div>
+</div>

@@ -4,19 +4,19 @@
   overflow: auto; /* Añadido para permitir desplazamiento */
   margin-top: 20px;
   text-align: center; /* Añadido para centrar */
+  width: 1150px;
+  height: 680px;
 }
   
   .contenido-content {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    margin-top: 20px; /* Ajusta según tus necesidades */
+    max-height: calc(100vh - 120px); /* Ajusta según tus necesidades; 120px es la altura del menú fijo */
+    padding: 10px; /* Ajusta según tus necesidades */
   }
   
   .contenido-grid {
     display: flex;
-    flex-wrap: wrap;
     gap: 20px;
+    overflow-x: auto;
   }
   
   @media screen and (max-width: 767px) {

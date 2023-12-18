@@ -1,9 +1,12 @@
+<app-barra-filtro [generos]="generos" (filterChange)="filtrarTipoGenero($event)"></app-barra-filtro>
 <div class="contenido-list">
-    <app-barra-filtro [generos]="generos" (filterChange)="filtrarTipoGenero($event)"></app-barra-filtro>
-  
     <div class="contenido-content">
         <div class="contenido-grid">
             <app-item-contenido *ngFor="let contenido of contenidosFiltrados | filtroBusqueda: searchTerm" [contenido]="contenido"></app-item-contenido>
         </div>
+        <div class="contenido-grid">
+            <app-item-contenido *ngFor="let contenido of contenidosFiltrados | filtroBusqueda: searchTerm" [contenido]="contenido"></app-item-contenido>
+        </div>
     </div>
-  </div>
+</div>
+

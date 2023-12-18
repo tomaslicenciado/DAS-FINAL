@@ -15,6 +15,7 @@ import org.springframework.jdbc.core.simple.SimpleJdbcCall;
 import org.springframework.stereotype.Repository;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import ar.edu.ubp.das.prime.beans.ActuacionCatalogo;
 import ar.edu.ubp.das.prime.beans.Catalogo;
@@ -32,6 +33,13 @@ public class PrimeRepository implements IPrimeRepository{
     private SqlParameterSource in;
     private SimpleJdbcCall jdbcCall;
     private Map<String, Object> out;
+    private Gson gson;
+
+    PrimeRepository(){
+        GsonBuilder gsonBuilder = new GsonBuilder();
+        gsonBuilder.setDateFormat("dd-MM-yyyy");
+        gson = gsonBuilder.create();
+    }
 
     @Override
     public RespuestaBean obtenerLoginUrl(String url_retorno, String token_servicio) {
@@ -54,7 +62,7 @@ public class PrimeRepository implements IPrimeRepository{
             Map<String, String> data = new HashMap<>();
             data.put("transaction_id", transaction_id);
             data.put("URL", URL);
-            return new RespuestaBean(Codigo.OK, "Url obtenida con éxito", new Gson().toJson(data));
+            return new RespuestaBean(Codigo.OK, "Url obtenida con éxito", gson.toJson(data));
         } catch (Exception e) {
             return handleErrorResponse("Error en la obtención de la url de login", e);
         }
@@ -76,7 +84,7 @@ public class PrimeRepository implements IPrimeRepository{
                 return handleUnauthorizedResponse("Los datos proporcionados no tienen un token de viewer asociado");
             Map<String, String> data = new HashMap<>();
             data.put("token", viewer_token);
-            return new RespuestaBean(Codigo.OK, "Token viewer obtenido con éxito", new Gson().toJson(data));
+            return new RespuestaBean(Codigo.OK, "Token viewer obtenido con éxito", gson.toJson(data));
         } catch (Exception e) {
             return handleErrorResponse("Error en la obtención del token de viewer", e);
         }
@@ -99,7 +107,7 @@ public class PrimeRepository implements IPrimeRepository{
             if (!login_completo)
                 return new RespuestaBean(Codigo.NO_ENCONTRADO, "El transaction id no tiene un viewer asociado", 
                             "El transaction id corresponde a un proceso de login incompleto");
-            return new RespuestaBean(Codigo.OK, "Dato obtenido con éxito", new Gson().toJson(nuevo));
+            return new RespuestaBean(Codigo.OK, "Dato obtenido con éxito", gson.toJson(nuevo));
         } catch (Exception e) {
             return handleErrorResponse("Error en la obtención delos datos del viewer", e);
         }
@@ -118,7 +126,7 @@ public class PrimeRepository implements IPrimeRepository{
             obtenerContenidos(catalogo);
             obtenerDirecciones(catalogo);
             usarSesion(sesion);
-            return new RespuestaBean(Codigo.OK, "Catálogo obtenido con éxito",new Gson().toJson(catalogo));
+            return new RespuestaBean(Codigo.OK, "Catálogo obtenido con éxito",gson.toJson(catalogo));
         } catch (Exception e) {
             return handleErrorResponse("Error en la obtención del catálogo", e);
         }
@@ -138,7 +146,7 @@ public class PrimeRepository implements IPrimeRepository{
             out = jdbcCall.execute(in);
             Map<String, String> data = new HashMap<>();
             data.put("sesion", sesion);
-            return new RespuestaBean(Codigo.OK, "Sesion obtenida con éxito", new Gson().toJson(data));
+            return new RespuestaBean(Codigo.OK, "Sesion obtenida con éxito", gson.toJson(data));
         } catch (Exception e) {
             return handleErrorResponse("Error en la obtención dela sesión", e);
         }
@@ -163,7 +171,7 @@ public class PrimeRepository implements IPrimeRepository{
             for (int i=0; i<urls_obtenidas.size(); i++){
                 urls.put("url" + Integer.toString(i), urls_obtenidas.get(i));
             }
-            return new RespuestaBean(Codigo.OK, "Datos obtenidos con éxito", new Gson().toJson(urls));
+            return new RespuestaBean(Codigo.OK, "Datos obtenidos con éxito", gson.toJson(urls));
         } catch (Exception e) {
             return handleErrorResponse("Error en la obtención de la url de contenido", e);
         }
@@ -365,7 +373,7 @@ public class PrimeRepository implements IPrimeRepository{
                     return handleUnauthorizedResponse("El email y/o contraseña no son válidos");
                 Map<String, String> data = new HashMap<>();
                 data.put("url_retorno", url_retorno);
-                return new RespuestaBean(Codigo.OK, "Login correcto", new Gson().toJson(data));
+                return new RespuestaBean(Codigo.OK, "Login correcto", gson.toJson(data));
             }
             else
                 throw new Exception("ERROR SQL");
