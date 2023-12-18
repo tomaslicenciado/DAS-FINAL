@@ -40,18 +40,18 @@ public class PrimeRepository implements IPrimeRepository{
         try {
             String transaction_id = TokenGenerator.generateTransactionID();
             jdbcCall = new SimpleJdbcCall(jdbcTpl).withProcedureName("iniciar_login").withSchemaName("dbo");
-            in = new MapSqlParameterSource().addValue("@token_servicio", token_servicio)
-                                            .addValue("@transaction_id", transaction_id)
-                                            .addValue("@url_retorno", url_retorno)
-                                            .addValue("@id_login", null, Types.INTEGER);
+            in = new MapSqlParameterSource().addValue("token_servicio", token_servicio)
+                                            .addValue("transaction_id", transaction_id)
+                                            .addValue("url_retorno", url_retorno)
+                                            .addValue("id_login", null, Types.INTEGER);
             out = jdbcCall.execute(in);
-            if (!out.containsKey("@id_login"))
+            if (!out.containsKey("id_login"))
                 throw new Exception("ERROR SQL");
-            int id_login = (int)out.get("@id_login");
+            int id_login = (int)out.get("id_login");
             if (id_login == 0)
                 throw new Exception("Id login = 0. Error en inserción SQL");
-            String URL = "http://localhost:8095/netflix/login?id=" + Integer.toString(id_login);
-            Map<String, String> data = new HashMap<String, String>();
+            String URL = "http://localhost:8091/prime/login?id=" + Integer.toString(id_login);
+            Map<String, String> data = new HashMap<>();
             data.put("transaction_id", transaction_id);
             data.put("URL", URL);
             return new RespuestaBean(Codigo.OK, "Url obtenida con éxito", new Gson().toJson(data));
@@ -66,15 +66,15 @@ public class PrimeRepository implements IPrimeRepository{
             return handleUnauthorizedResponse("El token de servicio proporcionado no es válido");
         try {
             jdbcCall = new SimpleJdbcCall(jdbcTpl).withProcedureName("obtener_viewer_token").withSchemaName("dbo");
-            in = new MapSqlParameterSource().addValue("@transaction_id", transaction_id).addValue("@token_servicio", token_servicio)
-                            .addValue("@viewer_token", null, Types.VARCHAR);
+            in = new MapSqlParameterSource().addValue("transaction_id", transaction_id).addValue("token_servicio", token_servicio)
+                            .addValue("viewer_token", null, Types.VARCHAR);
             out = jdbcCall.execute(in);
-            if (!out.containsKey("@viewer_token"))
+            if (!out.containsKey("viewer_token"))
                 throw new Exception("ERROR SQL");
-            String viewer_token = (String)out.get("@viewer_token");
+            String viewer_token = (String)out.get("viewer_token");
             if (viewer_token == null || viewer_token.isEmpty())
                 return handleUnauthorizedResponse("Los datos proporcionados no tienen un token de viewer asociado");
-            Map<String, String> data = new HashMap<String, String>();
+            Map<String, String> data = new HashMap<>();
             data.put("token", viewer_token);
             return new RespuestaBean(Codigo.OK, "Token viewer obtenido con éxito", new Gson().toJson(data));
         } catch (Exception e) {
@@ -88,14 +88,14 @@ public class PrimeRepository implements IPrimeRepository{
             return handleUnauthorizedResponse("El token de servicio proporcionado no es válido");
         try {
             jdbcCall = new SimpleJdbcCall(jdbcTpl).withSchemaName("dbo").withProcedureName("viewer_nuevo");
-            in = new MapSqlParameterSource().addValue("@transaction_id", token_servicio)
-                    .addValue("@token_servicio", token_servicio).addValue("@login_completo", null, Types.BIT)
-                    .addValue("@resultado", null, Types.BIT);
+            in = new MapSqlParameterSource().addValue("transaction_id", transaction_id)
+                    .addValue("token_servicio", token_servicio).addValue("login_completo", null, Types.BIT)
+                    .addValue("resultado", null, Types.BIT);
             out = jdbcCall.execute(in);
-            if (!out.containsKey("@resultado") || !out.containsKey("@login_completo"))
+            if (!out.containsKey("resultado") || !out.containsKey("login_completo"))
                 throw new Exception("ERROR SQL");
-            boolean nuevo = (boolean)out.get("@resultado");
-            boolean login_completo = (boolean)out.get("@login_completo");
+            boolean nuevo = (boolean)out.get("resultado");
+            boolean login_completo = (boolean)out.get("login_completo");
             if (!login_completo)
                 return new RespuestaBean(Codigo.NO_ENCONTRADO, "El transaction id no tiene un viewer asociado", 
                             "El transaction id corresponde a un proceso de login incompleto");
@@ -132,11 +132,11 @@ public class PrimeRepository implements IPrimeRepository{
             return handleUnauthorizedResponse("El token de viewer utilizado no es válido");
         try {
             String sesion = TokenGenerator.generateSession(token_viewer);
-            jdbcCall = new SimpleJdbcCall(jdbcTpl).withProcedureName("obtener_sesion").withSchemaName("dbo");
-            in = new MapSqlParameterSource().addValue("@token_viewer", token_viewer).addValue("@token_servicio", token_servicio)
-                    .addValue("@sesion", null, Types.VARCHAR);
+            jdbcCall = new SimpleJdbcCall(jdbcTpl).withProcedureName("insertar_sesion").withSchemaName("dbo");
+            in = new MapSqlParameterSource().addValue("token_viewer", token_viewer).addValue("token_servicio", token_servicio)
+                    .addValue("sesion", sesion);
             out = jdbcCall.execute(in);
-            Map<String, String> data = new HashMap<String, String>();
+            Map<String, String> data = new HashMap<>();
             data.put("sesion", sesion);
             return new RespuestaBean(Codigo.OK, "Sesion obtenida con éxito", new Gson().toJson(data));
         } catch (Exception e) {
@@ -154,12 +154,12 @@ public class PrimeRepository implements IPrimeRepository{
         try {
             jdbcCall = new SimpleJdbcCall(jdbcTpl).withProcedureName("obtener_contenido").withSchemaName("dbo")
                     .returningResultSet("urls", BeanPropertyRowMapper.newInstance(String.class));
-            in = new MapSqlParameterSource().addValue("@eidr_contenido", eidr_contenido);
+            in = new MapSqlParameterSource().addValue("eidr_contenido", eidr_contenido);
             out = jdbcCall.execute(in);
             if (!out.containsKey("urls"))
                 throw new Exception("ERROR SQL");
             List<String> urls_obtenidas = (List<String>)out.get("urls");
-            Map<String,String> urls = new HashMap<String, String>();
+            Map<String,String> urls = new HashMap<>();
             for (int i=0; i<urls_obtenidas.size(); i++){
                 urls.put("url" + Integer.toString(i), urls_obtenidas.get(i));
             }
@@ -187,15 +187,15 @@ public class PrimeRepository implements IPrimeRepository{
             int id_servicio = Integer.parseInt(id_login_valido.getBody());
             int id_viewer = 0;
             jdbcCall = new SimpleJdbcCall(jdbcTpl).withSchemaName("dbo").withProcedureName("insertar_viewer");
-            in = new MapSqlParameterSource().addValue("@nombres", nombres)
-                                            .addValue("@apellidos", apellidos)
-                                            .addValue("@email", email)
-                                            .addValue("@password", password)
-                                            .addValue("@id_viewer", null, Types.INTEGER);
+            in = new MapSqlParameterSource().addValue("nombres", nombres)
+                                            .addValue("apellidos", apellidos)
+                                            .addValue("email", email)
+                                            .addValue("password", password)
+                                            .addValue("id_viewer", null, Types.INTEGER);
             out = jdbcCall.execute(in);
-            if (!out.containsKey("@id_viewer"))
+            if (!out.containsKey("id_viewer"))
                 return handleErrorResponse("Error al insertar el nuevo usuario", new Exception("ERROR SQL"));
-            id_viewer = (int)out.get("@id_viewer");
+            id_viewer = (int)out.get("id_viewer");
             if (id_viewer == 0)
                 return handleErrorResponse("Error al insertar el nuevo usuario", new Exception("ERROR SQL"));
             return nuevoLogin(id_login, email, password, id_servicio, true);
@@ -209,9 +209,9 @@ public class PrimeRepository implements IPrimeRepository{
     private boolean tokenValid(String token_servicio){
         try {
             jdbcCall = new SimpleJdbcCall(jdbcTpl).withProcedureName("validar_token_servicio").withSchemaName("dbo");
-            in = new MapSqlParameterSource().addValue("@token", token_servicio).addValue("@resultado", null, Types.BIT);
+            in = new MapSqlParameterSource().addValue("token", token_servicio).addValue("resultado", null, Types.BIT);
             out = jdbcCall.execute(in);
-            return out.containsKey("resultado") && out.get("@resultado") != null && (boolean)out.get("@resultado");
+            return out.containsKey("resultado") && out.get("resultado") != null && (boolean)out.get("resultado");
         } catch (Exception e) {
             return false;
         }
@@ -220,7 +220,7 @@ public class PrimeRepository implements IPrimeRepository{
     private void usarSesion(String sesion) throws Exception{
         try {
             jdbcCall = new SimpleJdbcCall(jdbcTpl).withProcedureName("usar_sesion").withSchemaName("dbo");
-            in = new MapSqlParameterSource().addValue("@sesion", sesion);
+            in = new MapSqlParameterSource().addValue("sesion", sesion);
             jdbcCall.execute(in);
         } catch (Exception e) {
             throw e;
@@ -250,7 +250,7 @@ public class PrimeRepository implements IPrimeRepository{
             in = new MapSqlParameterSource();
             out = jdbcCall.execute(in);
             if (out.containsKey("actuaciones")){
-                List<ActuacionCatalogo> actuaciones = (List<ActuacionCatalogo>)out.get("direcciones");
+                List<ActuacionCatalogo> actuaciones = (List<ActuacionCatalogo>)out.get("actuaciones");
                 catalogo.setActuaciones(actuaciones);
             }
         } catch (Exception e) {
@@ -265,7 +265,7 @@ public class PrimeRepository implements IPrimeRepository{
             in = new MapSqlParameterSource();
             out = jdbcCall.execute(in);
             if (out.containsKey("contenidos")){
-                List<ContenidoCatalogo> contenidos = (List<ContenidoCatalogo>)out.get("direcciones");
+                List<ContenidoCatalogo> contenidos = (List<ContenidoCatalogo>)out.get("contenidos");
                 catalogo.setContenidos(contenidos);
             }
         } catch (Exception e) {
@@ -276,11 +276,11 @@ public class PrimeRepository implements IPrimeRepository{
     private RespuestaBean validarSesion(String sesion, String token_servicio){
         try {
             jdbcCall = new SimpleJdbcCall(jdbcTpl).withProcedureName("sesion_valida").withSchemaName("dbo");
-            in = new MapSqlParameterSource().addValue("@token_servicio", token_servicio).addValue("@sesion", sesion)
-                        .addValue("@resultado", null, Types.BIT);
+            in = new MapSqlParameterSource().addValue("token_servicio", token_servicio).addValue("sesion", sesion)
+                        .addValue("resultado", null, Types.INTEGER);
             out = jdbcCall.execute(in);
-            if (out.containsKey("@resultado")){
-                int resultado = (int)out.get("@resultado");
+            if (out.containsKey("resultado")){
+                int resultado = (int)out.get("resultado");
                 switch (resultado) {
                     case 1:
                         return new RespuestaBean(Codigo.OK, "Sesión válida", "Sesión válida");
@@ -308,17 +308,17 @@ public class PrimeRepository implements IPrimeRepository{
     }
 
     private RespuestaBean handleErrorResponse(String mensaje, Exception e){
-        return new RespuestaBean(Codigo.ERROR, mensaje, e.toString());
+        return new RespuestaBean(Codigo.ERROR, mensaje, e.getMessage());
     }
 
     private boolean viwerTokenValid(String viewer_token, String token_servicio){
         try {
             jdbcCall = new SimpleJdbcCall(jdbcTpl).withProcedureName("validar_token_viewer").withSchemaName("dbo");
-            in = new MapSqlParameterSource().addValue("@token_viewer", viewer_token).addValue("@token_servicio", token_servicio)
-                    .addValue("@resultado", null, Types.BIT);
+            in = new MapSqlParameterSource().addValue("token_viewer", viewer_token).addValue("token_servicio", token_servicio)
+                    .addValue("resultado", null, Types.BIT);
             out = jdbcCall.execute(in);
-            if (out.containsKey("@resultado") && out.get("@resultado") != null){
-                return (boolean)out.get("@resultado");
+            if (out.containsKey("resultado") && out.get("resultado") != null){
+                return (boolean)out.get("resultado");
             }
             else
                 return false;
@@ -330,12 +330,12 @@ public class PrimeRepository implements IPrimeRepository{
     private RespuestaBean validarIdLogin(int id_login){
         try {
             jdbcCall = new SimpleJdbcCall(jdbcTpl).withProcedureName("validar_id_login").withSchemaName("dbo");
-            in = new MapSqlParameterSource().addValue("@id_login", id_login).addValue("@valido", null, Types.BIT)
-                    .addValue("@id_servicio", null, Types.INTEGER);
+            in = new MapSqlParameterSource().addValue("id_login", id_login).addValue("valido", null, Types.BIT)
+                    .addValue("id_servicio", null, Types.INTEGER);
             out = jdbcCall.execute(in);
-            if (out.containsKey("@valido") && out.containsKey("@id_servicio")){
-                boolean valido = (boolean)out.get("@valido");
-                int id_servicio = (int)out.get("@id_servicio");
+            if (out.containsKey("valido") && out.containsKey("id_servicio")){
+                boolean valido = (boolean)out.get("valido");
+                int id_servicio = (int)out.get("id_servicio");
                 if (!valido)
                     return handleUnauthorizedResponse("El id de login no es válido");
                 return new RespuestaBean(Codigo.OK, "Id login valido", Integer.toString(id_servicio));
@@ -351,19 +351,19 @@ public class PrimeRepository implements IPrimeRepository{
         try {
             String token = TokenGenerator.generateToken(Integer.toString(id_login)+email+password+Integer.toString(id_servicio));
             jdbcCall = new SimpleJdbcCall(jdbcTpl).withProcedureName("login_viewer").withSchemaName("dbo");
-            in = new MapSqlParameterSource().addValue("@id_login", id_login)
-                                            .addValue("@email", email)
-                                            .addValue("@password", password)
-                                            .addValue("@token", token)
-                                            .addValue("@id_servicio", id_servicio)
-                                            .addValue("@is_new", viewer_nuevo)
-                                            .addValue("@url_retorno", null, Types.VARCHAR);
+            in = new MapSqlParameterSource().addValue("id_login", id_login)
+                                            .addValue("email", email)
+                                            .addValue("password", password)
+                                            .addValue("token", token)
+                                            .addValue("id_servicio", id_servicio)
+                                            .addValue("is_new", viewer_nuevo)
+                                            .addValue("url_retorno", null, Types.VARCHAR);
             out = jdbcCall.execute(in);
-            if (out.containsKey("@url_retorno")){
-                String url_retorno = (String)out.get("@url_retorno");
+            if (out.containsKey("url_retorno")){
+                String url_retorno = (String)out.get("url_retorno");
                 if (url_retorno == null || url_retorno.isEmpty())
                     return handleUnauthorizedResponse("El email y/o contraseña no son válidos");
-                Map<String, String> data = new HashMap<String, String>();
+                Map<String, String> data = new HashMap<>();
                 data.put("url_retorno", url_retorno);
                 return new RespuestaBean(Codigo.OK, "Login correcto", new Gson().toJson(data));
             }

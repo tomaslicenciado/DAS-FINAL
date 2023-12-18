@@ -29,23 +29,22 @@ public class PositivoRepository implements IPositivoRepository {
             return new RespuestaBean(Codigo.NO_AUTORIZADO,"El token proporcionado no es válido", "ERROR");
         }
         try {
-            SqlParameterSource in = new MapSqlParameterSource().addValue("@token_servicio", token_servicio);
+            SqlParameterSource in = new MapSqlParameterSource().addValue("token_servicio", token_servicio);
             SimpleJdbcCall jdbcCall = new SimpleJdbcCall(jdbcTpl).withProcedureName("obtener_publicidades").withSchemaName("dbo")
                 .returningResultSet("publicidades", BeanPropertyRowMapper.newInstance(Publicidad.class));
             Map<String, Object> out = jdbcCall.execute(in);
-
             return new RespuestaBean(Codigo.OK, "Publicidades obtenidas con éxito", new Gson().toJson((List<Publicidad>)out.get("publicidades")));
         } catch (Exception e) {
-            return new RespuestaBean(Codigo.ERROR, "Error en la obtención de publicidades", e.toString());
+            return new RespuestaBean(Codigo.ERROR, "Error en la obtención de publicidades", e.getMessage());
         }
     }
     
     private boolean tokenValid(String token_servicio){
         try {
-            SqlParameterSource in = new MapSqlParameterSource().addValue("@token", token_servicio).addValue("@resultado", null, Types.BIT);
+            SqlParameterSource in = new MapSqlParameterSource().addValue("token", token_servicio).addValue("resultado", null, Types.BIT);
             SimpleJdbcCall jdbcCall = new SimpleJdbcCall(jdbcTpl).withProcedureName("validar_token").withSchemaName("dbo");
             Map<String, Object> out = jdbcCall.execute(in);
-            return out.containsKey("resultado") && out.get("@resultado") != null && (boolean)out.get("@resultado");
+            return out.containsKey("resultado") && out.get("resultado") != null && (boolean)out.get("resultado");
         } catch (Exception e) {
             return false;
         }

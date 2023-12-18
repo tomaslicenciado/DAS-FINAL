@@ -43,7 +43,7 @@ public class SietesentidosWS {
 
     @WebMethod()
     @WebResult(name = "publicidades")
-    public RespuestaBean obtener_publicidades(@WebParam(name = "token_servicio") String token_servicio){
+    public RespuestaBean obtenerPublicidades(@WebParam(name = "token_servicio") String token_servicio){
         RespuestaBean respuesta = new RespuestaBean();
         if (!token_valid(token_servicio)){
             respuesta.setStatus(Codigo.NO_AUTORIZADO);
@@ -62,7 +62,7 @@ public class SietesentidosWS {
             conn.setAutoCommit(true);
             
             stmt = conn.prepareCall("{CALL dbo.obtener_publicidades(?)}");
-            stmt.setString("@token_servicio", token_servicio);
+            stmt.setString("token_servicio", token_servicio);
 
             rs = stmt.executeQuery();
             while (rs.next()){
@@ -70,6 +70,7 @@ public class SietesentidosWS {
                 pub.setBanner_code(rs.getInt("banner_code"));
                 pub.setUrl_imagen(rs.getString("url_imagen"));
                 pub.setUrl_redirect(rs.getString("url_contenido"));
+                pub.setCodigo_unico_id(rs.getInt("codigo_unico_id"));
                 publicidades.add(pub);
             }
 
@@ -84,7 +85,7 @@ public class SietesentidosWS {
         }
         catch (Exception ex){
             respuesta.setStatus(Codigo.ERROR);
-            respuesta.setBody(ex.toString());
+            respuesta.setBody(ex.getMessage());
             respuesta.setMensaje("Error en la obtención de publicidades");
             return respuesta;
         }
@@ -106,12 +107,14 @@ public class SietesentidosWS {
             stmt.execute();
 
             boolean resultado = stmt.getBoolean(2);
+            System.out.println(token_servicio+" - \nResultado: "+resultado);
 
             stmt.close();
             conn.close();
 
             return resultado;
         } catch (Exception e) {
+            System.err.println(e);
             return false;
         }
     }

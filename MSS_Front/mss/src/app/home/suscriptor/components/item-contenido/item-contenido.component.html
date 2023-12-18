@@ -1,0 +1,11 @@
+<div class="contenido-card" (click)="verContenido()">
+    <div class="card-background" [style.background-image]="'url(' + contenido.url_imagen + ')'">
+      <div *ngFor="let plataforma of contenido.cont_x_plataforma" class="platform-badge">{{ plataforma.id_plataforma }}</div>
+    </div>
+    <div class="card-details">
+      <div class="card-text">
+        <h3>{{ contenido.titulo }}</h3>
+        <p>{{ contenido.descripcion }}</p>
+      </div>
+    </div>
+  </div>

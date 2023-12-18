@@ -13,6 +13,7 @@ import java.util.Properties;
 import org.apache.cxf.interceptor.Fault;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import ar.edu.ubp.das.hbo.beans.ActuacionCatalogo;
 import ar.edu.ubp.das.hbo.beans.Catalogo;
@@ -34,7 +35,8 @@ public class HBOWS {
     private String sql_conection_string;
     private String sql_user;
     private String sql_pass;
-    private RespuestaBean respuesta;
+    private RespuestaBean respuesta = new RespuestaBean();
+    private Gson gson;
     
     public HBOWS() throws Fault{
         Properties properties = new Properties();
@@ -48,8 +50,11 @@ public class HBOWS {
         } catch (Exception e) {
             e.printStackTrace(); 
         }
+        GsonBuilder gsonBuilder = new GsonBuilder();
+        gsonBuilder.setDateFormat("dd-MM-yyyy");
+        gson = gsonBuilder.create();
     }
-
+    
     @WebMethod()
     @WebResult(name = "respuesta")
     public RespuestaBean obtenerLoginUrl(@WebParam(name = "url_retorno") String url_retorno, @WebParam(name = "token_servicio") String token_servicio){
@@ -81,13 +86,13 @@ public class HBOWS {
             stmt.close();
             conn.close();
 
-            String URL = "http://localhost:8094/hbo/login?id=" + Integer.toString(id_login);
-            Map<String, String> data = new HashMap<String, String>();
+            String URL = "http://localhost:8091/hbo/login?id=" + Integer.toString(id_login);
+            Map<String, String> data = new HashMap<>();
             data.put("transaction_id", transaction_id);
             data.put("URL", URL);
 
             respuesta.setStatus(Codigo.OK);
-            respuesta.setBody(new Gson().toJson(data));
+            respuesta.setBody(gson.toJson(data));
             respuesta.setMensaje("Url obtenida con éxito");
             return respuesta;
         } catch (Exception e) {
@@ -118,9 +123,9 @@ public class HBOWS {
                 return handleErrorResponse("Error en la obtención del token", new Exception("ERROR SQL"));
             }
             
-            Map<String, String> data = new HashMap<String, String>();
+            Map<String, String> data = new HashMap<>();
             data.put("token", token);
-            respuesta.setBody(new Gson().toJson(data));
+            respuesta.setBody(gson.toJson(data));
             respuesta.setMensaje("Token de viewer obtenido con éxito");
             respuesta.setStatus(Codigo.OK);
             stmt.close();
@@ -139,23 +144,24 @@ public class HBOWS {
         try (Connection conn = DriverManager.getConnection(sql_conection_string, sql_user, sql_pass)){
             CallableStatement stmt;
             conn.setAutoCommit(true);
-            stmt = conn.prepareCall("{CALL dbo.viewer_nuevo(?, ?, ?)}");
+            stmt = conn.prepareCall("{CALL dbo.viewer_nuevo(?, ?, ?, ?)}");
             stmt.setString(1, transaction_id);
-            stmt.registerOutParameter(2, java.sql.Types.BIT);
+            stmt.setString(2, token_servicio);
             stmt.registerOutParameter(3, java.sql.Types.BIT);
+            stmt.registerOutParameter(4, java.sql.Types.BIT);
 
             stmt.execute();
 
-            boolean usuario_logueado = stmt.getBoolean(2);
+            boolean usuario_logueado = stmt.getBoolean(3);
             if (!usuario_logueado){        
                 respuesta.setStatus(Codigo.NO_ENCONTRADO);
                 respuesta.setBody("ERROR");
                 respuesta.setMensaje("El login asociado al transaction_id proporcionado no se ha completado");
                 return respuesta;
             }
-            boolean es_nuevo = stmt.getBoolean(3);
+            boolean es_nuevo = stmt.getBoolean(4);
 
-            respuesta.setBody(new Gson().toJson(es_nuevo));
+            respuesta.setBody(gson.toJson(es_nuevo));
             respuesta.setMensaje("Dato obtenido con éxito");
             respuesta.setStatus(Codigo.OK);
 
@@ -186,7 +192,7 @@ public class HBOWS {
 
             respuesta.setStatus(Codigo.OK);
             respuesta.setMensaje("Catálogo obtenido con éxito");
-            respuesta.setBody(new Gson().toJson(catalogo));
+            respuesta.setBody(gson.toJson(catalogo));
             return respuesta;
         } catch (Exception e) {
             return handleErrorResponse("Error en la obtención del catálogo", e);
@@ -204,15 +210,15 @@ public class HBOWS {
         }
         try (Connection conn = DriverManager.getConnection(sql_conection_string, sql_user, sql_pass)){
             conn.setAutoCommit(true);
-            try (CallableStatement stmt = conn.prepareCall("{CALL dbo.obtener_sesion(?, ?, ?)}")){
+            try (CallableStatement stmt = conn.prepareCall("{CALL dbo.insertar_sesion(?, ?, ?)}")){
                 String sesion = TokenGenerator.generateSession(token_viewer);
                 stmt.setString(1, token_viewer);
                 stmt.setString(2, token_servicio);
                 stmt.setString(3, sesion);
                 stmt.execute();
-                Map<String, String> data = new HashMap<String, String>();
+                Map<String, String> data = new HashMap<>();
                 data.put("sesion", sesion);
-                return new RespuestaBean(Codigo.OK, "Sesion obtenida con éxito", new Gson().toJson(data));
+                return new RespuestaBean(Codigo.OK, "Sesion obtenida con éxito", gson.toJson(data));
             }
         } catch (Exception e) {
             return handleErrorResponse("Error en la obtención de la sesión", e);
@@ -235,11 +241,11 @@ public class HBOWS {
             CallableStatement stmt = conn.prepareCall("{CALL dbo.obtener_contenido(?)}");
             stmt.setString(1, eidr_contenido);
             ResultSet rs = stmt.executeQuery();
-            Map<String,String> urls = new HashMap<String,String>();
+            Map<String,String> urls = new HashMap<>();
             while (rs.next()) {
                 urls.put("url"+rs.getRow() , rs.getString("url_contenido"));
             }
-            return new RespuestaBean(Codigo.OK, "Datos obtenidos con éxito", new Gson().toJson(urls));
+            return new RespuestaBean(Codigo.OK, "Datos obtenidos con éxito", gson.toJson(urls));
         } catch (Exception e) {
             return handleErrorResponse("Error en la obtención de la url de contenido", e);
         }
@@ -350,14 +356,16 @@ public class HBOWS {
             try (ResultSet rs = stmt.executeQuery()){
                 while (rs.next()) {
                     catalogo.addContenido(new ContenidoCatalogo(
-                        rs.getString("edir_contenido"),
+                        rs.getString("eidr_contenido"),
                         rs.getString("titulo"),
                         rs.getString("url_imagen"),
                         rs.getString("descripcion"),
                         rs.getDate("fecha_estreno"),
                         rs.getString("genero"),
                         rs.getString("pais"),
-                        rs.getString("tipo_contenido")
+                        rs.getString("tipo_contenido"),
+                        rs.getBoolean("destacado"),
+                        rs.getDate("fecha_carga")
                     ));
                 }
             }
@@ -368,8 +376,8 @@ public class HBOWS {
         try (Connection conn = DriverManager.getConnection(sql_conection_string, sql_user, sql_pass)){
             conn.setAutoCommit(true);
             try (CallableStatement stmt = conn.prepareCall("{CALL dbo.sesion_valida(?, ?, ?)}")){
-                stmt.setString(1, sesion);
-                stmt.setString(2, token_servicio);
+                stmt.setString(2, sesion);
+                stmt.setString(1, token_servicio);
                 stmt.registerOutParameter(3, java.sql.Types.INTEGER);
                 stmt.execute();
                 int resultado = stmt.getInt(3);
@@ -399,7 +407,7 @@ public class HBOWS {
     }
 
     private RespuestaBean handleErrorResponse(String mensaje, Exception e){
-        return new RespuestaBean(Codigo.ERROR, mensaje, e.toString());
+        return new RespuestaBean(Codigo.ERROR, mensaje, e.getMessage());
     }
 
     private boolean viwerTokenValid(String viewer_token, String token_servicio){
@@ -438,6 +446,7 @@ public class HBOWS {
     }
 
     private RespuestaBean nuevoLogin(int id_login, String email, String password, int id_servicio, boolean viewer_nuevo){
+        System.err.println(id_login);
         try (Connection conn = DriverManager.getConnection(sql_conection_string, sql_user, sql_pass)){
             conn.setAutoCommit(true);
             try (CallableStatement stmt = conn.prepareCall("{CALL dbo.login_viewer(?, ?, ?, ?, ?, ?, ?)}")){
@@ -453,9 +462,9 @@ public class HBOWS {
                 String url_retorno = stmt.getString("url_retorno");
                 if (url_retorno == null || url_retorno.isEmpty())
                     return handleUnauthorizedResponse("El email y/o contraseña no son válidos");
-                Map<String, String> data = new HashMap<String, String>();
+                Map<String, String> data = new HashMap<>();
                 data.put("url_retorno", url_retorno);
-                return new RespuestaBean(Codigo.OK, "Login correcto", new Gson().toJson(data));
+                return new RespuestaBean(Codigo.OK, "Login correcto", gson.toJson(data));
             }
         } catch (Exception e) {
             return handleErrorResponse("Error al intentar realizar un login", e);

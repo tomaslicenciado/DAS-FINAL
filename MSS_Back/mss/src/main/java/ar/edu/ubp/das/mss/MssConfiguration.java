@@ -17,7 +17,8 @@ public class MssConfiguration {
     public FilterRegistrationBean<CorsFilter> corsFilter(){
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
-        config.addAllowedOrigin("http://localhost:8080");
+        config.addAllowedOrigin("http://localhost:8090");
+        config.addAllowedOriginPattern(null);
         config.setAllowedMethods(Arrays.asList("POST"));
         config.setAllowedHeaders(Arrays.asList("X-Requested-With", "Origin", "Content-Type", "Accept", "Autorization"));
 

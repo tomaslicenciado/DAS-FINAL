@@ -1,0 +1,56 @@
+<ng-template #iCampo let-campo="campo">
+    <small *ngIf="invalid && campo.errors" class="text-danger">
+        <mark *ngIf="campo.errors['required']" i18n>El campo es requerido</mark>
+        <mark *ngIf="campo.errors['email']" i18n>El email no tiene el formato correcto</mark>
+    </small>
+</ng-template>
+
+<div class="container-fluid overflow-y-hidden bg-dark d-flex justify-content-center align-items-center vh-100">
+    <div class="card p-3">
+        <h2 class="text-center mb-4" i18n>Registrar Nuevo Usuario</h2>
+        <div [formGroup]="form">
+            <div class="form-group">
+                <label for="nombres" i18n>Nombre/s:</label>
+                <input type="text" class="form-control" id="nombres"  i18n-placeholder placeholder="Ingresa tu/s nombre/s"  formControlName="nombres" (change)="validar()" >
+                <ng-template [ngTemplateOutlet]="iCampo" [ngTemplateOutletContext]="{campo: form.controls['nombres']}"></ng-template>
+            </div>
+
+            <div class="form-group">
+                <label for="apellidos" i18n>Apellido/s:</label>
+                <input type="text" class="form-control" id="apellidos"  i18n-placeholder placeholder="Ingresa tu/s apellido/s"  formControlName="apellidos" (change)="validar()" >
+                <ng-template [ngTemplateOutlet]="iCampo" [ngTemplateOutletContext]="{campo: form.controls['apellidos']}"></ng-template>
+            </div>
+
+            <div class="form-group">
+                <label for="username" i18n>Email:</label>
+                <input type="text" class="form-control" id="username"  i18n-placeholder placeholder="Ingresa tu email" formControlName="email1" (change)="validar()">
+                <ng-template [ngTemplateOutlet]="iCampo" [ngTemplateOutletContext]="{campo: form.controls['email1']}"></ng-template>
+            </div>
+
+            <div class="form-group">
+                <label for="username" i18n>Repita el Email:</label>
+                <input type="text" class="form-control" id="username"  i18n-placeholder placeholder="Ingresa tu email" formControlName="email2" (change)="validar()">
+                <ng-template [ngTemplateOutlet]="iCampo" [ngTemplateOutletContext]="{campo: form.controls['email2']}"></ng-template>
+            </div>
+
+            <div class="form-group">
+                <label for="pass1" i18n>Contraseña:</label>
+                <input type="password" class="form-control" id="pass1" i18n-placeholder placeholder="Ingresa tu contraseña"  formControlName="pass1" (change)="validar()" >
+                <ng-template [ngTemplateOutlet]="iCampo" [ngTemplateOutletContext]="{campo: form.controls['pass1']}"></ng-template>
+                <mark *ngIf="submited && !samePasswords" i18n>El campo contraseña debe coincidir</mark>
+            </div>
+
+            <div class="form-group">
+                <label for="pass2" i18n>Repita la Contraseña:</label>
+                <input type="password" class="form-control" id="pass2" i18n-placeholder placeholder="Repite tu contraseña"  formControlName="pass2" (change)="validar()" >
+                <ng-template [ngTemplateOutlet]="iCampo" [ngTemplateOutletContext]="{campo: form.controls['pass2']}"></ng-template>
+                <mark *ngIf="submited && !samePasswords" i18n>El campo contraseña debe coincidir</mark>
+            </div>
+
+            <div class="d-flex justify-content-end">
+                <button type="submit" class="btn btn-primary m-1 mt-3" (click)="register()" i18n>Registrarse</button>
+                <button type="button" class="btn btn-secondary m-1 mt-3" routerLink="/auth/login" i18n>volver</button>
+            </div>
+        </div>
+    </div>
+</div>

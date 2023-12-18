@@ -1,0 +1,12 @@
+<div class="modal-header">
+    <h4 class="modal-title texto">
+        <ng-container *ngIf="mensaje?.title">{{mensaje?.title}}</ng-container>
+        <ng-container *ngIf="!mensaje?.title">Mensaje de error</ng-container>
+    </h4>
+</div>
+<div class="modal-body">    
+    <p class="texto" [innerHTML]="mensaje?.text"></p>
+</div>
+<div class="modal-footer">
+    <button type="button" ngbAutofocus class="btn btn-outline-dark" (click)="activeModal.close()">Cerrar</button>
+</div>

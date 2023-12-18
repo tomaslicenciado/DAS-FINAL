@@ -25,7 +25,7 @@ public class NetflixController {
     NetflixRepository repo;
 
     @PostMapping(
-        path = "/obtener-login-url",
+        path = "/obtenerLoginUrl",
         consumes = { MediaType.APPLICATION_JSON_VALUE }
     )
     public ResponseEntity<RespuestaBean> obtenerLoginUrl(@RequestBody Map<String, String> body){ 
@@ -33,7 +33,7 @@ public class NetflixController {
     }
     
     @PostMapping(
-        path = "/obtener-token-viewer",
+        path = "/obtenerTokenViewer",
         consumes = { MediaType.APPLICATION_JSON_VALUE }
     )
     public ResponseEntity<RespuestaBean> obtenerTokenViewer(@RequestBody Map<String, String> body){ 
@@ -41,7 +41,7 @@ public class NetflixController {
     }
     
     @PostMapping(
-        path = "/es-usuario-nuevo",
+        path = "/esUsuarioNuevo",
         consumes = { MediaType.APPLICATION_JSON_VALUE }
     )
     public ResponseEntity<RespuestaBean> esUsuarioNuevo(@RequestBody Map<String, String> body){ 
@@ -49,7 +49,7 @@ public class NetflixController {
     }
     
     @PostMapping(
-        path = "/obtener-catalogo",
+        path = "/obtenerCatalogo",
         consumes = { MediaType.APPLICATION_JSON_VALUE }
     )
     public ResponseEntity<RespuestaBean> obtenerCatalogo(@RequestBody Map<String, String> body){ 
@@ -57,7 +57,7 @@ public class NetflixController {
     }
     
     @PostMapping(
-        path = "/obtener-sesion",
+        path = "/obtenerSesion",
         consumes = { MediaType.APPLICATION_JSON_VALUE }
     )
     public ResponseEntity<RespuestaBean> obtenerSesion(@RequestBody Map<String, String> body){ 
@@ -65,7 +65,7 @@ public class NetflixController {
     }
     
     @PostMapping(
-        path = "/obtener-url-contenido",
+        path = "/obtenerUrlContenido",
         consumes = { MediaType.APPLICATION_JSON_VALUE }
     )
     public ResponseEntity<RespuestaBean> obtenerUrlContenido(@RequestBody Map<String, String> body){ 

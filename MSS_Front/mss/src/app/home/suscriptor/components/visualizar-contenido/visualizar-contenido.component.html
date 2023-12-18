@@ -1,0 +1,38 @@
+<div class="contenido-info" *ngIf="!reproducir">
+    <div class="background-image" [style.background-image]="'url(' + contenido.url_imagen + ')'">
+      <!-- Contenido en la mitad inferior -->
+      <div class="contenido-detalle">
+        <h2>{{ contenido.titulo }}</h2>
+        <p>{{ contenido.descripcion }}</p>
+        <p i18n>Fecha de Estreno: {{ fechaEstreno }}</p>
+        <p i18n>País: {{ contenido.pais }}</p>
+        <p i18n>Protagonistas: {{ protagonistas }}</p>
+        <p i18n>Dirección: {{ direcciones }}</p>
+      </div>
+
+      <div class="iconos-plataformas">
+        <button *ngFor="let plataforma of contenido.cont_x_plataforma" (click)="seleccionarPlataforma(plataforma.id_plataforma)">
+          <img [src]="plataforma.url_icono_plataforma" alt="Icono de Plataforma">
+        </button>
+      </div>
+      <!-- Botones en la mitad superior -->
+      <div class="botones">
+        <button (click)="toggleReproducir()" i18n>Reproducir</button>
+        <button class="volver" (click)="volver()"> <!-- Agregamos el botón de Volver -->
+          <img src="ruta-hacia-icono-flecha-izquierda.png" alt="Volver">
+        </button>
+      </div>
+    </div>
+</div>
+
+<div class="reproducir-contenido" *ngIf="reproducir">
+    <video controls width="100%" height="100%">
+        <source [src]="contenidoUrl" type="video/mp4" i18n>
+        Tu navegador no soporta el tag de video.
+    </video>
+
+    <!-- Botón para volver -->
+    <button class="volver" (click)="volver()">
+        <img src="ruta-hacia-icono-flecha-izquierda.png" i18n-alt alt="Volver">
+    </button>
+</div>

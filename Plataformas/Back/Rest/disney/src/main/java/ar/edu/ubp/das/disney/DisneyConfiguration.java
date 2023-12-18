@@ -16,7 +16,7 @@ public class DisneyConfiguration {
     public FilterRegistrationBean<CorsFilter> corsFilter(){
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
-        config.addAllowedOrigin("http://localhost:8087");
+        config.addAllowedOrigin("http://localhost");
         config.setAllowedMethods(Arrays.asList("POST"));
         config.setAllowedHeaders(Arrays.asList("X-Requested-With", "Origin", "Content-Type", "Accept", "Autorization"));
 

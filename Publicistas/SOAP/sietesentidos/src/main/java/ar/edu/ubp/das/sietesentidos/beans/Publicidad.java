@@ -4,6 +4,18 @@ public class Publicidad {
     private int banner_code;
     private String url_imagen;
     private String url_redirect;
+    private int codigo_unico_id;
+    
+    public Publicidad() {
+    }
+    
+    public Publicidad(int banner_code, String url_imagen, String url_redirect, int codigo_unico_id) {
+        this.banner_code = banner_code;
+        this.url_imagen = url_imagen;
+        this.url_redirect = url_redirect;
+        this.codigo_unico_id = codigo_unico_id;
+    }
+
     public int getBanner_code() {
         return banner_code;
     }
@@ -21,6 +33,12 @@ public class Publicidad {
     }
     public void setUrl_redirect(String url_redirect) {
         this.url_redirect = url_redirect;
+    }
+    public int getCodigo_unico_id() {
+        return codigo_unico_id;
+    }
+    public void setCodigo_unico_id(int codigo_unico_id) {
+        this.codigo_unico_id = codigo_unico_id;
     }
     
 }

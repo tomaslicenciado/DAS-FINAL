@@ -1,0 +1,26 @@
+.contenido-list {
+  max-width: 1200px;
+  margin: 0 auto;
+  overflow: auto; /* Añadido para permitir desplazamiento */
+  margin-top: 20px;
+  text-align: center; /* Añadido para centrar */
+}
+  
+  .contenido-content {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    margin-top: 20px; /* Ajusta según tus necesidades */
+  }
+  
+  .contenido-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+  
+  @media screen and (max-width: 767px) {
+    .contenido-grid {
+      justify-content: center;
+    }
+  }

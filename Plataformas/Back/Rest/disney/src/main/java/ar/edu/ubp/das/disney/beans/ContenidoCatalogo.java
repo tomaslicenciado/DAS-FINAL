@@ -3,20 +3,22 @@ package ar.edu.ubp.das.disney.beans;
 import java.util.Date;
 
 public class ContenidoCatalogo {
-    private String eidr;
+    private String eidr_contenido;
     private String titulo;
     private String url_imagen;
     private String descripcion;
     private Date fecha_estreno;
     private String genero;
-    private String tipo_contenido;
     private String pais;
+    private String tipo_contenido;
+    private boolean destacado;
+    private Date fecha_Carga;
     
     public ContenidoCatalogo(){}
 
     public ContenidoCatalogo(String eidr, String titulo, String url_imagen, String descripcion, Date fecha_estreno,
-            String genero, String pais, String tipo_contenido) {
-        this.eidr = eidr;
+            String genero, String pais, String tipo_contenido, boolean destacado, Date fecha_Carga) {
+        this.eidr_contenido = eidr;
         this.titulo = titulo;
         this.url_imagen = url_imagen;
         this.descripcion = descripcion;
@@ -24,13 +26,31 @@ public class ContenidoCatalogo {
         this.genero = genero;
         this.pais = pais;
         this.tipo_contenido = tipo_contenido;
+        this.fecha_Carga = fecha_Carga;
+        this.destacado = destacado;
     }
 
-    public String getEidr() {
-        return eidr;
+    public boolean isDestacado() {
+        return destacado;
     }
-    public void setEidr(String eidr) {
-        this.eidr = eidr;
+
+    public void setDestacado(boolean reciente) {
+        this.destacado = reciente;
+    }
+
+    public Date getFecha_Carga() {
+        return fecha_Carga;
+    }
+
+    public void setFecha_Carga(Date destacado) {
+        this.fecha_Carga = destacado;
+    }
+
+    public String getEidr_contenido() {
+        return eidr_contenido;
+    }
+    public void setEidr_contenido(String eidr) {
+        this.eidr_contenido = eidr;
     }
     public String getTitulo() {
         return titulo;

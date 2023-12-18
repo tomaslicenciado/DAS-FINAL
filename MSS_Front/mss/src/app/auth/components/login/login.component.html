@@ -1,0 +1,30 @@
+<ng-template #iCampo let-campo="campo">
+    <small *ngIf="invalid && campo.errors" class="text-danger">
+        <mark *ngIf="campo.errors['required']" i18n>El campo es requerido</mark>
+        <mark *ngIf="campo.errors['email']" i18n>El email no tiene el formato correcto</mark>
+    </small>
+</ng-template>
+
+<div class="container-fluid overflow-y-hidden bg-dark d-flex justify-content-center align-items-center vh-100">
+    <div class="card p-3">
+        <h2 class="text-center mb-4" i18n>Iniciar sesión</h2>
+        <div [formGroup]="form">
+            <div class="form-group">
+                <label for="username" i18n>Email:</label>
+                <input type="text" class="form-control" id="username" i18n-placeholder placeholder="Ingresa tu email" formControlName="email" (change)="validar()">
+                <ng-template [ngTemplateOutlet]="iCampo" [ngTemplateOutletContext]="{campo: form.controls['email']}"></ng-template>
+            </div>
+
+            <div class="formº-group">
+                <label for="u_password" i18n>Contraseña:</label>
+                <input type="password" class="form-control" id="password" i18n-placeholder placeholder="Ingresa tu contraseña"  formControlName="password" (change)="validar()" >
+                <ng-template [ngTemplateOutlet]="iCampo" [ngTemplateOutletContext]="{campo: form.controls['password']}"></ng-template>
+            </div>
+
+            <div class="d-flex justify-content-end">
+                <button type="submit" class="btn btn-primary m-1 mt-3" (click)="login()" i18n>Iniciar sesión</button>
+                <button type="button" class="btn btn-secondary m-1 mt-3" routerLink="/auth/register" i18n>Registrarse</button>
+            </div>
+        </div>
+    </div>
+</div>

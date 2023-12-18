@@ -1,0 +1,32 @@
+{
+	"folders": [
+		{
+			"path": "Plataformas/Back/Rest/disney"
+		},
+		{
+			"path": "Plataformas/Back/Rest/netflix"
+		},
+		{
+			"path": "Plataformas/Back/Rest/prime"
+		},
+		{
+			"path": "Plataformas/Back/Soap/hbo"
+		},
+		{
+			"path": "Publicistas/REST/positivo"
+		},
+		{
+			"path": "Publicistas/SOAP/jpg"
+		},
+		{
+			"path": "Publicistas/SOAP/sietesentidos"
+		},
+		{
+			"path": "MSS_Back/mss"
+		}
+	],
+	"settings": {
+		"java.compile.nullAnalysis.mode": "automatic",
+		"java.configuration.updateBuildConfiguration": "automatic"
+	}
+}

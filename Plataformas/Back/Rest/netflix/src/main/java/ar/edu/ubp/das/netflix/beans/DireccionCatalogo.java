@@ -4,6 +4,7 @@ public class DireccionCatalogo {
     private String eidr_contenido;
     private String nombres;
     private String apellidos;
+    
     public DireccionCatalogo() {
     }
     public DireccionCatalogo(String eidr_contenido, String nombres, String apellidos) {

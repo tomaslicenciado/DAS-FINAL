@@ -1,0 +1,25 @@
+.back-button {
+    position: absolute;
+    bottom: 20px; /* Ajustar la distancia desde la parte inferior según sea necesario */
+    left: 50%;
+    transform: translateX(-50%); /* Centrar horizontalmente usando transform */
+  }
+  
+  .back-button button {
+    background-color: grey; /* Estilo gris para el botón */
+    color: white; /* Color de texto blanco para contrastar */
+    padding: 10px 20px; /* Ajustar el relleno según sea necesario */
+    border: none;
+    cursor: pointer;
+  }
+  
+  .back-button button:hover {
+    background-color: darkgrey; /* Cambiar el color al pasar el ratón sobre el botón */
+  }
+
+  .resultado{
+    display: flex;
+    flex-wrap: wrap;
+    margin: 20px;
+    justify-content: center;
+  }

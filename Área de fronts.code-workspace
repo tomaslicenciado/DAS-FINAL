@@ -1,0 +1,16 @@
+{
+	"folders": [
+		{
+			"path": "Plataformas/Front/hbo"
+		},
+		{
+			"path": "Plataformas/Front/netflix"
+		},
+		{
+			"path": "Plataformas/Front/prime"
+		},
+		{
+			"path": "Plataformas/Front/disney"
+		}
+	]
+}

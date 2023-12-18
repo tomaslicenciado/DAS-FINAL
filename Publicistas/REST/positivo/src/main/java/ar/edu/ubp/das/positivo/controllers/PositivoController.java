@@ -27,7 +27,7 @@ public class PositivoController {
     PositivoRepository repo;
 
     @PostMapping(
-        path = "/obtener-publicidades",
+        path = "/obtenerPublicidades",
         consumes = { MediaType.APPLICATION_JSON_VALUE }
     )
     public ResponseEntity<RespuestaBean> obtenerPublicidades(@RequestBody Map<String, String> body) {

@@ -1,0 +1,13 @@
+<div class="modal-header">
+    <h4 class="modal-title">{{ modalTitle }}</h4>
+    <button type="button" class="close" aria-label="Close" (click)="activeModal.dismiss('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <form>
+      <!-- Campos del formulario -->
+      <p>{{plataforma.nombre}}</p>
+      <button type="button" class="btn btn-success" (click)="guardarPlataforma()">Guardar</button>
+    </form>
+  </div>

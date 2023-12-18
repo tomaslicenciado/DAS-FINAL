@@ -1,0 +1,35 @@
+<ng-template #iCampo let-campo="campo">
+    <small *ngIf="invalid && campo.errors" class="text-danger">
+        <mark *ngIf="campo.errors['required']" i18n>El campo es requerido</mark>
+    </small>
+</ng-template>
+
+<div class="banner-list">
+    <h2 class="titulo-banners">Banners</h2>
+    <div *ngFor="let form of bannerForms" class="banner-item">
+      <form [formGroup]="form" (ngSubmit)="guardarCambios(form)">
+        <div class="form-group">
+          <label for="bannerCode" i18n>Código del Banner:</label>
+          <input type="text" id="bannerCode" formControlName="banner_code" class="form-control" readonly>
+        </div>
+        <div class="form-group">
+          <label for="tarifaBase" i18n>Tarifa Base:</label>
+          <input type="number" id="tarifaBase" formControlName="tarifa_base" class="form-control" (change)="validar(form)">
+          <ng-template [ngTemplateOutlet]="iCampo" [ngTemplateOutletContext]="{campo: form.controls['tarifa_base']}"></ng-template>
+        </div>
+        <div class="form-group">
+          <label for="idUltPublicidad" i18n>ID Última Publicidad:</label>
+          <input type="number" id="idUltPublicidad" formControlName="id_ult_publicidad" class="form-control" readonly>
+        </div>
+        <div class="form-group">
+          <label for="tarifaUsoExclusivo" i18n>Tarifa Uso Exclusivo:</label>
+          <input type="number" id="tarifaUsoExclusivo" formControlName="tarifa_uso_exclusivo" class="form-control" (change)="validar(form)">
+          <ng-template [ngTemplateOutlet]="iCampo" [ngTemplateOutletContext]="{campo: form.controls['tarifa_uso_exclusivo']}"></ng-template>
+        </div>
+        <button type="submit" class="btn btn-primary" i18n>Guardar cambios</button>
+      </form>
+    </div>
+    <div class="back-button">
+        <button class="back-button" (click)="volver()" i18n>Volver</button>
+    </div>
+  </div>

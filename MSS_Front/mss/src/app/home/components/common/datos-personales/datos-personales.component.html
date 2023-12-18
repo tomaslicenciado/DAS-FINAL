@@ -1,0 +1,7 @@
+<p>datos-personales works!</p>
+<ng-container *ngIf="user.id_nivel == 1">
+    <button type="button" (click)="listarPlataformas()">Federar plataforma</button>
+    <ng-container *ngFor="let plataforma of plataformas">
+        <button type="button" (click)="federar(plataforma.id_plataforma)">{{plataforma.nombre}}</button>
+    </ng-container>
+</ng-container>
