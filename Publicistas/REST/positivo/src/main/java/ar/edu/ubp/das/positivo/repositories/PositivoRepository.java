@@ -33,6 +33,7 @@ public class PositivoRepository implements IPositivoRepository {
             SimpleJdbcCall jdbcCall = new SimpleJdbcCall(jdbcTpl).withProcedureName("obtener_publicidades").withSchemaName("dbo")
                 .returningResultSet("publicidades", BeanPropertyRowMapper.newInstance(Publicidad.class));
             Map<String, Object> out = jdbcCall.execute(in);
+            System.out.println(new Gson().toJson((List<Publicidad>)out.get("publicidades")));
             return new RespuestaBean(Codigo.OK, "Publicidades obtenidas con éxito", new Gson().toJson((List<Publicidad>)out.get("publicidades")));
         } catch (Exception e) {
             return new RespuestaBean(Codigo.ERROR, "Error en la obtención de publicidades", e.getMessage());

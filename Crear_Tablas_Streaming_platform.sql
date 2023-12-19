@@ -475,6 +475,7 @@ BEGIN
         DATEADD(MINUTE, 30, GETDATE()), -- Vencimiento en media hora
         NULL,
         NULL
+
     );
 END;
 go

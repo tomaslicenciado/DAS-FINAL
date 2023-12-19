@@ -11,6 +11,7 @@ import { FiltroBusquedaPipe } from './pipes/filtro-busqueda.pipe';
 import { ReactiveFormsModule } from '@angular/forms';
 import { SuscriptorMainComponent } from './components/suscriptor-main/suscriptor-main.component';
 import { FinalizarFederacionComponent } from './components/finalizar-federacion/finalizar-federacion.component';
+import { VisualizacionService } from './services/visualizacion.service';
 
 
 @NgModule({
@@ -28,6 +29,9 @@ import { FinalizarFederacionComponent } from './components/finalizar-federacion/
     CommonModule,
     SuscriptorRoutingModule,
     ReactiveFormsModule
+  ],
+  providers: [
+    VisualizacionService
   ]
 })
 export class SuscriptorModule { }

@@ -1,38 +1,28 @@
-import { Component, EventEmitter, Input, NgZone, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, NgZone, OnDestroy, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { ActivatedRoute, ActivatedRouteSnapshot, NavigationStart, Router } from '@angular/router';
+import { Subscription } from 'rxjs';
 import { IContenido } from 'src/app/api/models/i-contenido';
+import { IContenidoXPlataforma } from 'src/app/api/models/i-contenido-x-plataforma';
 import { IGeneroContenido } from 'src/app/api/models/i-genero-contenido';
 import { MensajeService } from 'src/app/core/mensajes/service/mensaje.service';
+import { VisualizacionService } from '../../services/visualizacion.service';
 
 @Component({
   selector: 'app-lista-contenidos',
   templateUrl: './lista-contenidos.component.html',
   styleUrls: ['./lista-contenidos.component.css']
 })
-export class ListaContenidosComponent implements OnInit{
+export class ListaContenidosComponent implements OnInit, OnDestroy{
   @Input() contenidos: IContenido[] = [];
   @Input() generos: IGeneroContenido[] = [];
   filterForm: FormGroup;
   contenidosFiltrados: IContenido[] = [];
   searchTerm: string = "";
-  @Input() contenidoVisualizado: IContenido= {
-    url_imagen: "",
-    tipo_contenido: "",
-    actuaciones: [],
-    cont_x_plataforma: [],
-    descripcion: "",
-    direcciones: [],
-    eidr_contenido: "",
-    fecha_estreno: new Date,
-    genero: "",
-    pais: "",
-    titulo: ""
-  };
-  @Input() visualizando: boolean = false;
-  @Output() visualizandoChange: EventEmitter<boolean> = new EventEmitter<boolean>();
+  visualizando: boolean = false;
+  private _subscription!: Subscription;
 
-  constructor(private fb: FormBuilder, private _router: Router, private _ngZone: NgZone, private _msgSrv: MensajeService) {
+  constructor(private fb: FormBuilder, private _router: Router, private _ngZone: NgZone, private _msgSrv: MensajeService,private _vsServ: VisualizacionService) {
     this.filterForm = this.fb.group({
       tipo: ['Todo'],
       genero: ['Todo'],
@@ -54,10 +44,16 @@ export class ListaContenidosComponent implements OnInit{
       }
     })
   }
+
+  ngOnDestroy(): void {
+    this._subscription.unsubscribe();
+  }
   
   ngOnInit(): void {
     this.contenidosFiltrados = this.contenidos;
-    console.log(this.contenidos);
+    this._subscription = this._vsServ.getEstadoObservable().subscribe((vis) => {
+      this.visualizando = vis;
+    });
   }
 
   filtrarTipoGenero(form: any) {

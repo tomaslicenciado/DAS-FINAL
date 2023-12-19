@@ -69,7 +69,7 @@ public class JPGWS {
                 Publicidad pub = new Publicidad();
                 pub.setBanner_code(rs.getInt("banner_code"));
                 pub.setUrl_imagen(rs.getString("url_imagen"));
-                pub.setUrl_redirect(rs.getString("url_contenido"));
+                pub.setUrl_contenido(rs.getString("url_contenido"));
                 pub.setCodigo_unico_id(rs.getInt("codigo_unico_id"));
                 publicidades.add(pub);
             }
@@ -108,13 +108,11 @@ public class JPGWS {
 
             boolean resultado = stmt.getBoolean(2);
 
-            System.out.println(token_servicio+" - \nResultado: "+resultado);
             stmt.close();
             conn.close();
 
             return resultado;
         } catch (Exception e) {
-            System.out.println(e.getMessage() + "  " + e.toString());
             return false;
         }
     }

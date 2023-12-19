@@ -1,7 +1,8 @@
-import { Component, ElementRef, HostListener, Input, OnInit } from '@angular/core';
+import { Component, ElementRef, EventEmitter, HostListener, Input, OnInit, Output } from '@angular/core';
 import { Router } from '@angular/router';
 import { IContenido } from 'src/app/api/models/i-contenido';
 import { IContenidoXPlataforma } from 'src/app/api/models/i-contenido-x-plataforma';
+import { VisualizacionService } from '../../services/visualizacion.service';
 
 @Component({
   selector: 'app-item-contenido',
@@ -22,33 +23,13 @@ export class ItemContenidoComponent implements OnInit{
     pais: "",
     titulo: ""
   };
-  mostrarPlataformas: boolean = false;
 
-  constructor(private _router: Router, private _el: ElementRef){}
+  constructor(private _router: Router, private _vsServ: VisualizacionService){}
 
   ngOnInit(): void {
-    console.log(this.contenido)
   }
 
-  verContenido(){
-    this._router.navigate(['/visualizar-contenido'], { state: { contenido: this.contenido } });
+  visualizar(){
+    this._vsServ.visualizar(this.contenido);
   }
-
-  togglePlataformas() {
-    this.mostrarPlataformas = !this.mostrarPlataformas;
-  }
-
-  @HostListener('document:click', ['$event'])
-  handleDocumentClick(event: Event) {
-     if (!this._el.nativeElement.contains(event.target)) {
-        this.mostrarPlataformas = false;
-     }
-  }
-
-  @HostListener('document:mouseover', ['$event'])
-   handleDocumentMouseOver(event: Event) {
-      if (this.mostrarPlataformas && !this._el.nativeElement.contains(event.target)) {
-         this.mostrarPlataformas = false;
-      }
-   }
 }

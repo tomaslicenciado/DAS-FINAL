@@ -8,7 +8,7 @@ import { VisualizarContenidoComponent } from './components/visualizar-contenido/
 
 const routes: Routes = [
   {path: '', component: SuscriptorMainComponent, resolve: {publicaciones: PublicacionesResolver, catalogo: CatalogoResolver, plataformas: PlataformasResolver,
-                                                            generos: GenerosResolver, banners: BannersResolver}},
+                                                            generos: GenerosResolver}},
   {path: 'finalizarFederacion/:id', component: FinalizarFederacionComponent},
   {path: 'visualizar-contenido', component: VisualizarContenidoComponent}
 ];

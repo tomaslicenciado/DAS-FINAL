@@ -1,25 +1,28 @@
-import { Component, Input, NgZone, OnInit } from '@angular/core';
+import { Component, ElementRef, EventEmitter, HostListener, Input, NgZone, OnDestroy, OnInit, Output } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { IActuacion } from 'src/app/api/models/i-actuacion';
 import { IContenido } from 'src/app/api/models/i-contenido';
-import { IDireccion } from 'src/app/api/models/i-direccion';
-import { RespuestaBean } from 'src/app/api/models/respuesta-bean';
+import { RespuestaBean, getCodigo } from 'src/app/api/models/respuesta-bean';
 import { MssApiRestResourceService } from 'src/app/api/resources/mss-api-rest-resource.service';
 import { MensajeService } from 'src/app/core/mensajes/service/mensaje.service';
+import { VisualizacionService } from '../../services/visualizacion.service';
+import { MssApiService } from 'src/app/api/resolvers/mss-api.service';
+import { Codigo } from 'src/app/api/models/codigo';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-visualizar-contenido',
   templateUrl: './visualizar-contenido.component.html',
   styleUrls: ['./visualizar-contenido.component.css']
 })
-export class VisualizarContenidoComponent implements OnInit{
-  @Input() contenido: IContenido;
+export class VisualizarContenidoComponent implements OnInit, OnDestroy{
+  contenido: IContenido;
   reproducir: boolean = false;
-  contenidoUrl: string = "";
+  contenidoUrl: SafeResourceUrl = "";
   idPlataforma: number = 0;
 
   constructor(private _mssService: MssApiRestResourceService, private _ngZone: NgZone, private _msgSrv: MensajeService,
-            private _router: Router, private _route: ActivatedRoute){
+            private _router: Router, private _route: ActivatedRoute, private _el: ElementRef, private _vsServ: VisualizacionService,
+            private _apiService: MssApiService, private sanitizer: DomSanitizer){
     this.contenido = {
       url_imagen: "",
       tipo_contenido: "",
@@ -34,46 +37,60 @@ export class VisualizarContenidoComponent implements OnInit{
       titulo: ""
     }
   }
+  mostrarPlataformas: boolean = false;
+  
+  ngOnDestroy(): void {
+  }
 
   ngOnInit(): void {
-    console.log(this.contenido)
+    this.contenido = this._vsServ.contenido;
   }
 
-  get protagonistas(): string {
-    return ""
-    //return this.contenido.actuaciones.map((actuacion: IActuacion) => actuacion.actor).join(', ');
-  }
-
-  // Calcula la lista de direcciones como una cadena
-  get direcciones(): string {
-    return ""
-    //return this.contenido.direcciones.map((direccion: IDireccion) => direccion.director).join(', ');
-  }
-
-  // Calcula la fecha de estreno en formato legible
-  get fechaEstreno(): string {
-    const options = { year: 'numeric', month: 'long', day: 'numeric' };
-    return ""
-    //return new Date(this.contenido.fecha_estreno).toLocaleDateString('es-ES', options);
-  }
-
-  toggleReproducir() {
-    this._mssService.obtenerContenido().subscribe({
+  toggleReproducir(id_p: number) {
+    this._mssService.obtenerContenido({token_suscriptor: this._apiService.getUser().token, id_plataforma: id_p, eidr_contenido: this.contenido.eidr_contenido}).subscribe({
       next: (respuesta: RespuestaBean) => {
-        //procesar el video
+        if (getCodigo(respuesta) == Codigo.OK){
+          const urls = JSON.parse(respuesta.body!);
+          this.contenidoUrl = this.sanitizer.bypassSecurityTrustResourceUrl(urls['url1']+"&autoplay=1");
+          this.reproducir = !this.reproducir;
+        }
       },
       error: (error) => {
         this._ngZone.run(() => this._msgSrv.showMessage({title: "Error en login", text: error}), 0);
       }
     });
-    this.reproducir = !this.reproducir;
+    this._mssService.registrarVisualizacion({token_suscriptor: this._apiService.getUser().token,id_plataforma: id_p, eidr_contenido: this.contenido.eidr_contenido}).subscribe({
+      next: (respuesta: RespuestaBean) => {
+        console.log(respuesta);
+      }
+    });
   }
 
   volver(){
-    this._router.navigate(['/']);
+    this._vsServ.detener();
+    //this._router.navigate(['/']);
   }
 
   seleccionarPlataforma(idPlataforma: number) {
     this.idPlataforma = idPlataforma;
   }
+  
+
+  togglePlataformas() {
+    this.mostrarPlataformas = !this.mostrarPlataformas;
+  }
+
+  @HostListener('document:click', ['$event'])
+  handleDocumentClick(event: Event) {
+     if (!this._el.nativeElement.contains(event.target)) {
+        this.mostrarPlataformas = false;
+     }
+  }
+
+  @HostListener('document:mouseover', ['$event'])
+   handleDocumentMouseOver(event: Event) {
+      if (this.mostrarPlataformas && !this._el.nativeElement.contains(event.target)) {
+         this.mostrarPlataformas = false;
+      }
+   }
 }

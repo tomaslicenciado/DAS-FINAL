@@ -2,72 +2,125 @@
     display: flex;
     flex-direction: column;
     height: 100vh; /* 100% del alto de la ventana */
+    margin-bottom: 0;
   }
   
-  .background-image {
-    flex: 1;
-    background-size: cover;
-    position: relative;
-  }
-  
-  .contenido-detalle {
-    padding: 20px;
-    color: #fff;
-    position: absolute;
-    bottom: 0;
-    width: 100%;
-    background: rgba(0, 0, 0, 0.7); /* Fondo oscuro para mejorar legibilidad */
-  }
-  
-  .botones {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .botones button {
-    margin-bottom: 10px;
-  }
-  
-  .volver {
-    cursor: pointer;
-  }
-  
-  .reproducir-contenido {
-    /* Estilos para la segunda parte cuando se está reproduciendo el contenido */
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: #000;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-  }
-  
-  .reproducir-contenido video {
-    max-width: 100%;
-    max-height: 100%;
-  }
+.background-image {
+  flex: 1;
+  background-size:contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  position: relative;
+  overflow: hidden;
+}
 
-  .iconos-plataformas {
-    display: flex;
-    gap: 10px;
-    margin-top: 10px;
-  }
-  
-  .iconos-plataformas button {
-    background: none;
-    border: none;
-    cursor: pointer;
-  }
-  
-  .iconos-plataformas img {
-    width: 30px; /* Ajusta según tus necesidades */
-    height: 30px; /* Ajusta según tus necesidades */
-    border-radius: 50%;
-  }
+.contenido-detalle {
+  padding: 20px;
+  color: #fff;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.7); /* Fondo oscuro para mejorar legibilidad */
+}
+
+.botones {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  flex-direction: column;
+}
+
+.reproducir-contenido {
+  /* Estilos para la segunda parte cuando se está reproduciendo el contenido */
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.reproducir-contenido video {
+  max-width: 100%;
+  max-height: 100%;
+}
+
+.volver {
+  cursor: pointer;
+  top: 10%;
+  left: 10px;
+  position: absolute;
+  color: #fff;
+  background-color: transparent;
+  border: none;
+  font-size: large;
+}
+
+.boton-reproducir{
+  border-radius: 50%;
+  width: 200px;
+  height: 200px;
+  position: absolute;
+  cursor: pointer;
+  top: 33%;
+  left: 45%;
+  transition: transform 0.3s ease;
+}
+
+.boton-reproducir:hover{
+  transform: scale(1.05); 
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+}
+
+.icono-plataforma{
+  border-radius: 50%;
+  width: 200px;
+  height: 200px;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.icono-plataforma:hover{
+  transform: scale(1.05); 
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+}
+
+.plataformas-list {
+  list-style-type: none;
+  padding: 5px;
+  margin: 0;
+  background-color: #ffffff00;
+  border: none;
+  position: absolute;
+  bottom: 30%;
+  left: 45%;
+  z-index: 1001;
+  justify-content: center;
+}
+
+.plataformas-list li {
+  padding: 5px;
+}
+
+.fondo-semi-transparente {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* Ajusta el valor alpha según la opacidad que desees */
+  z-index: 1000; /* Asegura que esté por debajo de .plataformas-list */
+  display: none; /* Por defecto, oculto cuando no está activo */
+}
+
+.mostrar-fondo {
+display: block; /* Muestra el fondo cuando está activo */
+}

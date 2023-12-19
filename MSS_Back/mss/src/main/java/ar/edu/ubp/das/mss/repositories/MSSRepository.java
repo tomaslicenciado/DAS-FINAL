@@ -327,6 +327,7 @@ public class MSSRepository implements IMSSRepository{
     @Override
     public RespuestaBean registrarVisualizacion(String token_suscriptor, int id_plataforma, String eidr_contenido) {
         try {
+            System.out.println("Me llamaron");
             int nivel = obtenerNivelUsuario(token_suscriptor);
             if (nivel != Nivel.SUSCRIPTOR.getNivel())
                 return ResponseHandler.handleUnauthorizedResponse("No tiene permisos para realizar esta operación");
@@ -774,7 +775,7 @@ public class MSSRepository implements IMSSRepository{
                 contenidosXPlataformas.add(new ContenidoXPlataformaSqlBean(id_plataforma, cont.getEidr_contenido(),cont.getFecha_Carga(),cont.isDestacado()));
             }
         }
-        System.out.println(gson.toJson(contenidos));
+
         jdbcCall = nuevaCall("insertar_contenidos_batch");
         in = new MapSqlParameterSource().addValue("json", gson.toJson(contenidos));
         jdbcCall.execute(in);
@@ -794,7 +795,6 @@ public class MSSRepository implements IMSSRepository{
     @Override
     public void actualizarPublicidades() throws Exception {
         List<Integer> ids_publicistas_activos = obtenerIdsPublicistas();
-        List<AtomicReference<Exception>> exceptionReferences = new ArrayList<>();
         List<PublicacionBean> publicidades = new ArrayList<>();
         for (int id_publicista : ids_publicistas_activos){
             RespuestaBean respPublicista = services.consultarPublicista(id_publicista, "obtenerPublicidades", null);
@@ -803,7 +803,7 @@ public class MSSRepository implements IMSSRepository{
             List<PublicacionBean> pub = (List<PublicacionBean>) obtenerValorDeJsonBody(respPublicista, null, PublicacionBean.class, true);
             publicidades.addAll(pub);
         }
-        //Actualizo las publicidades en la base
+        System.out.println(gson.toJson(publicidades));
         jdbcCall = nuevaCall("actualizar_publicidades_batch");
         in = new MapSqlParameterSource().addValue("json", gson.toJson(publicidades)); 
         out = jdbcCall.execute(in);

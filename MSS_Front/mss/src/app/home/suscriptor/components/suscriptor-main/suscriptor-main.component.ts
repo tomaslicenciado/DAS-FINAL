@@ -20,7 +20,6 @@ export class SuscriptorMainComponent implements OnInit{
   catalogo: IContenido[] = [];
   plataformas: IPlataforma[] = [];
   generos: IGeneroContenido[] = [];
-  banners: IBanner[] = [];
 
   constructor(private _router: Router, private _route: ActivatedRoute, private _ngZone: NgZone, private _msgSrv: MensajeService){}
   
@@ -31,10 +30,6 @@ export class SuscriptorMainComponent implements OnInit{
         const respCatalogo: RespuestaBean = data['catalogo'];
         const respPlataformas: RespuestaBean = data['plataformas'];
         const respGeneros: RespuestaBean = data['generos'];
-        const respBanners: RespuestaBean = data['banners'];
-        if (getCodigo(respBanners) == Codigo.OK){
-          this.banners = JSON.parse(respBanners.body!);
-        }
         if (getCodigo(respPublicaciones) == Codigo.OK){
           this.publicaciones = JSON.parse(respPublicaciones.body!);
         }

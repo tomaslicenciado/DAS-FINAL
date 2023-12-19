@@ -14,14 +14,12 @@ export class FiltroBusquedaPipe implements PipeTransform {
     searchTerm = searchTerm.toLowerCase();
 
     return contenidos.filter(contenido => {
-      const cAct = contenido.actuaciones.some(actuacion => {return actuacion.apellidos.toLowerCase().includes(searchTerm) || 
-                                              actuacion.nombres.toLowerCase().includes(searchTerm)});
-      const cDir = contenido.direcciones.some(direccion => {return direccion.apellidos.toLowerCase().includes(searchTerm) || 
-                                              direccion.nombres.toLowerCase().includes(searchTerm)});
-      const cDesc = contenido.descripcion.toLowerCase().includes(searchTerm);
-      const cTit = contenido.titulo.toLowerCase().includes(searchTerm);
-      const cPais = contenido.pais.toLowerCase().includes(searchTerm);
-      return cAct || cDir || cDesc || cTit || cPais;
+      const regEx = new RegExp(searchTerm, 'gi');
+      const actuaciones = contenido.actuaciones;
+      const direcciones = contenido.direcciones;
+      return regEx.test(contenido.descripcion) || regEx.test(contenido.titulo) || regEx.test(contenido.pais) ||
+            actuaciones.some((actuacion) => { return regEx.test(actuacion.nombres) || regEx.test(actuacion.apellidos)}) ||
+            direcciones.some((direccion) => { return regEx.test(direccion.nombres) || regEx.test(direccion.apellidos)});
     });
   }
 }

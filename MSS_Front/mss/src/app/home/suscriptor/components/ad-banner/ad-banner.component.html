@@ -1,5 +1,5 @@
-<div class="ad" [ngStyle]="getBannerStyle()">
-    <a [href]="publicacion.url_contenido" target="_blank">
+<div class="ad" [ngStyle]="getBannerStyle()" *ngIf="!visualizando">
+    <a [href]="publicacion.url_contenido" target="_blank" (click)="registrarAcceso()">
         <img [src]="publicacion.url_imagen" alt="{{publicacion.banner_code}}" style="width: 100%; height: 100%;"/>
     </a>
 </div>

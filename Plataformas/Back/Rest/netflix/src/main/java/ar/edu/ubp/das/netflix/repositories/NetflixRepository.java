@@ -161,7 +161,10 @@ public class NetflixRepository implements INetflixRepository {
             return valid_sesion;
         try {
             jdbcCall = new SimpleJdbcCall(jdbcTpl).withProcedureName("obtener_contenido").withSchemaName("dbo")
-                    .returningResultSet("urls", BeanPropertyRowMapper.newInstance(String.class));
+                    .returningResultSet("urls", (rs, rowNum) -> {
+                        System.out.println(rs.getString("url_contenido"));
+                        return rs.getString("url_contenido");
+                    });
             in = new MapSqlParameterSource().addValue("eidr_contenido", eidr_contenido);
             out = jdbcCall.execute(in);
             if (!out.containsKey("urls"))
@@ -169,7 +172,7 @@ public class NetflixRepository implements INetflixRepository {
             List<String> urls_obtenidas = (List<String>)out.get("urls");
             Map<String,String> urls = new HashMap<>();
             for (int i=0; i<urls_obtenidas.size(); i++){
-                urls.put("url" + Integer.toString(i), urls_obtenidas.get(i));
+                urls.put("url" + Integer.toString(i+1), urls_obtenidas.get(i));
             }
             return new RespuestaBean(Codigo.OK, "Datos obtenidos con éxito", gson.toJson(urls));
         } catch (Exception e) {
