@@ -68,6 +68,7 @@ export class VisualizarContenidoComponent implements OnInit, OnDestroy{
 
   volver(){
     this._vsServ.detener();
+    window.location.reload();
     //this._router.navigate(['/']);
   }
 

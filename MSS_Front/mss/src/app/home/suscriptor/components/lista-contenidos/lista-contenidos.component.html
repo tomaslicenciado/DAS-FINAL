@@ -1,8 +1,33 @@
 <ng-container *ngIf="!visualizando">
     <app-barra-filtro [generos]="generos" (filterChange)="filtrarTipoGenero($event)"></app-barra-filtro>
     <div class="contenido-list">
-        <div class="contenido-content">
-            <div class="contenido-grid">
+        <div class="contenido-content" *ngIf="!filtrando">
+            <h4 class="titulo-seccion">Destacados</h4>
+            <div #contenidoGrid class="contenido-grid">
+                <button (click)="scrollLeft(0)" class="btn-ant btn-scroll" *ngIf="contenidosDestacados.length > 4"><</button>
+                <app-item-contenido *ngFor="let contenido of contenidosDestacados | filtroBusqueda:searchTerm" [contenido]="contenido"></app-item-contenido>
+                <button (click)="scrollRight(0)" class="btn-sig btn-scroll" *ngIf="contenidosDestacados.length > 4">></button>
+            </div>
+        </div>
+        <div class="contenido-content" *ngIf="!filtrando">
+            <h4 class="titulo-seccion">Recientes</h4>
+            <div #contenidoGrid class="contenido-grid">
+                <button (click)="scrollLeft(1)" class="btn-ant btn-scroll" *ngIf="contenidosRecientes.length > 4"><</button>
+                <app-item-contenido *ngFor="let contenido of contenidosRecientes | filtroBusqueda:searchTerm" [contenido]="contenido"></app-item-contenido>
+                <button (click)="scrollRight(1)" class="btn-sig btn-scroll" *ngIf="contenidosRecientes.length > 4">></button>
+            </div>
+        </div>
+        <div class="contenido-content" *ngIf="!filtrando">
+            <h4 class="titulo-seccion">Más vistos</h4>
+            <div #contenidoGrid class="contenido-grid">
+                <button (click)="scrollLeft(2)" class="btn-ant btn-scroll" *ngIf="contenidosMasVistos.length > 4"><</button>
+                <app-item-contenido *ngFor="let contenido of contenidosMasVistos | filtroBusqueda:searchTerm" [contenido]="contenido"></app-item-contenido>
+                <button (click)="scrollRight(2)" class="btn-sig btn-scroll" *ngIf="contenidosMasVistos.length > 4">></button>
+            </div>
+        </div>
+        
+        <div class="contenido-filtrado" *ngIf="filtrando">
+            <div class="contenido-grid-filtrado">
                 <app-item-contenido *ngFor="let contenido of contenidosFiltrados | filtroBusqueda:searchTerm" [contenido]="contenido"></app-item-contenido>
             </div>
         </div>

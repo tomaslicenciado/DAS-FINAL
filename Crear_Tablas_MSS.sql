@@ -2099,6 +2099,22 @@ begin
 end
 go
 
+create or alter procedure dbo.obtener_contenidos_mas_vistos
+as
+begin
+	set nocount on;
+	set transaction isolation level repeatable read;
+
+	select top 10 c.eidr_contenido, count (v.id_visualizacion) as cantidad
+	from dbo.Contenidos c
+	join dbo.Plataformas_X_Contenido pxc on pxc.eidr_contenido = c.eidr_contenido
+	join dbo.Visualizaciones v on v.id_plataforma_contenido = pxc.id_plataforma_contenido
+	where v.fecha_visualizacion between DATEADD(DAY, -7, GETDATE()) and GETDATE()
+	group by c.eidr_contenido
+	order by count (v.id_visualizacion) desc
+	
+end
+go
 
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------

@@ -8,19 +8,64 @@
   height: 680px;
 }
   
-  .contenido-content {
-    max-height: calc(100vh - 120px); /* Ajusta según tus necesidades; 120px es la altura del menú fijo */
-    padding: 10px; /* Ajusta según tus necesidades */
-  }
-  
+.contenido-content {
+  max-height: calc(100vh - 120px); /* Ajusta según tus necesidades; 120px es la altura del menú fijo */
+  padding: 10px; /* Ajusta según tus necesidades */
+}
+
+.contenido-grid {
+  display: flex;
+  gap: 20px;
+  overflow-x: hidden;
+  transition: transform 0.3s ease-in-out;
+  scroll-behavior: smooth;
+  white-space: nowrap;
+}
+
+.contenido-grid-filtrado{
+  display: flex;
+  flex-wrap: wrap;
+}
+
+@media screen and (max-width: 767px) {
   .contenido-grid {
-    display: flex;
-    gap: 20px;
-    overflow-x: auto;
+    justify-content: center;
   }
-  
-  @media screen and (max-width: 767px) {
-    .contenido-grid {
-      justify-content: center;
-    }
-  }
+}
+
+*::-webkit-scrollbar {
+  width: 2px;
+  height: 2px;
+  size: 5px;
+}
+
+*::-webkit-scrollbar-track {
+  background: rgba(90, 90, 90, 0);
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: rgb(56, 56, 56);
+  border: none;
+}
+
+.titulo-seccion{
+  text-shadow: 0 5px 10px white;
+}
+
+.btn-ant {
+  opacity: 0.25; /* Establece la opacidad a 50% */
+  z-index: 1100; /* Asegúrate de que el botón esté encima de otros elementos */
+  position: sticky;
+  left: 0;
+}
+
+.btn-sig {
+  opacity: 0.25; /* Establece la opacidad a 50% */
+  position: sticky;
+  right: 0;
+  z-index: 1100; /* Asegúrate de que el botón esté encima de otros elementos */
+}
+
+.btn-scroll:hover{
+  opacity: 0.5;
+}

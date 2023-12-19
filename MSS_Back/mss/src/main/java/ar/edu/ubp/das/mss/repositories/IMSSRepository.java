@@ -17,6 +17,7 @@ public interface IMSSRepository {
     public RespuestaBean obtenerListadoGenerosContenido(String token_usuario);
     public RespuestaBean obtenerListadoPlataformas(String token_usuario);
     public RespuestaBean obtenerCatalogo(String token_suscriptor);
+    public RespuestaBean obtenerContenidosMasVistos(String token_suscriptor);
     public RespuestaBean obtenerPublicidades(String token_suscriptor);
     public RespuestaBean registrarVisualizacion(String token_suscriptor, int id_plataforma, String eidr_contenido);
     public RespuestaBean registrarAccesoPublicidad(String token_suscriptor, int id_publicidad);

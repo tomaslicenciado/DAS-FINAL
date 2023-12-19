@@ -32,36 +32,5 @@ export class DatosPersonalesComponent {
   constructor(private _router: Router, private _service: MssApiService, private _rsService: MssApiRestResourceService,
               private _ngZone: NgZone, private _msgSrv: MensajeService){}
 
-  listarPlataformas(){
-    this._rsService.obtenerListadoPlataformas({token_usuario: this.user.token}).subscribe({
-      next: (respuesta: RespuestaBean) => {
-        if (getCodigo(respuesta) == Codigo.OK){
-          this.plataformas = JSON.parse(respuesta.body!);
-        }
-      },
-      error: (error) => {
-
-      }
-    });
-  }
-
-  federar(id_plataforma: number){
-    console.log(id_plataforma);
-    this._rsService.iniciarFederacionPlataforma({id_plataforma: id_plataforma, 
-                                                  token_suscriptor: this.user.token, 
-                                                  url_retorno: 'http:localhost:8090/home/suscriptor/finalizarFederacion/'+id_plataforma}).subscribe({
-      next: (respuesta: RespuestaBean) => {
-        console.log(respuesta);
-        if (getCodigo(respuesta) == Codigo.OK){
-          console.log(JSON.parse(respuesta.body!));
-          const url = JSON.parse(respuesta.body!).URL;
-          console.log(url);
-          window.location.href = url;
-        }
-      },
-      error: (error) => {
-        this._ngZone.run(() => this._msgSrv.showMessage({title: "Error en login", text: error}), 0);
-      }
-    });
-  }
+  
 }

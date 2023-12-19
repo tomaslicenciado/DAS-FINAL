@@ -1,4 +1,15 @@
+<div class="federar">
+    <button type="button" (click)="listarPlataformas()">Federar plataforma</button>
+    <ng-container *ngIf="federando">
+        <ng-container *ngFor="let plataforma of plataformas">
+            <button type="button" (click)="federar(plataforma.id_plataforma)">{{plataforma.nombre}}</button>
+        </ng-container>
+    </ng-container>
+</div>
 <app-ad-banner *ngFor="let publicacion of publicaciones" [publicacion]="publicacion"></app-ad-banner>
 <div class="contenido">
-    <app-lista-contenidos [generos]="generos" [contenidos]="catalogo"></app-lista-contenidos>
+    <app-lista-contenidos [generos]="generos" [contenidos]="catalogo" 
+                            [contenidosRecientes]="recientes" 
+                            [contenidosDestacados]="destacados"
+                            [contenidosMasVistos]="masVistos"></app-lista-contenidos>
 </div>

@@ -239,4 +239,11 @@ export class MssApiRestResourceService extends Resource{
     responseBodyType: ResourceResponseBodyType.Json
   })
   actualizarPublicidades!: IResourceMethodObservable<{token_usuario: string},RespuestaBean>
+
+  @ResourceAction({
+    method: ResourceRequestMethod.Post,
+    path: '/obtenerContenidosMasVistos',
+    responseBodyType: ResourceResponseBodyType.Json
+  })
+  obtenerContenidosMasVistos!: IResourceMethodObservable<{token_usuario: string},RespuestaBean>
 }

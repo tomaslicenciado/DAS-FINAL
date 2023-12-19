@@ -89,7 +89,7 @@ public class MSSRepository implements IMSSRepository{
 
     public MSSRepository(){
         GsonBuilder gsonBuilder = new GsonBuilder();
-        gsonBuilder.setDateFormat("dd-MM-yyyy");
+        gsonBuilder.setDateFormat("yyyy-MM-dd");
         this.gson = gsonBuilder.create();
     }
     
@@ -654,6 +654,27 @@ public class MSSRepository implements IMSSRepository{
             return new RespuestaBean(Codigo.OK, "Banners obtenidos con éxito", gson.toJson(banners));
         } catch (Exception e) {
             return ResponseHandler.handleErrorResponse("Error al intentar obtener los banners", e);
+        }
+    }
+
+    @Override
+    public RespuestaBean obtenerContenidosMasVistos(String token_suscriptor){
+        try {
+            int nivel = obtenerNivelUsuario(token_suscriptor);
+            if (nivel == -1)
+                return ResponseHandler.handleUnauthorizedResponse("No tiene permisos para realizar esta operación");
+            jdbcCall = nuevaCall("obtener_contenidos_mas_vistos")
+                        .returningResultSet("contenidos", (rs, rowNum) -> {
+                            return rs.getString("eidr_contenido");
+                        });
+            in = new MapSqlParameterSource();
+            out = jdbcCall.execute(in);
+            if (!out.containsKey("contenidos"))
+                return ResponseHandler.handleSQLErrorResponse("MSS: Resulset vacío al realizar la consulta", "dbo.obtener_contenidos_mas_vistos");
+            List<String> eidrs = (List<String>)out.get("contenidos");
+            return new RespuestaBean(Codigo.OK, "Contenidos obtenidos correctamente", gson.toJson(eidrs));
+        } catch (Exception e) {
+            return ResponseHandler.handleErrorResponse("Error en la obtención de contenido más visto", e);
         }
     }
 

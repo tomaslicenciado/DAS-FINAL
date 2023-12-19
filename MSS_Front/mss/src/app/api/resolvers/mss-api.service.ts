@@ -109,6 +109,16 @@ export class MssApiService {
       }
     });
   }
+
+  convertirFormatoFecha(fechaString: string): string {
+    const partes = fechaString.split('-');
+    if (partes.length === 3) {
+      const [anio, mes, dia] = partes;
+      return `${dia}-${mes}-${anio}`;
+    } else {
+      return fechaString;
+    }
+  }
 }
 
 export const PublicacionesResolver: ResolveFn<Observable<RespuestaBean>> = (_route: ActivatedRouteSnapshot, state: RouterStateSnapshot) => {
@@ -157,4 +167,11 @@ export const PublicistasResolver: ResolveFn<Observable<RespuestaBean>> = (_route
   const user = userService.getUser();
   
   return inject(MssApiRestResourceService).obtenerListadoPublicistas({token_usuario: user.token});
+}
+
+export const ContenidosMasVistosResolver: ResolveFn<Observable<RespuestaBean>> = (_route: ActivatedRouteSnapshot, state: RouterStateSnapshot) => {
+  const userService = inject(MssApiService);
+  const user = userService.getUser();
+  
+  return inject(MssApiRestResourceService).obtenerContenidosMasVistos({token_usuario: user.token});
 }

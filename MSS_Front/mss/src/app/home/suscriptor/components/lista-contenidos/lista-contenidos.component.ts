@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, NgZone, OnDestroy, OnInit, Output } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, NgZone, OnDestroy, OnInit, Output, QueryList, Renderer2, ViewChild, ViewChildren } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { ActivatedRoute, ActivatedRouteSnapshot, NavigationStart, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
@@ -18,11 +18,17 @@ export class ListaContenidosComponent implements OnInit, OnDestroy{
   @Input() generos: IGeneroContenido[] = [];
   filterForm: FormGroup;
   contenidosFiltrados: IContenido[] = [];
+  @Input()contenidosDestacados: IContenido[] = [];
+  @Input()contenidosRecientes: IContenido[] = [];
+  @Input()contenidosMasVistos: IContenido[] = [];
   searchTerm: string = "";
   visualizando: boolean = false;
   private _subscription!: Subscription;
+  filtrando: boolean = false;
+  @ViewChildren('contenidoGrid') elementosDinamicos: QueryList<ElementRef> = new QueryList();
 
-  constructor(private fb: FormBuilder, private _router: Router, private _ngZone: NgZone, private _msgSrv: MensajeService,private _vsServ: VisualizacionService) {
+  constructor(private fb: FormBuilder, private _router: Router, private _ngZone: NgZone, private _msgSrv: MensajeService,private _vsServ: VisualizacionService,
+    private renderer: Renderer2) {
     this.filterForm = this.fb.group({
       tipo: ['Todo'],
       genero: ['Todo'],
@@ -59,15 +65,30 @@ export class ListaContenidosComponent implements OnInit, OnDestroy{
   filtrarTipoGenero(form: any) {
     // Lógica para aplicar los filtros a la lista de videos
     // Puedes acceder a los valores del formulario usando this.filterForm.value
+    this.filtrando = true;
     const tipo: string = form.tipo;
     const genero = form.genero;
     this.searchTerm = form.searchTerm;
+    if (tipo === 'Todo' && genero === 'Todo' && this.searchTerm === "")
+      this.filtrando = false;
     // Aplica los filtros según tus necesidades
     this.contenidosFiltrados = this.contenidos.filter((contenido) => {
       return (
-        (tipo === 'Todo' || contenido.tipo_contenido === tipo || tipo.toLowerCase().includes(contenido.tipo_contenido.toLowerCase())) &&
+        (tipo === 'Todo' || contenido.tipo_contenido === tipo) &&
         (genero === 'Todo' || contenido.genero === genero)
       );
     });
+  }
+
+  scrollLeft(index: number): void {
+    this.desplazarLista(index, -1000);
+  }
+
+  scrollRight(index: number): void {
+    this.desplazarLista(index, 1000);
+  }
+
+  private desplazarLista(index:number, px: number): void {
+    this.elementosDinamicos.get(index)!.nativeElement.scrollLeft += px;
   }
 }

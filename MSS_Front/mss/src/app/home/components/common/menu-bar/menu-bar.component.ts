@@ -47,8 +47,6 @@ export class MenuBarComponent implements OnInit{
         this.opcionesMenu.push({ref: '/administrador/abm-publicistas', titulo: 'Publicistas'})
         this.opcionesMenu.push({ref: '/administrador/scheduled-tasks', titulo: 'Scheduled Tasks'})
         break;
-      case 1:
-        this.opcionesMenu.push({ref: '/suscriptor', titulo: 'Peliculas'});
     }
   }
 
