@@ -366,6 +366,6 @@ public class MSSController {
         consumes = { MediaType.APPLICATION_JSON_VALUE }
     )
     public ResponseEntity<RespuestaBean> obtenerContenidosMasVistos(@RequestBody Map<String, String> body){
-        return new ResponseEntity<RespuestaBean>(repo.obtenerContenidosMasVistos(body.get("token_usuario")), HttpStatus.OK);
+        return new ResponseEntity<RespuestaBean>(repo.obtenerContenidosMasVistos(body.get("token_suscriptor")), HttpStatus.OK);
     }
 }

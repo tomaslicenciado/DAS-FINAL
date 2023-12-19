@@ -1,9 +1,8 @@
 import { Component, ElementRef, EventEmitter, Input, NgZone, OnDestroy, OnInit, Output, QueryList, Renderer2, ViewChild, ViewChildren } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
-import { ActivatedRoute, ActivatedRouteSnapshot, NavigationStart, Router } from '@angular/router';
+import { NavigationStart, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { IContenido } from 'src/app/api/models/i-contenido';
-import { IContenidoXPlataforma } from 'src/app/api/models/i-contenido-x-plataforma';
 import { IGeneroContenido } from 'src/app/api/models/i-genero-contenido';
 import { MensajeService } from 'src/app/core/mensajes/service/mensaje.service';
 import { VisualizacionService } from '../../services/visualizacion.service';
@@ -46,7 +45,7 @@ export class ListaContenidosComponent implements OnInit, OnDestroy{
         }
       },
       error: (error) => {
-        this._ngZone.run(() => this._msgSrv.showMessage({title: "Error en login", text: error}), 0);
+        this._ngZone.run(() => this._msgSrv.showMessage({title: "Error en listar contenidos", text: error}), 0);
       }
     })
   }

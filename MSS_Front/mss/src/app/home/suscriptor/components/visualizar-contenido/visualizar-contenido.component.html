@@ -5,25 +5,20 @@
         <div class="contenido-detalle">
           <h2>{{ contenido.titulo }}</h2>
           <p>{{ contenido.descripcion }}</p>
-          <p i18n>Fecha de Estreno: </p>
+          <p i18n>Fecha de Estreno: {{ convertirFormatoFecha(contenido.fecha_estreno.toString()) }}</p>
           <p i18n>País: {{ contenido.pais }}</p>
-          <p i18n>Protagonistas: </p>
-          <p i18n>Dirección: </p>
+          <p i18n>Protagonistas: {{ obtenerActuaciones(contenido) }}</p>
+          <p i18n>Dirección: {{ obtenerDirecciones(contenido) }}</p>
         </div>
 
-        <ul *ngIf="mostrarPlataformas" class="plataformas-list">
-          <li *ngFor="let pxc of contenido.cont_x_plataforma">
-            <img src="{{pxc.url_icono_plataforma}}" alt="{{pxc.id_plataforma}}" class="icono-plataforma" (click)="toggleReproducir(pxc.id_plataforma)">
-          </li>
+        <ul class="plataformas-list">
+            <li *ngFor="let pxc of contenido.cont_x_plataforma">
+              <img src="{{pxc.url_icono_plataforma}}" alt="{{pxc.id_plataforma}}" class="icono-plataforma" (click)="toggleReproducir(pxc.id_plataforma)"> 
+                Ver contenido en {{pxc.nombre_plataforma}}
+            </li>
         </ul>
       </div>
   </div>
-  <ng-container >
-    <img class="boton-reproducir" 
-          src="https://w7.pngwing.com/pngs/471/285/png-transparent-button-audio-control-multimedia-play-video-button-v1-icon.png" 
-          alt="Reproducir" 
-          (click)="togglePlataformas()">
-  </ng-container>
   <button class="volver" (click)="volver()">X</button>
   <div class="reproducir-contenido" *ngIf="reproducir">
       <!--<video controls width="100%" height="100%">
@@ -39,6 +34,4 @@
       <!-- Botón para volver -->
       <button class="volver" (click)="volver()">X</button>
   </div>
-
-  <div class="fondo-semi-transparente" [ngClass]="{'mostrar-fondo': mostrarPlataformas && !reproducir}" (click)="togglePlataformas()"></div>
 </div>

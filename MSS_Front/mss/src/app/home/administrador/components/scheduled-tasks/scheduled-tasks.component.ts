@@ -27,6 +27,9 @@ export class ScheduledTasksComponent {
       next: (respuesta: RespuestaBean) => {
         this.resultado = respuesta.mensaje;
         console.log(respuesta);
+      },
+      error: (error) => {
+        this._ngZone.run(() => this._mensajeService.showMessage({title: "Error al actualizar el catálogo", text: error}), 0);
       }
     });
   }

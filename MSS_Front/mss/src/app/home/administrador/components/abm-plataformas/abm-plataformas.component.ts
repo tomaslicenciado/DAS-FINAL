@@ -29,7 +29,7 @@ export class AbmPlataformasComponent implements OnInit{
         }
       },
       error: (error) => {
-        this._ngZone.run(() => this._msgSrv.showMessage({title: "Error en login", text: error}), 0);
+        this._ngZone.run(() => this._msgSrv.showMessage({title: "Error en la obtención de plataformas", text: error}), 0);
       }
     });
   }

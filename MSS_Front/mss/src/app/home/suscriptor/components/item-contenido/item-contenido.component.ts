@@ -1,7 +1,6 @@
 import { Component, ElementRef, EventEmitter, HostListener, Input, OnInit, Output } from '@angular/core';
 import { Router } from '@angular/router';
 import { IContenido } from 'src/app/api/models/i-contenido';
-import { IContenidoXPlataforma } from 'src/app/api/models/i-contenido-x-plataforma';
 import { VisualizacionService } from '../../services/visualizacion.service';
 
 @Component({

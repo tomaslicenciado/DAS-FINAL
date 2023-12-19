@@ -1,7 +1,49 @@
 .federar{
-    position: absolute;
-    top: 15px;
-    left: 45%;
-    z-index: 1500;
-    cursor: pointer;
-  }
+  position: fixed;
+  top: 15px;
+  left: 45%;
+  z-index: 1500;
+  cursor: pointer;
+}
+
+.btn-plataforma img{
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+}
+
+.btn-plataforma{
+  background-color:#2d3c3f00;
+  border: none;
+}
+
+.btn-plataforma img:hover{
+  box-shadow: 0 5px 15px white;
+}
+
+.btn-federar{
+  padding: 10px 20px;
+  background-color: #435b5f;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  box-shadow: 0 5px 15px white;
+}
+
+.btn-federar:hover{
+  background-color: #2d3c3f;
+}
+
+.btn-federar:active{
+  background-color: #a5d7e0;
+}
+
+.btn-federar-deshabilitado{
+  padding: 10px 20px;
+  background-color: #273436;
+  color: grey;
+  border: none;
+  border-radius: 5px;
+  cursor:default;
+}

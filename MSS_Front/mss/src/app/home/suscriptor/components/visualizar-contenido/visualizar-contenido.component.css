@@ -1,7 +1,7 @@
 .contenido-info {
     display: flex;
     flex-direction: column;
-    height: 100vh; /* 100% del alto de la ventana */
+    height: 90vh; /* 100% del alto de la ventana */
     margin-bottom: 0;
   }
   
@@ -81,17 +81,12 @@
 
 .icono-plataforma{
   border-radius: 50%;
-  width: 200px;
-  height: 200px;
+  width: 150px;
+  height: 150px;
   border: none;
   cursor: pointer;
-  transition: transform 0.3s ease;
 }
 
-.icono-plataforma:hover{
-  transform: scale(1.05); 
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
-}
 
 .plataformas-list {
   list-style-type: none;
@@ -100,14 +95,20 @@
   background-color: #ffffff00;
   border: none;
   position: absolute;
-  bottom: 30%;
-  left: 45%;
+  top: 0;
+  right: 10%;
   z-index: 1001;
   justify-content: center;
 }
 
 .plataformas-list li {
   padding: 5px;
+  transition: transform 0.3s ease;
+}
+
+.plataformas-list li:hover{
+  transform: scale(1.05); 
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
 }
 
 .fondo-semi-transparente {

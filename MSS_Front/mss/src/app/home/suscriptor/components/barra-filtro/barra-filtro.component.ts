@@ -28,7 +28,7 @@ export class BarraFiltroComponent implements OnInit {
         this.onFilterChange();
       },
       error: (error) => {
-        this._ngZone.run(() => this._msgSrv.showMessage({title: "Error en login", text: error}), 0);
+        this._ngZone.run(() => this._msgSrv.showMessage({title: "Error en filtrar contenido", text: error}), 0);
       }
     });
   }

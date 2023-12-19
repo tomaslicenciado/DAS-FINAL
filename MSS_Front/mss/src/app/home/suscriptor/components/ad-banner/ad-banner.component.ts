@@ -1,10 +1,10 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { IPublicacion } from 'src/app/api/models/i-publicacion';
-import { VisualizacionService } from '../../services/visualizacion.service';
 import { Subscription } from 'rxjs';
 import { MssApiRestResourceService } from 'src/app/api/resources/mss-api-rest-resource.service';
 import { MssApiService } from 'src/app/api/resolvers/mss-api.service';
 import { RespuestaBean } from 'src/app/api/models/respuesta-bean';
+import { VisualizacionService } from '../../services/visualizacion.service';
 
 @Component({
   selector: 'app-ad-banner',
@@ -30,7 +30,7 @@ export class AdBannerComponent implements OnInit, OnDestroy{
   }
   
   ngOnInit(): void {
-    this._subscription = this._vsServ.getEstadoObservable().subscribe((vis) => {
+    this._subscription = this._vsServ.getEstadoObservable().subscribe((vis: boolean) => {
       this.visualizando = vis;
     })
   }

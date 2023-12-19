@@ -1,5 +1,10 @@
 <div class="contenido-card" (click)="visualizar()">
     <div class="card-background" [style.background-image]="'url(' + contenido.url_imagen + ')'">
+      <ul class="plataformas-list">
+          <li *ngFor="let pxc of contenido.cont_x_plataforma">
+            <img src="{{pxc.url_icono_plataforma}}" alt="{{pxc.id_plataforma}}" class="icono-plataforma" >
+          </li>
+      </ul>
     </div>
     <div class="card-details">
       <div class="card-text">

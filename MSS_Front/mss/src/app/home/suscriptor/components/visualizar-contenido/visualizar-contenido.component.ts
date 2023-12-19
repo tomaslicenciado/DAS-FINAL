@@ -4,10 +4,12 @@ import { IContenido } from 'src/app/api/models/i-contenido';
 import { RespuestaBean, getCodigo } from 'src/app/api/models/respuesta-bean';
 import { MssApiRestResourceService } from 'src/app/api/resources/mss-api-rest-resource.service';
 import { MensajeService } from 'src/app/core/mensajes/service/mensaje.service';
-import { VisualizacionService } from '../../services/visualizacion.service';
 import { MssApiService } from 'src/app/api/resolvers/mss-api.service';
 import { Codigo } from 'src/app/api/models/codigo';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { IActuacion } from 'src/app/api/models/i-actuacion';
+import { IDireccion } from 'src/app/api/models/i-direccion';
+import { VisualizacionService } from '../../services/visualizacion.service';
 
 @Component({
   selector: 'app-visualizar-contenido',
@@ -56,12 +58,15 @@ export class VisualizarContenidoComponent implements OnInit, OnDestroy{
         }
       },
       error: (error) => {
-        this._ngZone.run(() => this._msgSrv.showMessage({title: "Error en login", text: error}), 0);
+        this._ngZone.run(() => this._msgSrv.showMessage({title: "Error en visualización de contenido", text: error}), 0);
       }
     });
     this._mssService.registrarVisualizacion({token_suscriptor: this._apiService.getUser().token,id_plataforma: id_p, eidr_contenido: this.contenido.eidr_contenido}).subscribe({
       next: (respuesta: RespuestaBean) => {
         console.log(respuesta);
+      },
+      error: (error) => {
+        this._ngZone.run(() => this._msgSrv.showMessage({title: "Error en registro de visualización", text: error}), 0);
       }
     });
   }
@@ -74,11 +79,6 @@ export class VisualizarContenidoComponent implements OnInit, OnDestroy{
 
   seleccionarPlataforma(idPlataforma: number) {
     this.idPlataforma = idPlataforma;
-  }
-  
-
-  togglePlataformas() {
-    this.mostrarPlataformas = !this.mostrarPlataformas;
   }
 
   @HostListener('document:click', ['$event'])
@@ -94,4 +94,27 @@ export class VisualizarContenidoComponent implements OnInit, OnDestroy{
          this.mostrarPlataformas = false;
       }
    }
+
+   convertirFormatoFecha(fechaString: string): string {
+    const partes = fechaString.split('-');
+    if (partes.length === 3) {
+      const [anio, mes, dia] = partes;
+      return `${dia}-${mes}-${anio}`;
+    } else {
+      // Manejo de error o devolución de la fecha original si no tiene el formato esperado
+      return fechaString;
+    }
+  }
+
+  obtenerActuaciones(contenido: IContenido): string {
+    const actuaciones: IActuacion[] = contenido.actuaciones;
+    return actuaciones.map((actuacion) => {return actuacion.nombres + " " + actuacion.apellidos}).join(", ");
+  }
+
+  obtenerDirecciones(contenido: IContenido): string {
+    console.log(this.contenido);
+    
+    const direcciones: IDireccion[] = contenido.direcciones;
+    return direcciones.map((direccion) => {return direccion.nombres + " " + direccion.apellidos}).join(", ");
+  }
 }

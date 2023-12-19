@@ -245,5 +245,5 @@ export class MssApiRestResourceService extends Resource{
     path: '/obtenerContenidosMasVistos',
     responseBodyType: ResourceResponseBodyType.Json
   })
-  obtenerContenidosMasVistos!: IResourceMethodObservable<{token_usuario: string},RespuestaBean>
+  obtenerContenidosMasVistos!: IResourceMethodObservable<{token_suscriptor: string},RespuestaBean>
 }

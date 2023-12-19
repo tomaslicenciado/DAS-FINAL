@@ -20,6 +20,10 @@ li {
     margin-right: 10px;
 }
 
+li h6{
+    text-shadow: 0 5px 10px black;
+}
+
 a {
     text-decoration: none;
     color: white;
@@ -30,4 +34,8 @@ a {
 .logo{
     width: 50px;
     border-radius: 10px;
+}
+
+.cuenta{
+    right: 0;
 }

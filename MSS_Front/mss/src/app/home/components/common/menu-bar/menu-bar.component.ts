@@ -29,11 +29,7 @@ export class MenuBarComponent implements OnInit{
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['user'] && changes['user'].currentValue) {
-      // Se ejecutará cada vez que cambie la propiedad 'user'
-      // Accede a changes.user.currentValue para obtener el nuevo valor del usuario
       this.user = changes['user'].currentValue;
-      
-      // Realiza las acciones necesarias basadas en el nuevo usuario
       this.generarOpciones();
     }
   }

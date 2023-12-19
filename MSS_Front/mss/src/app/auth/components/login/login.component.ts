@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { MssApiService } from 'src/app/api/resolvers/mss-api.service';
@@ -8,7 +8,7 @@ import { MssApiService } from 'src/app/api/resolvers/mss-api.service';
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css']
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
   form: FormGroup;
   invalid: boolean = false;
   submited: boolean = false;
@@ -45,6 +45,7 @@ export class LoginComponent {
       this.form.controls['email'].setValue('');
       this.form.controls['password'].setValue('');
       this._service.login(email, password);
+      this._router.navigate(['/home/suscriptor']);
     }
   }
 }

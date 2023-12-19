@@ -1,8 +1,8 @@
-<div class="federar">
-    <button type="button" (click)="listarPlataformas()">Federar plataforma</button>
+<div class="federar" *ngIf="!visualizando">
+    <button [class]="getClassBtnFederar()" type="button" (click)="listarPlataformas()">Federar plataforma</button>
     <ng-container *ngIf="federando">
-        <ng-container *ngFor="let plataforma of plataformas">
-            <button type="button" (click)="federar(plataforma.id_plataforma)">{{plataforma.nombre}}</button>
+        <ng-container *ngFor="let plataforma of plataformasNoFederadas">
+            <button class="btn-plataforma" type="button" (click)="federar(plataforma.id_plataforma)"><img src="{{plataforma.url_icono}}" alt="{{plataforma.nombre}}"></button>
         </ng-container>
     </ng-container>
 </div>

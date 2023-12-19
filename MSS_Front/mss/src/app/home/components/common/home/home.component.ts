@@ -29,7 +29,7 @@ export class HomeComponent implements OnInit{
         this.user = data["user"];
       },
       error: (error) => {
-        this._ngZone.run(() => this._msgSrv.showMessage({title: "Error en login", text: error}), 0);
+        this._ngZone.run(() => this._msgSrv.showMessage({title: "Error en home", text: error}), 0);
       }
     });
   }

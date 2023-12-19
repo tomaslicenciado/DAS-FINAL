@@ -1,7 +1,7 @@
 <ng-container *ngIf="!visualizando">
     <app-barra-filtro [generos]="generos" (filterChange)="filtrarTipoGenero($event)"></app-barra-filtro>
     <div class="contenido-list">
-        <div class="contenido-content" *ngIf="!filtrando">
+        <div class="contenido-content" *ngIf="!filtrando && contenidosDestacados.length > 0">
             <h4 class="titulo-seccion">Destacados</h4>
             <div #contenidoGrid class="contenido-grid">
                 <button (click)="scrollLeft(0)" class="btn-ant btn-scroll" *ngIf="contenidosDestacados.length > 4"><</button>
@@ -9,7 +9,7 @@
                 <button (click)="scrollRight(0)" class="btn-sig btn-scroll" *ngIf="contenidosDestacados.length > 4">></button>
             </div>
         </div>
-        <div class="contenido-content" *ngIf="!filtrando">
+        <div class="contenido-content" *ngIf="!filtrando && contenidosRecientes.length > 0">
             <h4 class="titulo-seccion">Recientes</h4>
             <div #contenidoGrid class="contenido-grid">
                 <button (click)="scrollLeft(1)" class="btn-ant btn-scroll" *ngIf="contenidosRecientes.length > 4"><</button>
@@ -17,7 +17,7 @@
                 <button (click)="scrollRight(1)" class="btn-sig btn-scroll" *ngIf="contenidosRecientes.length > 4">></button>
             </div>
         </div>
-        <div class="contenido-content" *ngIf="!filtrando">
+        <div class="contenido-content" *ngIf="!filtrando && contenidosMasVistos.length > 0">
             <h4 class="titulo-seccion">Más vistos</h4>
             <div #contenidoGrid class="contenido-grid">
                 <button (click)="scrollLeft(2)" class="btn-ant btn-scroll" *ngIf="contenidosMasVistos.length > 4"><</button>

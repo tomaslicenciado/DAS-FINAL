@@ -138,40 +138,40 @@ export const BannersResolver: ResolveFn<Observable<RespuestaBean>> = (_route: Ac
   const userService = inject(MssApiService);
   const user = userService.getUser();
   
-  return inject(MssApiRestResourceService).obtenerListadoBanners({token_usuario: user.token});
+  return inject(MssApiRestResourceService).obtenerListadoBanners({token_usuario: user.token!});
 }
 
 export const CatalogoResolver: ResolveFn<Observable<RespuestaBean>> = (_route: ActivatedRouteSnapshot, state: RouterStateSnapshot) => {
   const userService = inject(MssApiService);
   const user = userService.getUser();
   
-  return inject(MssApiRestResourceService).obtenerCatalogo({token_suscriptor: user.token});
+  return inject(MssApiRestResourceService).obtenerCatalogo({token_suscriptor: user.token!});
 }
 
 export const PlataformasResolver: ResolveFn<Observable<RespuestaBean>> = (_route: ActivatedRouteSnapshot, state: RouterStateSnapshot) => {
   const userService = inject(MssApiService);
   const user = userService.getUser();
   
-  return inject(MssApiRestResourceService).obtenerListadoPlataformas({token_usuario: user.token});
+  return inject(MssApiRestResourceService).obtenerListadoPlataformas({token_usuario: user.token!});
 }
 
 export const GenerosResolver: ResolveFn<Observable<RespuestaBean>> = (_route: ActivatedRouteSnapshot, state: RouterStateSnapshot) => {
   const userService = inject(MssApiService);
   const user = userService.getUser();
   
-  return inject(MssApiRestResourceService).obtenerListadoGenerosContenido({token_usuario: user.token});
+  return inject(MssApiRestResourceService).obtenerListadoGenerosContenido({token_usuario: user.token!});
 }
 
 export const PublicistasResolver: ResolveFn<Observable<RespuestaBean>> = (_route: ActivatedRouteSnapshot, state: RouterStateSnapshot) => {
   const userService = inject(MssApiService);
   const user = userService.getUser();
   
-  return inject(MssApiRestResourceService).obtenerListadoPublicistas({token_usuario: user.token});
+  return inject(MssApiRestResourceService).obtenerListadoPublicistas({token_usuario: user.token!});
 }
 
 export const ContenidosMasVistosResolver: ResolveFn<Observable<RespuestaBean>> = (_route: ActivatedRouteSnapshot, state: RouterStateSnapshot) => {
   const userService = inject(MssApiService);
   const user = userService.getUser();
   
-  return inject(MssApiRestResourceService).obtenerContenidosMasVistos({token_usuario: user.token});
+  return inject(MssApiRestResourceService).obtenerContenidosMasVistos({token_suscriptor: user.token!});
 }

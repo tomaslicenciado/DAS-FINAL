@@ -1063,14 +1063,14 @@ BEGIN
         t.tipo_contenido,
         p.pais,
         (
-            SELECT p.nombres, p.apellidos, a.eidr_contenido
+            SELECT p.nombres, p.apellidos, a.eidr_contenido as eidr_contenido
             FROM dbo.Actuaciones a
 			LEFT JOIN dbo.Personas p ON p.id_persona = a.id_persona
             WHERE eidr_contenido = c.eidr_contenido
             FOR JSON AUTO
         ) AS actuaciones,
         (
-            SELECT d.eidr_contenido, p.nombres, p.apellidos
+            SELECT p.nombres, p.apellidos, d.eidr_contenido as eidr_contenido
             FROM dbo.Direcciones d
 			LEFT JOIN dbo.Personas p ON p.id_persona = d.id_persona
             WHERE eidr_contenido = c.eidr_contenido

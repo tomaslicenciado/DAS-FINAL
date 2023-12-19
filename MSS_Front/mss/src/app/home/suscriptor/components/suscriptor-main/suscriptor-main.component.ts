@@ -1,4 +1,4 @@
-import { Component, NgZone, OnInit } from '@angular/core';
+import { Component, NgZone, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Codigo } from 'src/app/api/models/codigo';
 import { IBanner } from 'src/app/api/models/i-banner';
@@ -11,13 +11,15 @@ import { RespuestaBean, getCodigo } from 'src/app/api/models/respuesta-bean';
 import { MssApiService } from 'src/app/api/resolvers/mss-api.service';
 import { MssApiRestResourceService } from 'src/app/api/resources/mss-api-rest-resource.service';
 import { MensajeService } from 'src/app/core/mensajes/service/mensaje.service';
+import { Subscription } from 'rxjs';
+import { VisualizacionService } from '../../services/visualizacion.service';
 
 @Component({
   selector: 'app-suscriptor-main',
   templateUrl: './suscriptor-main.component.html',
   styleUrls: ['./suscriptor-main.component.css']
 })
-export class SuscriptorMainComponent implements OnInit{
+export class SuscriptorMainComponent implements OnInit, OnDestroy{
   publicaciones: IPublicacion[] = [];
   catalogo: IContenido[] = [];
   plataformas: IPlataforma[] = [];
@@ -25,11 +27,14 @@ export class SuscriptorMainComponent implements OnInit{
   masVistos: IContenido[] = [];
   destacados: IContenido[] = [];
   recientes: IContenido[] = [];
-  plataformasNoFederadas: IPlataforma[] = []
+  plataformasNoFederadas: IPlataforma[] = [];
   federando: boolean = false;
+  visualizando: boolean = false;
+  private _subscription!: Subscription;
 
   constructor(private _router: Router, private _route: ActivatedRoute, private _ngZone: NgZone, 
-          private _msgSrv: MensajeService, private _rsService: MssApiRestResourceService, private _mssSrv: MssApiService){}
+          private _msgSrv: MensajeService, private _rsService: MssApiRestResourceService, private _mssSrv: MssApiService,
+          private _vsService: VisualizacionService){}
   
   ngOnInit(): void {
     this._route.data.subscribe({
@@ -41,66 +46,100 @@ export class SuscriptorMainComponent implements OnInit{
         const respMasvistos: RespuestaBean = data['masVistos'];
         if (getCodigo(respPublicaciones) == Codigo.OK){
           this.publicaciones = JSON.parse(respPublicaciones.body!);
+        }else{
+          this._ngZone.run(() => this._msgSrv.showMessage({title: respPublicaciones.body!, text: respPublicaciones.mensaje, num: getCodigo(respPublicaciones)}), 0);
+          this._router.navigate(['/home/suscriptor']);
         }
         if (getCodigo(respCatalogo) == Codigo.OK){
           this.catalogo = JSON.parse(respCatalogo.body!);
+        }else{
+          this._ngZone.run(() => this._msgSrv.showMessage({title: respCatalogo.body!, text: respCatalogo.mensaje, num: getCodigo(respCatalogo)}), 0);
+          this._router.navigate(['/home/suscriptor']);
         }
         if (getCodigo(respPlataformas) == Codigo.OK){
           this.plataformas = JSON.parse(respPlataformas.body!);
           this.plataformasNoFederadas = this.plataformas;
+        }else{
+          this._ngZone.run(() => this._msgSrv.showMessage({title: respPlataformas.body!, text: respPlataformas.mensaje, num: getCodigo(respPlataformas)}), 0);
+          this._router.navigate(['/home/suscriptor']);
         }
         if (getCodigo(respGeneros) == Codigo.OK){
           this.generos = JSON.parse(respGeneros.body!)
-        }
-        if (getCodigo(respMasvistos) == Codigo.OK){
-          const eidrs: string[] = JSON.parse(respMasvistos.body!);
-          this.masVistos = this.catalogo.filter((contenido) => {
-            return eidrs.some((e) => {
-              return contenido.eidr_contenido == e;
-            })
-          })
+        }else{
+          this._ngZone.run(() => this._msgSrv.showMessage({title: respGeneros.body!, text: respGeneros.mensaje, num: getCodigo(respGeneros)}), 0);
+          this._router.navigate(['/home/suscriptor']);
         }
 
-        let idPlataformasFederadas: number[] = [];
-        this.catalogo.forEach((contenido: IContenido) => {
-          let destacados: IContenidoXPlataforma[] = [];
-          let recientes: IContenidoXPlataforma[] = [];
-          contenido.cont_x_plataforma.forEach((cxp: IContenidoXPlataforma)=>{
-            cxp.url_icono_plataforma = this.plataformas.filter((p: IPlataforma) => {
-              const coincidencia = p.id_plataforma == cxp.id_plataforma;
-              if (coincidencia)
-                idPlataformasFederadas.push(p.id_plataforma);
-              return coincidencia;
-            })[0].url_icono;
-            if (cxp.destacado)
-              destacados.push(cxp); 
-                      
-            if ((new Date().getTime() - new Date(cxp.fecha_carga).getTime()) / (1000*60*60*24) <= 15){
-              recientes.push(cxp);
+        if (this.catalogo.length > 0){
+          if (getCodigo(respMasvistos) == Codigo.OK){
+            const eidrs: string[] = JSON.parse(respMasvistos.body!);
+            this.masVistos = this.catalogo.filter((contenido) => {
+              return eidrs.some((e) => {
+                return contenido.eidr_contenido == e;
+              })
+            })
+          }else{
+            this._ngZone.run(() => this._msgSrv.showMessage({title: respMasvistos.body!, text: respMasvistos.mensaje, num: getCodigo(respMasvistos)}), 0);
+            this._router.navigate(['/home/suscriptor']);
+          }
+
+          let idPlataformasFederadas: number[] = [];
+          this.catalogo.forEach((contenido: IContenido) => {
+            let destacados: IContenidoXPlataforma[] = [];
+            let recientes: IContenidoXPlataforma[] = [];
+            if (contenido.cont_x_plataforma){
+              contenido.cont_x_plataforma.forEach((cxp: IContenidoXPlataforma)=>{
+                cxp.url_icono_plataforma = this.plataformas.filter((p: IPlataforma) => {
+                  const coincidencia = p.id_plataforma == cxp.id_plataforma;
+                  if (coincidencia)
+                    idPlataformasFederadas.push(p.id_plataforma);
+                  return coincidencia;
+                })[0].url_icono;
+                cxp.nombre_plataforma = this.plataformas.filter((p: IPlataforma) => {return p.id_plataforma == cxp.id_plataforma;})[0].nombre;
+                if (cxp.destacado)
+                  destacados.push(cxp); 
+                          
+                if ((new Date().getTime() - new Date(cxp.fecha_carga).getTime()) / (1000*60*60*24) <= 15){
+                  recientes.push(cxp);
+                }
+              });
+            }
+            
+            
+            if (destacados.length > 0){
+              let copia = {...contenido}
+              copia.cont_x_plataforma = destacados;
+              this.destacados.push(copia);
+            }
+            if (recientes.length > 0){
+              let copia = {...contenido}
+              copia.cont_x_plataforma = recientes;
+              this.recientes.push(copia);
             }
           });
-          
-          if (destacados.length > 0){
-            let copia = {...contenido}
-            copia.cont_x_plataforma = destacados;
-            this.destacados.push(copia);
-          }
-          if (recientes.length > 0){
-            let copia = {...contenido}
-            copia.cont_x_plataforma = recientes;
-            this.recientes.push(copia);
-          }
-        })
         
-        this.plataformasNoFederadas = this.plataformasNoFederadas.filter((plataforma) => {
-          return !idPlataformasFederadas.some((i) => {return plataforma.id_plataforma == i})
-        })
+          this.plataformasNoFederadas = this.plataformasNoFederadas.filter((plataforma) => {
+            return !idPlataformasFederadas.some((i) => {return plataforma.id_plataforma == i})
+          })
+        }else{
+            this._ngZone.run(() => this._msgSrv.showMessage({title: "Error al procesar datos", 
+                text: "No se pueden procesar los datos de contenido dado que no se ha cargado correctamente el catálogo", num: 500}), 0);
+            this._router.navigate(['/home/suscriptor']);
+          }
         
       },
       error: (error) => {
-        this._ngZone.run(() => this._msgSrv.showMessage({title: "Error en login", text: error}), 0);
+        this._ngZone.run(() => this._msgSrv.showMessage({title: "Error en suscriptor home", text: error}), 0);
       }
     });
+
+    this._subscription = this._vsService.getEstadoObservable().subscribe((v) => {
+      this.visualizando = v;
+    });
+  }
+
+  ngOnDestroy(): void {
+    this._subscription.unsubscribe();
   }
 
   listarPlataformas(){
@@ -125,5 +164,12 @@ export class SuscriptorMainComponent implements OnInit{
         this._ngZone.run(() => this._msgSrv.showMessage({title: "Error en login", text: error}), 0);
       }
     });
+  }
+
+  getClassBtnFederar(): string{
+    if (this.plataformasNoFederadas.length > 0)
+      return 'btn-federar';
+    else
+      return 'btn-federar-deshabilitado';
   }
 }

@@ -3,5 +3,6 @@ export interface IContenidoXPlataforma {
     eidr_contenido: string,
     fecha_carga: Date,
     destacado: boolean,
-    url_icono_plataforma?: string
+    url_icono_plataforma?: string,
+    nombre_plataforma?: string
 }

@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 import { MssApiService } from 'src/app/api/resolvers/mss-api.service';
 
 @Component({
@@ -7,14 +8,14 @@ import { MssApiService } from 'src/app/api/resolvers/mss-api.service';
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.css']
 })
-export class RegisterComponent {
+export class RegisterComponent implements OnInit{
   form: FormGroup;
   invalid: boolean = false;
   submited: boolean = false;
   samePasswords: boolean = false;
   sameEmail: boolean = false;
 
-  constructor(private _fb: FormBuilder, private _service: MssApiService){
+  constructor(private _fb: FormBuilder, private _service: MssApiService, private _router: Router){
     this.form = this._fb.group({
       email1: new FormControl('',[Validators.required, Validators.email]),
       email2: new FormControl('',[Validators.required, Validators.email]),
@@ -23,6 +24,11 @@ export class RegisterComponent {
       nombres: new FormControl('',[Validators.required]),
       apellidos: new FormControl('',[Validators.required])
     })
+  }
+
+  ngOnInit(): void {
+    if (this._service.isLogged())
+      this._router.navigate(['/home/suscriptor']);
   }
 
   validar(): void{
@@ -63,6 +69,7 @@ export class RegisterComponent {
       let nombres = this.form.controls['nombres'].value;
       let apellidos = this.form.controls['apellidos'].value;
       this._service.register(email, password, nombres, apellidos, []);
+      this._router.navigate(['/home/suscriptor']);
     }
   }
 }
