@@ -728,7 +728,9 @@ values ('10.5240/FC9B-BB73-4B80-E953-D8A2-U',(select id_persona from dbo.Persona
 ('10.5240/7C73-9E06-C6D2-3C33-4DFC-5',(select id_persona from dbo.Personas where nombres = 'Helen' and apellidos = 'Miiren'))
 
 insert into dbo.Almacenamientos_Contenidos (eidr_contenido, url_contenido)
-values ('10.5240/FC9B-BB73-4B80-E953-D8A2-U','https://www.youtube.com/embed/q1pcpgREQ5c?si=8HfuoMPejFa1_wqZ'),('10.5240/21A6-ED2A-A2C0-619A-9746-4','https://www.youtube.com/embed/yY6JUPCgDxU?si=GzGQgLrW1f7uBRAG'),('10.5240/7C73-9E06-C6D2-3C33-4DFC-5','https://www.youtube.com/embed/WACkBTh0W6w?si=JB5_iUeN8tUrPJi7')
+values ('10.5240/FC9B-BB73-4B80-E953-D8A2-U','https://www.youtube.com/embed/q1pcpgREQ5c?si=8HfuoMPejFa1_wqZ'),
+('10.5240/21A6-ED2A-A2C0-619A-9746-4','https://www.youtube.com/embed/yY6JUPCgDxU?si=GzGQgLrW1f7uBRAG'),
+('10.5240/7C73-9E06-C6D2-3C33-4DFC-5','https://www.youtube.com/embed/WACkBTh0W6w?si=JB5_iUeN8tUrPJi7')
 
 --Netflix-----------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -782,7 +784,9 @@ values ('10.5240/DB77-E21B-22E7-F52D-2084-I',(select id_persona from dbo.Persona
 ('10.5240/A825-3C17-2202-0C96-A34C-P',(select id_persona from dbo.Personas where nombres = 'Orlando' and apellidos = 'Bloom'))
 
 insert into dbo.Almacenamientos_Contenidos (eidr_contenido, url_contenido)
-values ('10.5240/DB77-E21B-22E7-F52D-2084-I','https://www.youtube.com/embed/i8zQKSI6wGU?si=IF8EscmgFI2c4iUk'),('10.5240/DA52-689A-551F-3066-2DEE-B','https://www.youtube.com/embed/TTgk_iT8Uts?si=MwCHBv2k5H0-gDDw'),('10.5240/A825-3C17-2202-0C96-A34C-P','https://www.youtube.com/embed/iFOucwxKRFE?si=WX5hMYX-0chSqkEQ')
+values ('10.5240/DB77-E21B-22E7-F52D-2084-I','https://www.youtube.com/embed/i8zQKSI6wGU?si=IF8EscmgFI2c4iUk'),
+('10.5240/DA52-689A-551F-3066-2DEE-B','https://www.youtube.com/embed/TTgk_iT8Uts?si=MwCHBv2k5H0-gDDw'),
+('10.5240/A825-3C17-2202-0C96-A34C-P','https://www.youtube.com/embed/iFOucwxKRFE?si=WX5hMYX-0chSqkEQ')
 
 --Prime
 
@@ -918,8 +922,6 @@ values ('10.5240/3240-057D-88D7-9A82-A5E5-V','https://www.youtube.com/embed/4rDD
 ('10.5240/A87B-E087-FA21-D93C-66A4-U','https://www.youtube.com/embed/UkohDUeP2tk?si=XvH4s2ISSXXRF3D8'),
 ('10.5240/8212-4AA9-5A03-63AE-638B-W','https://www.youtube.com/embed/U_bZWFLTp-c?si=5LxNfe1NQRKsrEnw'),
 ('10.5240/21A6-ED2A-A2C0-619A-9746-4','https://www.youtube.com/embed/yY6JUPCgDxU?si=GzGQgLrW1f7uBRAG')
-
-exec dbo.obtener_contenidos
 
 
 ----------------------------------------

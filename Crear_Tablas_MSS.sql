@@ -2241,6 +2241,12 @@ select * from dbo.Publicistas
 insert into dbo.Publicidades (id_publicista, banner_code, exclusiva, fecha_inicio, fecha_fin)
 values (2,1001,0,GETDATE(), DATEADD(MONTH, 1, GETDATE())),(3,2001,0,GETDATE(), DATEADD(MONTH, 1, GETDATE())),(1,3001,0,GETDATE(), DATEADD(MONTH, 1, GETDATE()))
 
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+--PRUEBAS
+
 select * from dbo.Publicidades p left join dbo.Publicistas pl on p.id_publicista = pl.id_publicista
 
 exec dbo.obtener_publicidades_a_mostrar;
