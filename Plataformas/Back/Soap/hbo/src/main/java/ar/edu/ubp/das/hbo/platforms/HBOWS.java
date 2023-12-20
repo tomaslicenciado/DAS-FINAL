@@ -7,6 +7,7 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -14,12 +15,15 @@ import org.apache.cxf.interceptor.Fault;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 
 import ar.edu.ubp.das.hbo.beans.ActuacionCatalogo;
 import ar.edu.ubp.das.hbo.beans.Catalogo;
 import ar.edu.ubp.das.hbo.beans.Codigo;
 import ar.edu.ubp.das.hbo.beans.ContenidoCatalogo;
 import ar.edu.ubp.das.hbo.beans.DireccionCatalogo;
+import ar.edu.ubp.das.hbo.beans.RegistroEstadisticoContenido;
+import ar.edu.ubp.das.hbo.beans.RegistroEstadisticoViewer;
 import ar.edu.ubp.das.hbo.beans.RespuestaBean;
 import ar.edu.ubp.das.hbo.utils.TokenGenerator;
 import jakarta.jws.WebMethod;
@@ -297,6 +301,38 @@ public class HBOWS {
             return handleErrorResponse("Error al registrar el nuevo usuario", e);
         }
     }
+
+    //REGISTRAR
+    @WebMethod()
+    @WebResult(name = "respuesta")
+    public RespuestaBean insertarEstadisticas(@WebParam(name = "token_servicio") String token_servicio, 
+                                            @WebParam(name = "estadisticas_viewers_json") String estadisticas_viewers_json,
+                                            @WebParam(name = "estadisticas_contenidos_json") String estadisticas_contenidos_json){
+        try {
+            if (!tokenValid(token_servicio))
+                return handleUnauthorizedResponse("El token de servicio proporcionado no es válido");
+            try (Connection conn = DriverManager.getConnection(sql_conection_string, sql_user, sql_pass)){
+                conn.setAutoCommit(true);
+                try (CallableStatement stmt = conn.prepareCall("{CALL dbo.insertar_estadisticas_viewers(?, ?)}")){
+                    stmt.setString(1, estadisticas_viewers_json);
+                    stmt.setString(2, token_servicio);
+                    stmt.execute();
+                }
+            }
+            try (Connection conn = DriverManager.getConnection(sql_conection_string, sql_user, sql_pass)){
+                conn.setAutoCommit(true);
+                try (CallableStatement stmt = conn.prepareCall("{CALL dbo.insertar_estadisticas_contenidos(?, ?)}")){
+                    stmt.setString(1, estadisticas_contenidos_json);
+                    stmt.setString(2, token_servicio);
+                    stmt.execute();
+                }
+            }
+            return new RespuestaBean(Codigo.OK, "Estadísticas registradas con éxito", null);
+        } catch (Exception e) {
+            return handleErrorResponse("Error al insertar estadísticas", e);
+        }
+    }
+    
     /*-------------------------------------------------------------------------------------------------------*/
 
     private boolean tokenValid(String token_servicio){
@@ -446,7 +482,6 @@ public class HBOWS {
     }
 
     private RespuestaBean nuevoLogin(int id_login, String email, String password, int id_servicio, boolean viewer_nuevo){
-        System.err.println(id_login);
         try (Connection conn = DriverManager.getConnection(sql_conection_string, sql_user, sql_pass)){
             conn.setAutoCommit(true);
             try (CallableStatement stmt = conn.prepareCall("{CALL dbo.login_viewer(?, ?, ?, ?, ?, ?, ?)}")){

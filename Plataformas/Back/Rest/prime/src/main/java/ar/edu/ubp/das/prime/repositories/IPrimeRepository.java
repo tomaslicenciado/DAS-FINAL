@@ -11,4 +11,5 @@ public interface IPrimeRepository {
     public RespuestaBean obtenerUrlContenido(String sesion, String eidr_contenido, String token_servicio);
     public RespuestaBean login(int id_login, String email, String password);
     public RespuestaBean register(int id_login, String nombres, String apellidos, String email, String password);
+    public RespuestaBean insertarEstadisticas(String token_servicio, String estadisticas_viewers_json, String estadisticas_contenidos_json);
 }

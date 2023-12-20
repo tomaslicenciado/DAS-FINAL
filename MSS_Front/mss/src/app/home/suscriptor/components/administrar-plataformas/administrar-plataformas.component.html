@@ -1,0 +1,28 @@
+<div class="modal-header">
+    <h4 class="modal-title texto" style="color: black;">
+        Administrar plataformas
+    </h4>
+    <button type="button" class="btn-cerrar" (click)="cerrar()">X</button>
+</div>
+<div class="modal-body">
+    <div class="plataformas">
+        <ng-container *ngFor="let plataforma of plataformas">
+            <div class="row plataforma">
+                <div class="col">
+                    <p style="color: black;">
+                        <img src="{{plataforma.url_icono}}" alt="{{plataforma.nombre}}" class="icono-plataforma">
+                        {{plataforma.nombre}}
+                    </p>
+                </div>
+                <div class="col">
+                    <button class="btn-plataforma" type="button" (click)="federar(plataforma)" *ngIf="!plataformaFederada(plataforma)">Federar</button>
+                </div>
+                <div class="col">
+                    <button class="btn-plataforma" type="button" (click)="desuscribir(plataforma)" *ngIf="plataformaFederada(plataforma)">Desuscribir</button>
+                </div>
+            </div>
+        </ng-container>
+    </div>
+</div>
+<div class="modal-footer">
+</div>

@@ -1,7 +1,9 @@
 import { Component, Input, OnInit, SimpleChanges } from '@angular/core';
-import { NavigationStart, Router } from '@angular/router';
+import { Router } from '@angular/router';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { IUser } from 'src/app/api/models/i-user';
 import { MssApiService } from 'src/app/api/resolvers/mss-api.service';
+import { DatosPersonalesComponent } from '../datos-personales/datos-personales.component';
 
 @Component({
   selector: 'app-menu-bar',
@@ -25,7 +27,7 @@ export class MenuBarComponent implements OnInit{
       this.isReady = true;
   }
 
-  constructor(private _router: Router, private _service: MssApiService){}
+  constructor(private _router: Router, private _service: MssApiService, private _modal: NgbModal){}
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['user'] && changes['user'].currentValue) {
@@ -46,7 +48,9 @@ export class MenuBarComponent implements OnInit{
     }
   }
 
-  modificarDatos(){}
+  modificarDatos(){
+    this._modal.open(DatosPersonalesComponent, {size: 'lg'});
+  }
 
   logout(){
     this._service.logout();

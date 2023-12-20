@@ -1,4 +1,6 @@
 /*Eliminar tablas anteriores*/
+drop table if exists dbo.Estadisticas_Externas_Contenidos
+drop table if exists dbo.Estadisticas_Externas_Viewers
 drop table if exists dbo.Direcciones
 drop table if exists dbo.Actuaciones
 drop table if exists dbo.Almacenamientos_Contenidos
@@ -168,6 +170,27 @@ create table dbo.Transacciones(
 	id_transaccion integer identity constraint PK_Id_Transaccion_END primary key,
 	id_factura integer constraint FK_Factura_Transaccion_END references dbo.Facturas(id_factura),
 	monto float not null default 0
+)
+go
+
+create table dbo.Estadisticas_Externas_Viewers(
+	id_estadistica_v integer identity constraint PK_Id_estadistica_V_END primary key,
+	id_servicio integer constraint FK_Servicio_Estadistica_V_END references dbo.Servicios_Externos(id_servicio),
+	fecha_inicio date not null,
+	fecha_fin date not null,
+	cant_usuarios_activos integer not null default 0,
+	cant_registros_nuevos integer not null default 0
+)
+go
+
+create table dbo.Estadisticas_Externas_Contenidos(
+	id_estadistica_c integer identity constraint PK_Id_Estadistica_C_END primary key,
+	id_servicio integer constraint FK_Servicio_Estadistica_C_END references dbo.Servicios_Externos(id_servicio),
+	fecha_inicio date not null,
+	fecha_fin date not null,
+	eidr_contenido varchar(255) constraint FK_Contenido_Estadistica_C_END references dbo.Contenidos (eidr_contenido),
+	cant_visualizaciones integer not null default 0,
+	cant_likes integer not null default 0
 )
 go
 
@@ -590,6 +613,56 @@ BEGIN
 END;
 go
 
+create or alter procedure dbo.insertar_estadisticas_viewers
+	@json nvarchar(max),
+	@token_servicio varchar(255)
+as
+begin
+    SET NOCOUNT ON;
+	SET TRANSACTION ISOLATION LEVEL REPEATABLE READ;
+	declare @id_servicio integer;
+
+	select @id_servicio = id_servicio
+	from dbo.Servicios_Externos
+	where token_servicio = @token_servicio
+
+	insert into dbo.Estadisticas_Externas_Viewers (id_servicio, fecha_inicio, fecha_fin, cant_usuarios_activos, cant_registros_nuevos)
+	select @id_servicio as id_servicio, *
+	from openjson(@json) with (
+		fecha_inicio date '$.fecha_inicio',
+		fecha_fin date '$.fecha_fin',
+		cant_usuarios_activos integer '$.cant_usuarios_activos',
+		cant_registros_nuevos integer '$.cant_registros_nuevos'
+	)
+end
+go
+
+create or alter procedure dbo.insertar_estadisticas_contenidos
+	@json nvarchar(max),
+	@token_servicio varchar(255)
+as
+begin
+    SET NOCOUNT ON;
+	SET TRANSACTION ISOLATION LEVEL REPEATABLE READ;
+	declare @id_servicio integer;
+
+	select @id_servicio = id_servicio
+	from dbo.Servicios_Externos
+	where token_servicio = @token_servicio
+
+	insert into dbo.Estadisticas_Externas_Contenidos (id_servicio, eidr_contenido, fecha_inicio, fecha_fin, cant_visualizaciones, cant_likes)
+	select @id_servicio as id_servicio, *
+	from openjson(@json) with (
+		eidr_contenido varchar(255) '$.eidr_contenido',
+		fecha_inicio date '$.fecha_inicio',
+		fecha_fin date '$.fecha_fin',
+		cant_visualizaciones integer '$.cant_visualizaciones',
+		cant_likes integer '$.cant_likes'
+	)
+
+end
+go
+
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 --                                                                   DATOS
@@ -655,7 +728,7 @@ values ('10.5240/FC9B-BB73-4B80-E953-D8A2-U',(select id_persona from dbo.Persona
 ('10.5240/7C73-9E06-C6D2-3C33-4DFC-5',(select id_persona from dbo.Personas where nombres = 'Helen' and apellidos = 'Miiren'))
 
 insert into dbo.Almacenamientos_Contenidos (eidr_contenido, url_contenido)
-values ('10.5240/FC9B-BB73-4B80-E953-D8A2-U','https://www.youtube.com/watch?v=q1pcpgREQ5c&ab_channel=RachelIsabelle'),('10.5240/21A6-ED2A-A2C0-619A-9746-4','https://www.youtube.com/watch?v=yY6JUPCgDxU&ab_channel=UniversalSpain'),('10.5240/7C73-9E06-C6D2-3C33-4DFC-5','https://www.youtube.com/watch?v=WACkBTh0W6w&ab_channel=HDRetroTrailers')
+values ('10.5240/FC9B-BB73-4B80-E953-D8A2-U','https://www.youtube.com/embed/q1pcpgREQ5c?si=8HfuoMPejFa1_wqZ'),('10.5240/21A6-ED2A-A2C0-619A-9746-4','https://www.youtube.com/embed/yY6JUPCgDxU?si=GzGQgLrW1f7uBRAG'),('10.5240/7C73-9E06-C6D2-3C33-4DFC-5','https://www.youtube.com/embed/WACkBTh0W6w?si=JB5_iUeN8tUrPJi7')
 
 --Netflix-----------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -709,7 +782,7 @@ values ('10.5240/DB77-E21B-22E7-F52D-2084-I',(select id_persona from dbo.Persona
 ('10.5240/A825-3C17-2202-0C96-A34C-P',(select id_persona from dbo.Personas where nombres = 'Orlando' and apellidos = 'Bloom'))
 
 insert into dbo.Almacenamientos_Contenidos (eidr_contenido, url_contenido)
-values ('10.5240/DB77-E21B-22E7-F52D-2084-I','https://www.youtube.com/watch?v=i8zQKSI6wGU&ab_channel=CINECONECTA'),('10.5240/DA52-689A-551F-3066-2DEE-B','https://www.youtube.com/watch?v=TTgk_iT8Uts&ab_channel=WarnerBros.PicturesLatinoam%C3%A9rica'),('10.5240/A825-3C17-2202-0C96-A34C-P','https://www.youtube.com/watch?v=iFOucwxKRFE&ab_channel=CineFantasia')
+values ('10.5240/DB77-E21B-22E7-F52D-2084-I','https://www.youtube.com/embed/i8zQKSI6wGU?si=IF8EscmgFI2c4iUk'),('10.5240/DA52-689A-551F-3066-2DEE-B','https://www.youtube.com/embed/TTgk_iT8Uts?si=MwCHBv2k5H0-gDDw'),('10.5240/A825-3C17-2202-0C96-A34C-P','https://www.youtube.com/embed/iFOucwxKRFE?si=WX5hMYX-0chSqkEQ')
 
 --Prime
 
@@ -733,9 +806,11 @@ values
   ('Gastón', 'Pauls'),
   ('Leticia', 'Brédice'),
   ('Tomas', 'Fonzi'),
-  ('Fabián', 'Bielinsky');
+  ('Fabián', 'Bielinsky'),
+  ('Clint', 'Eastwood'),
+  ('Bee', 'Vang');;
 
-insert into dbo.Generos_Contenidos (genero) values ('Fantasía'),('Histórica'),('Suspenso')
+insert into dbo.Generos_Contenidos (genero) values ('Fantasía'),('Histórica'),('Suspenso'), ('Drama')
 
 insert into dbo.Tipos_Contenidos (tipo) values ('Películas'), ('Series')
 
@@ -744,14 +819,16 @@ insert into dbo.Paises_Contenidos (pais) values ('EEUU'),('Argentina')
 insert into dbo.Contenidos (eidr_contenido, titulo, descripcion, url_imagen, fecha_estreno, id_genero, id_tipo_contenido, id_pais, fecha_carga, destacado)
 values ('10.5240/C1B5-3BA1-8991-A571-8472-W','Juego de Tronos','La primera temporada comienza quince años después de la guerra civil conocida como la «rebelión de Robert», con la cual Robert Baratheon expulsó del Trono de Hierro a los Targaryen y se proclamó gobernante de Poniente','https://es.web.img3.acsta.net/pictures/19/03/22/10/08/5883111.jpg?coixp=50&coiyp=40',CONVERT(DATE,'2011-01-01'),(select id_genero from dbo.Generos_Contenidos where genero = 'Fantasía'),(select id_tipo_contenido from dbo.Tipos_Contenidos where tipo = 'Series'),(select id_pais from dbo.Paises_Contenidos where pais = 'EEUU'),CONVERT(DATE,'2012-01-01'),0),
 ('10.5240/2FF5-DE47-6253-4E94-7A63-4','La Noche de los Lápices','Corre el año 1975 en Argentina, a los estudiantes de diferentes colegios se les quita el boleto estudiantil —con el que obtenían un importante descuento en la tarifa del viaje en colectivo— durante el gobierno de Isabel Martínez de Perón.','https://m.media-amazon.com/images/S/pv-target-images/47ed4001b825ca6a084a0f78a7c1b84945dded10d200d5399f97353d90b7984e.jpg',CONVERT(DATE,'1986-01-01'),(select id_genero from dbo.Generos_Contenidos where genero = 'Histórica'),(select id_tipo_contenido from dbo.Tipos_Contenidos where tipo = 'Películas'),(select id_pais from dbo.Paises_Contenidos where pais = 'Argentina'),CONVERT(DATE,'2008-01-01'),0),
-('10.5240/9B6C-ED71-5811-2A48-5809-T','Nueve Reinas','Cuenta la historia de dos estafadores que se conocen por casualidad y deciden unirse para trabajar juntos.','https://cloudfront-us-east-1.images.arcpublishing.com/infobae/WAIMDDPU2ZDL7FB62INBQA6PZY.jpg',CONVERT(DATE,'2000-01-01'),(select id_genero from dbo.Generos_Contenidos where genero = 'Suspenso'),(select id_tipo_contenido from dbo.Tipos_Contenidos where tipo = 'Películas'),(select id_pais from dbo.Paises_Contenidos where pais = 'Argentina'),CONVERT(DATE,'2015-01-01'),0)
+('10.5240/9B6C-ED71-5811-2A48-5809-T','Nueve Reinas','Cuenta la historia de dos estafadores que se conocen por casualidad y deciden unirse para trabajar juntos.','https://cloudfront-us-east-1.images.arcpublishing.com/infobae/WAIMDDPU2ZDL7FB62INBQA6PZY.jpg',CONVERT(DATE,'2000-01-01'),(select id_genero from dbo.Generos_Contenidos where genero = 'Suspenso'),(select id_tipo_contenido from dbo.Tipos_Contenidos where tipo = 'Películas'),(select id_pais from dbo.Paises_Contenidos where pais = 'Argentina'),CONVERT(DATE,'2015-01-01'),0),
+('10.5240/8212-4AA9-5A03-63AE-638B-W','Gran Torino','Walt Kowalski (Clint Eastwood) es un anciano veterano de la guerra de Corea y trabajador jubilado de la fábrica de Ford, de actitud amargada, quien acaba de enviudar','https://static.independent.co.uk/s3fs-public/thumbnails/image/2009/07/02/18/204860.jpg?width=1200',CONVERT(DATE,'2008-01-01'),(select id_genero from dbo.Generos_Contenidos where genero = 'Drama'),(select id_tipo_contenido from dbo.Tipos_Contenidos where tipo = 'Películas'),(select id_pais from dbo.Paises_Contenidos where pais = 'EEUU'),CONVERT(DATE,'2015-01-01'),1)
 
 insert into dbo.Direcciones (eidr_contenido, id_persona)
 values ('10.5240/C1B5-3BA1-8991-A571-8472-W',(select id_persona from dbo.Personas where nombres = 'Tim' and apellidos = 'Van Patten')),
 ('10.5240/C1B5-3BA1-8991-A571-8472-W',(select id_persona from dbo.Personas where nombres = 'Brian' and apellidos = 'Kirk')),
 ('10.5240/C1B5-3BA1-8991-A571-8472-W',(select id_persona from dbo.Personas where nombres = 'Daniel' and apellidos = 'Minahan')),
 ('10.5240/2FF5-DE47-6253-4E94-7A63-4',(select id_persona from dbo.Personas where nombres = 'Héctor' and apellidos = 'Olivera')),
-('10.5240/9B6C-ED71-5811-2A48-5809-T',(select id_persona from dbo.Personas where nombres = 'Fabián' and apellidos = 'Bielinsky'))
+('10.5240/9B6C-ED71-5811-2A48-5809-T',(select id_persona from dbo.Personas where nombres = 'Fabián' and apellidos = 'Bielinsky')),
+('10.5240/8212-4AA9-5A03-63AE-638B-W',(select id_persona from dbo.Personas where nombres = 'Clint' and apellidos = 'Eastwood'))
 
 insert into dbo.Actuaciones (eidr_contenido, id_persona)
 values ('10.5240/C1B5-3BA1-8991-A571-8472-W',(select id_persona from dbo.Personas where nombres = 'Sean' and apellidos = 'Bean')),
@@ -764,10 +841,15 @@ values ('10.5240/C1B5-3BA1-8991-A571-8472-W',(select id_persona from dbo.Persona
 ('10.5240/9B6C-ED71-5811-2A48-5809-T',(select id_persona from dbo.Personas where nombres = 'Ricardo' and apellidos = 'Darín')),
 ('10.5240/9B6C-ED71-5811-2A48-5809-T',(select id_persona from dbo.Personas where nombres = 'Gastón' and apellidos = 'Pauls')),
 ('10.5240/9B6C-ED71-5811-2A48-5809-T',(select id_persona from dbo.Personas where nombres = 'Leticia' and apellidos = 'Brédice')),
-('10.5240/9B6C-ED71-5811-2A48-5809-T',(select id_persona from dbo.Personas where nombres = 'Tomas' and apellidos = 'Fonzi'))
+('10.5240/9B6C-ED71-5811-2A48-5809-T',(select id_persona from dbo.Personas where nombres = 'Tomas' and apellidos = 'Fonzi')),
+('10.5240/8212-4AA9-5A03-63AE-638B-W',(select id_persona from dbo.Personas where nombres = 'Clint' and apellidos = 'Eastwood')),
+('10.5240/8212-4AA9-5A03-63AE-638B-W',(select id_persona from dbo.Personas where nombres = 'Bee' and apellidos = 'Vang'))
 
 insert into dbo.Almacenamientos_Contenidos (eidr_contenido, url_contenido)
-values ('10.5240/C1B5-3BA1-8991-A571-8472-W','https://www.youtube.com/watch?v=KPLWWIOCOOQ&ab_channel=GameofThrones'),('10.5240/2FF5-DE47-6253-4E94-7A63-4','https://www.youtube.com/watch?v=Y41L4oZfWrg&ab_channel=SolPortillo'),('10.5240/9B6C-ED71-5811-2A48-5809-T','https://www.youtube.com/watch?v=O2D3rXfNjWw&ab_channel=Patagonik')
+values ('10.5240/C1B5-3BA1-8991-A571-8472-W','https://www.youtube.com/embed/KPLWWIOCOOQ?si=2947ZAMJTqZabNRN'),
+('10.5240/2FF5-DE47-6253-4E94-7A63-4','https://www.youtube.com/embed/Y41L4oZfWrg?si=CmnuYQgG2HgDDLFo'),
+('10.5240/9B6C-ED71-5811-2A48-5809-T','https://www.youtube.com/embed/O2D3rXfNjWw?si=k42cpEzeQeYRaNvB'),
+('10.5240/8212-4AA9-5A03-63AE-638B-W','https://www.youtube.com/embed/U_bZWFLTp-c?si=5LxNfe1NQRKsrEnw')
 
 --Disney
 
@@ -786,9 +868,14 @@ values
   ('Dean', 'DeBlois'),
   ('Meryl', 'Streep'),
   ('Clint', 'Eastwood'),
-  ('Bee', 'Vang');
+  ('Bee', 'Vang'),
+  ('Vin', 'Diesel'),
+  ('Paul', 'Walker'),
+  ('Dwayne', 'Johnson'),
+  ('Michelle', 'Rodriguez'),
+  ('Justin', 'Lin');;
 
-insert into dbo.Generos_Contenidos (genero) values ('Drama'),('Aventura'),('Comedia')
+insert into dbo.Generos_Contenidos (genero) values ('Drama'),('Aventura'),('Comedia'),('Acción')
 
 insert into dbo.Tipos_Contenidos (tipo) values ('Películas')
 
@@ -798,14 +885,16 @@ insert into dbo.Contenidos (eidr_contenido, titulo, descripcion, url_imagen, fec
 values ('10.5240/3240-057D-88D7-9A82-A5E5-V','Wall-E','En el siglo XXIX, específicamente en el año 2805, el consumismo desenfrenado, la codicia empresarial y la negligencia ambiental han convertido al planeta Tierra en un páramo lleno de basura','https://lumiere-a.akamaihd.net/v1/images/p_walle_19753_69f7ff00.jpeg',CONVERT(DATE,'2008-01-01'),(select id_genero from dbo.Generos_Contenidos where genero = 'Aventura'),(select id_tipo_contenido from dbo.Tipos_Contenidos where tipo = 'Películas'),(select id_pais from dbo.Paises_Contenidos where pais = 'EEUU'),CONVERT(DATE,'2022-01-01'),0),
 ('10.5240/32B1-B567-14AC-65C2-B8EF-X','Lilo y Stich','La historia gira en torno a dos personajes: Lilo Pelekai (Daveigh Chase), una niña solitaria y un extraterrestre llamado Stitch','https://es.web.img3.acsta.net/pictures/14/03/27/11/39/176864.jpg',CONVERT(DATE,'2002-01-01'),(select id_genero from dbo.Generos_Contenidos where genero = 'Comedia'),(select id_tipo_contenido from dbo.Tipos_Contenidos where tipo = 'Películas'),(select id_pais from dbo.Paises_Contenidos where pais = 'EEUU'),GETDATE(),1),
 ('10.5240/A87B-E087-FA21-D93C-66A4-U','Los Puentes de Madison','Una solitaria ama de casa del Medio Oeste natural de la ciudad de Bari (Italia), casada con un soldado estadounidense destinado en Italia y llegada con él a los Estados Unidos.','https://es.web.img2.acsta.net/medias/nmedia/18/68/46/37/20340605.jpg',CONVERT(DATE,'1995-01-01'),(select id_genero from dbo.Generos_Contenidos where genero = 'Drama'),(select id_tipo_contenido from dbo.Tipos_Contenidos where tipo = 'Películas'),(select id_pais from dbo.Paises_Contenidos where pais = 'EEUU'),CONVERT(DATE,'2015-01-01'),0),
-('10.5240/8212-4AA9-5A03-63AE-638B-W','Gran Torino','Walt Kowalski (Clint Eastwood) es un anciano veterano de la guerra de Corea y trabajador jubilado de la fábrica de Ford, de actitud amargada, quien acaba de enviudar','https://static.independent.co.uk/s3fs-public/thumbnails/image/2009/07/02/18/204860.jpg?width=1200',CONVERT(DATE,'2008-01-01'),(select id_genero from dbo.Generos_Contenidos where genero = 'Drama'),(select id_tipo_contenido from dbo.Tipos_Contenidos where tipo = 'Películas'),(select id_pais from dbo.Paises_Contenidos where pais = 'EEUU'),CONVERT(DATE,'2015-01-01'),1)
+('10.5240/8212-4AA9-5A03-63AE-638B-W','Gran Torino','Walt Kowalski (Clint Eastwood) es un anciano veterano de la guerra de Corea y trabajador jubilado de la fábrica de Ford, de actitud amargada, quien acaba de enviudar','https://static.independent.co.uk/s3fs-public/thumbnails/image/2009/07/02/18/204860.jpg?width=1200',CONVERT(DATE,'2008-01-01'),(select id_genero from dbo.Generos_Contenidos where genero = 'Drama'),(select id_tipo_contenido from dbo.Tipos_Contenidos where tipo = 'Películas'),(select id_pais from dbo.Paises_Contenidos where pais = 'EEUU'),CONVERT(DATE,'2015-01-01'),1),
+('10.5240/21A6-ED2A-A2C0-619A-9746-4','Rápidos y Furiosos 6','Después de su exitoso golpe en Río de Janeiro, Brasil, Dominic "Dom" Toretto (Vin Diesel) y Brian O`Conner (Paul Walker) están en una carrera en las Islas Canarias, España, hasta llegar a un hospital, ya que el hijo de Brian está a punto de nacer. ','https://m.media-amazon.com/images/S/pv-target-images/2a711d2b91761c98205aa9f8b62e8cb47f423cc8f7697bfac5e76b71af850fda.jpg',CONVERT(DATE,'2013-01-01'),(select id_genero from dbo.Generos_Contenidos where genero = 'Acción'),(select id_tipo_contenido from dbo.Tipos_Contenidos where tipo = 'Películas'),(select id_pais from dbo.Paises_Contenidos where pais = 'EEUU'),GETDATE(),1)
 
 insert into dbo.Direcciones (eidr_contenido, id_persona)
 values ('10.5240/3240-057D-88D7-9A82-A5E5-V',(select id_persona from dbo.Personas where nombres = 'Andrew' and apellidos = 'Stanton')),
 ('10.5240/32B1-B567-14AC-65C2-B8EF-X',(select id_persona from dbo.Personas where nombres = 'Chris' and apellidos = 'Sanders')),
 ('10.5240/32B1-B567-14AC-65C2-B8EF-X',(select id_persona from dbo.Personas where nombres = 'Dean' and apellidos = 'DeBlois')),
 ('10.5240/A87B-E087-FA21-D93C-66A4-U',(select id_persona from dbo.Personas where nombres = 'Clint' and apellidos = 'Eastwood')),
-('10.5240/8212-4AA9-5A03-63AE-638B-W',(select id_persona from dbo.Personas where nombres = 'Clint' and apellidos = 'Eastwood'))
+('10.5240/8212-4AA9-5A03-63AE-638B-W',(select id_persona from dbo.Personas where nombres = 'Clint' and apellidos = 'Eastwood')),
+('10.5240/21A6-ED2A-A2C0-619A-9746-4',(select id_persona from dbo.Personas where nombres = 'Justin' and apellidos = 'Lin'))
 
 insert into dbo.Actuaciones (eidr_contenido, id_persona)
 values ('10.5240/3240-057D-88D7-9A82-A5E5-V',(select id_persona from dbo.Personas where nombres = 'Ben' and apellidos = 'Burtt')),
@@ -817,31 +906,28 @@ values ('10.5240/3240-057D-88D7-9A82-A5E5-V',(select id_persona from dbo.Persona
 ('10.5240/A87B-E087-FA21-D93C-66A4-U',(select id_persona from dbo.Personas where nombres = 'Clint' and apellidos = 'Eastwood')),
 ('10.5240/A87B-E087-FA21-D93C-66A4-U',(select id_persona from dbo.Personas where nombres = 'Meryl' and apellidos = 'Streep')),
 ('10.5240/8212-4AA9-5A03-63AE-638B-W',(select id_persona from dbo.Personas where nombres = 'Clint' and apellidos = 'Eastwood')),
-('10.5240/8212-4AA9-5A03-63AE-638B-W',(select id_persona from dbo.Personas where nombres = 'Bee' and apellidos = 'Vang'))
+('10.5240/8212-4AA9-5A03-63AE-638B-W',(select id_persona from dbo.Personas where nombres = 'Bee' and apellidos = 'Vang')),
+('10.5240/21A6-ED2A-A2C0-619A-9746-4',(select id_persona from dbo.Personas where nombres = 'Vin' and apellidos = 'Diesel')),
+('10.5240/21A6-ED2A-A2C0-619A-9746-4',(select id_persona from dbo.Personas where nombres = 'Paul' and apellidos = 'Walker')),
+('10.5240/21A6-ED2A-A2C0-619A-9746-4',(select id_persona from dbo.Personas where nombres = 'Dwayne' and apellidos = 'Johnson')),
+('10.5240/21A6-ED2A-A2C0-619A-9746-4',(select id_persona from dbo.Personas where nombres = 'Michelle' and apellidos = 'Rodriguez'))
 
 insert into dbo.Almacenamientos_Contenidos (eidr_contenido, url_contenido)
-values ('10.5240/3240-057D-88D7-9A82-A5E5-V','https://www.youtube.com/watch?v=4rDD3SccHxQ&ab_channel=Gertson0000'),('10.5240/32B1-B567-14AC-65C2-B8EF-X','https://www.youtube.com/watch?v=_WbTe5hjSkE&ab_channel=JoyasDeLaAnimaci%C3%B3n'),('10.5240/A87B-E087-FA21-D93C-66A4-U','https://www.youtube.com/watch?v=UkohDUeP2tk&ab_channel=DVDmaniaMX'),('10.5240/8212-4AA9-5A03-63AE-638B-W','https://www.youtube.com/watch?v=U_bZWFLTp-c&ab_channel=HDclipvideo')
+values ('10.5240/3240-057D-88D7-9A82-A5E5-V','https://www.youtube.com/embed/4rDD3SccHxQ?si=UxOkxDfYcY-HhPNk'),
+('10.5240/32B1-B567-14AC-65C2-B8EF-X','https://www.youtube.com/embed/_WbTe5hjSkE?si=7Lss-NiZYPipaTad'),
+('10.5240/A87B-E087-FA21-D93C-66A4-U','https://www.youtube.com/embed/UkohDUeP2tk?si=XvH4s2ISSXXRF3D8'),
+('10.5240/8212-4AA9-5A03-63AE-638B-W','https://www.youtube.com/embed/U_bZWFLTp-c?si=5LxNfe1NQRKsrEnw'),
+('10.5240/21A6-ED2A-A2C0-619A-9746-4','https://www.youtube.com/embed/yY6JUPCgDxU?si=GzGQgLrW1f7uBRAG')
 
 exec dbo.obtener_contenidos
 
 
 ----------------------------------------
+  
 
-insert into dbo.Personas (nombres, apellidos)
-values('Clint', 'Eastwood'),
-  ('Bee', 'Vang');
 
-insert into dbo.Generos_Contenidos (genero) values ('Drama')
 
-insert into dbo.Contenidos (eidr_contenido, titulo, descripcion, url_imagen, fecha_estreno, id_genero, id_tipo_contenido, id_pais, fecha_carga, destacado)
-values ('10.5240/8212-4AA9-5A03-63AE-638B-W','Gran Torino','Walt Kowalski (Clint Eastwood) es un anciano veterano de la guerra de Corea y trabajador jubilado de la fábrica de Ford, de actitud amargada, quien acaba de enviudar','https://static.independent.co.uk/s3fs-public/thumbnails/image/2009/07/02/18/204860.jpg?width=1200',CONVERT(DATE,'2008-01-01'),(select id_genero from dbo.Generos_Contenidos where genero = 'Drama'),(select id_tipo_contenido from dbo.Tipos_Contenidos where tipo = 'Películas'),(select id_pais from dbo.Paises_Contenidos where pais = 'EEUU'),CONVERT(DATE,'2015-01-01'),1)
 
-insert into dbo.Direcciones (eidr_contenido, id_persona)
-values ('10.5240/8212-4AA9-5A03-63AE-638B-W',(select id_persona from dbo.Personas where nombres = 'Clint' and apellidos = 'Eastwood'))
 
-insert into dbo.Actuaciones (eidr_contenido, id_persona)
-values ('10.5240/8212-4AA9-5A03-63AE-638B-W',(select id_persona from dbo.Personas where nombres = 'Clint' and apellidos = 'Eastwood')),
-('10.5240/8212-4AA9-5A03-63AE-638B-W',(select id_persona from dbo.Personas where nombres = 'Bee' and apellidos = 'Vang'))
 
-insert into dbo.Almacenamientos_Contenidos (eidr_contenido, url_contenido)
-values ('10.5240/8212-4AA9-5A03-63AE-638B-W','https://www.youtube.com/watch?v=U_bZWFLTp-c&ab_channel=HDclipvideo')
+

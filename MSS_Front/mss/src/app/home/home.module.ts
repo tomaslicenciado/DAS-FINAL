@@ -9,6 +9,8 @@ import { PublicistaModule } from './publicista/publicista.module';
 import { HomeComponent } from './components/common/home/home.component';
 import { MssApiService } from '../api/resolvers/mss-api.service';
 import { DatosPersonalesComponent } from './components/common/datos-personales/datos-personales.component';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { ReactiveFormsModule } from '@angular/forms';
 
 
 @NgModule({
@@ -22,7 +24,9 @@ import { DatosPersonalesComponent } from './components/common/datos-personales/d
     HomeRoutingModule,
     AdministradorModule,
     SuscriptorModule,
-    PublicistaModule
+    PublicistaModule,
+    NgbModule,
+    ReactiveFormsModule
   ],
   providers: [
     MssApiService

@@ -1,20 +1,21 @@
 <div [formGroup]="filterForm" class="filter-bar">
-    <!-- Dropdown para Tipo de Contenido -->
-    <label for="tipoContenido" i18n>Tipo de Contenido:</label>
-    <select id="tipoContenido" formControlName="tipo">
-      <option value="Todo" i18n>Todo</option>
-      <option value="Películas" i18n>Películas</option>
-      <option value="Series" i18n>Series</option>
-    </select>
-  
-    <!-- Dropdown para Género -->
-    <label for="genero" i18n>Género:</label>
-    <select id="genero" formControlName="genero">
-      <option value="Todo" i18n>Todo</option>
-      <option *ngFor="let genero of generos" [value]="genero.genero">{{ genero.genero }}</option>
-    </select>
-  
-    <!-- Buscador -->
-    <label for="buscador" i18n>Buscar:</label>
-    <input type="text" id="buscador" formControlName="searchTerm" />
+  <button type="button" class="btn-todos">Todos los contenidos</button>
+  <!-- Dropdown para Tipo de Contenido -->
+  <label for="tipoContenido" i18n>Tipo de Contenido:</label>
+  <select id="tipoContenido" formControlName="tipo">
+    <option value="Todo" i18n>Todo</option>
+    <option value="Películas" i18n>Películas</option>
+    <option value="Series" i18n>Series</option>
+  </select>
+
+  <!-- Dropdown para Género -->
+  <label for="genero" i18n>Género:</label>
+  <select id="genero" formControlName="genero">
+    <option value="Todo" i18n>Todo</option>
+    <option *ngFor="let genero of generos" [value]="genero.genero">{{ genero.genero }}</option>
+  </select>
+
+  <!-- Buscador -->
+  <label for="buscador" i18n>Buscar:</label>
+  <input type="text" id="buscador" formControlName="searchTerm" />
 </div>

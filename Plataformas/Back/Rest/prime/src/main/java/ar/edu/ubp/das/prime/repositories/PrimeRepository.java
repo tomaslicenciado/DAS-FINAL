@@ -16,12 +16,15 @@ import org.springframework.stereotype.Repository;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 
 import ar.edu.ubp.das.prime.beans.ActuacionCatalogo;
 import ar.edu.ubp.das.prime.beans.Catalogo;
 import ar.edu.ubp.das.prime.beans.Codigo;
 import ar.edu.ubp.das.prime.beans.ContenidoCatalogo;
 import ar.edu.ubp.das.prime.beans.DireccionCatalogo;
+import ar.edu.ubp.das.prime.beans.RegistroEstadisticoContenido;
+import ar.edu.ubp.das.prime.beans.RegistroEstadisticoViewer;
 import ar.edu.ubp.das.prime.beans.RespuestaBean;
 import ar.edu.ubp.das.prime.utils.TokenGenerator;
 
@@ -162,7 +165,6 @@ public class PrimeRepository implements IPrimeRepository{
         try {
             jdbcCall = new SimpleJdbcCall(jdbcTpl).withProcedureName("obtener_contenido").withSchemaName("dbo")
                         .returningResultSet("urls", (rs, rowNum) -> {
-                            System.out.println(rs.getString("url_contenido"));
                             return rs.getString("url_contenido");
                         });
             in = new MapSqlParameterSource().addValue("eidr_contenido", eidr_contenido);
@@ -212,6 +214,23 @@ public class PrimeRepository implements IPrimeRepository{
             return nuevoLogin(id_login, email, password, id_servicio, true);
         } catch (Exception e) {
             return handleErrorResponse("Error en registro", e);
+        }
+    }
+
+    @Override
+    public RespuestaBean insertarEstadisticas(String token_servicio, String estadisticas_viewers_json, String estadisticas_contenidos_json){
+        try {
+            if (!tokenValid(token_servicio))
+                return handleUnauthorizedResponse("El token de servicio proporcionado no es válido");
+            jdbcCall = new SimpleJdbcCall(jdbcTpl).withSchemaName("dbo").withProcedureName("insertar_estadisticas_viewers");
+            in = new MapSqlParameterSource().addValue("json", estadisticas_viewers_json).addValue("token_servicio", token_servicio);
+            jdbcCall.execute(in);
+            jdbcCall = new SimpleJdbcCall(jdbcTpl).withSchemaName("dbo").withProcedureName("insertar_estadisticas_contenidos");
+            in = new MapSqlParameterSource().addValue("json", estadisticas_contenidos_json).addValue("token_servicio", token_servicio);
+            jdbcCall.execute(in);
+            return new RespuestaBean(Codigo.OK, "Estadísticas registradas con éxito", null);
+        } catch (Exception e) {
+            return handleErrorResponse("Error al insertar estadísticas", e);
         }
     }
     

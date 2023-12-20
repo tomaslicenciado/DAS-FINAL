@@ -2,25 +2,23 @@
     <ul>
         <li>
             <a href="#">
-            <img src="https://t3.ftcdn.net/jpg/04/42/89/18/360_F_442891893_HntRDa5phYsDPvDf99fXiiiDwdPwbPQb.jpg" alt="logo" class="logo" >
+                <img src="https://t3.ftcdn.net/jpg/04/42/89/18/360_F_442891893_HntRDa5phYsDPvDf99fXiiiDwdPwbPQb.jpg" alt="logo" class="logo" >
             </a>
         </li>
-        <li>
-            <h6>Multiplataforma de Servicios de Streaming</h6>
-        </li>
+        <h6>Multiplataforma de Servicios de Streaming</h6>
         <li *ngFor="let opcion of opcionesMenu">
             <a href="{{opcion.ref}}">{{ opcion.titulo }}</a>
         </li>
-        <ng-container class="cuenta">
-            <li>
-                <p> {{user.apellidos}} {{user.nombres}}</p>
-            </li>
-            <li>
-                <a routerLink="/home/cuenta" i18n>Mis datos</a>
-            </li>
-            <li>
-                <a (click)="logout()" i18n>Logout</a>
-            </li>
-        </ng-container>
     </ul>
+    <div class="cuenta">
+        <div ngbDropdown class="d-inline-block" container="body">
+			<button type="button" class="btn btn-secondary" id="dropdownBasic1" ngbDropdownToggle>
+				{{user.apellidos}} {{user.nombres}}
+			</button>
+			<div ngbDropdownMenu aria-labelledby="dropdownBasic1">
+				<button ngbDropdownItem (click)="modificarDatos()" i18n>Mis datos</button>
+				<button ngbDropdownItem (click)="logout()" i18n>Logout</button>
+			</div>
+		</div>
+    </div>
 </nav>

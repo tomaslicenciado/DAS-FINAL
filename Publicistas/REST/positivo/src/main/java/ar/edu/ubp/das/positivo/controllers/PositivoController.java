@@ -33,4 +33,12 @@ public class PositivoController {
     public ResponseEntity<RespuestaBean> obtenerPublicidades(@RequestBody Map<String, String> body) {
         return new ResponseEntity<RespuestaBean>(repo.obtenerPublicidades(body.get("token_servicio")), HttpStatus.OK);
     }
+
+    @PostMapping(
+        path = "/insertarEstadisticas",
+        consumes = { MediaType.APPLICATION_JSON_VALUE }
+    )
+    public ResponseEntity<RespuestaBean> insertarEstadisticas(@RequestBody Map<String, String> body) {
+        return new ResponseEntity<RespuestaBean>(repo.insertarEstadisticas(body.get("token_servicio"), body.get("estadisticas_accesos_json")), HttpStatus.OK);
+    }
 }

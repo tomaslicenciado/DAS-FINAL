@@ -1,4 +1,54 @@
-<p>datos-personales works!</p>
-<ng-container *ngIf="user.id_nivel == 1">
-    
-</ng-container>
+<ng-template #iCampo let-campo="campo">
+    <small *ngIf="invalid && campo.errors" class="text-danger">
+        <mark *ngIf="campo.errors['required']" i18n>El campo es requerido</mark>
+    </small>
+</ng-template>
+
+<div class="modal-header">
+    <h4 class="modal-title texto">
+        Datos Personales
+    </h4>
+    <button type="button" class="btn-cerrar" (click)="activeModal.close()">X</button>
+</div>
+<div class="modal-body">
+    <form [formGroup]="formulario">
+        <div class="form-group">
+            <label>
+                Nombres:
+                <input type="text" formControlName="nombres" />
+            </label>
+        </div>
+        <ng-template [ngTemplateOutlet]="iCampo" [ngTemplateOutletContext]="{campo: formulario.controls['nombres']}"></ng-template>
+        <div class="form-group">
+            <label>
+                Apellidos:
+                <input type="text" formControlName="apellidos" />
+            </label>
+        </div>
+        <ng-template [ngTemplateOutlet]="iCampo" [ngTemplateOutletContext]="{campo: formulario.controls['apellidos']}"></ng-template>
+        <div class="form-group">
+            <label>
+                Contraseña Actual:
+                <input type="password" formControlName="contrasenaActual" />
+            </label>
+        </div>
+        <ng-template [ngTemplateOutlet]="iCampo" [ngTemplateOutletContext]="{campo: formulario.controls['contrasenaActual']}"></ng-template>
+        <div class="form-group">
+            <label>
+                Nueva Contraseña:
+                <input type="password" formControlName="nuevaContrasena" />
+            </label>
+        </div>
+        <ng-template [ngTemplateOutlet]="iCampo" [ngTemplateOutletContext]="{campo: formulario.controls['nuevaContrasena']}"></ng-template>
+        <div class="form-group">
+            <label>
+                Repetir Nueva Contraseña:
+                <input type="password" formControlName="repetirNuevaContrasena" />
+            </label>
+        </div>
+        <ng-template [ngTemplateOutlet]="iCampo" [ngTemplateOutletContext]="{campo: formulario.controls['repetirNuevaContrasena']}"></ng-template>
+    </form>
+</div>
+<div class="modal-footer">
+    <button type="button" (click)="guardarCambios()">Guardar Cambios</button>
+</div>

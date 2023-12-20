@@ -2116,6 +2116,75 @@ begin
 end
 go
 
+create or alter procedure dbo.obtener_estadisticas_viewers
+	@fecha_inicio date,
+	@fecha_fin date
+as
+begin
+	set nocount on;
+	set transaction isolation level repeatable read;
+
+	select p.id_plataforma as id_plataforma,
+		(
+			select count(f.id_federacion)
+			from dbo.Federaciones f
+			where f.id_plataforma = p.id_plataforma
+			and (f.fecha_baja is null or f.fecha_baja <= @fecha_fin)
+			and f.fecha_inicio >= @fecha_inicio
+		) as cant_usuarios_activos,
+		(
+			select count(fn.id_federacion)
+			from dbo.Federaciones fn
+			where fn.id_plataforma = p.id_plataforma
+			and (fn.fecha_baja is null or fn.fecha_baja <= @fecha_fin)
+			and fn.fecha_inicio >= @fecha_inicio
+			and fn.is_new = 1
+		) as cant_registros_nuevos
+	from dbo.Plataformas_Streaming p
+end
+go
+
+create or alter procedure dbo.obtener_estadisticas_contenidos
+	@fecha_inicio date,
+	@fecha_fin date
+as
+begin
+	set nocount on;
+	set transaction isolation level repeatable read;
+
+	select p.id_plataforma as id_plataforma, p.eidr_contenido as eidr_contenido,
+		(
+			select count(*)
+			from dbo.Visualizaciones v
+			where v.id_plataforma_contenido = p.id_plataforma_contenido
+			and v.fecha_visualizacion between @fecha_inicio and @fecha_fin
+		) as cant_visualizaciones,
+		(
+			select count(*)
+			from dbo.Likes_Usuarios l
+			where l.eidr_contenido = p.eidr_contenido
+			and l.fecha_like between @fecha_inicio and @fecha_fin
+		) as cant_likes
+	from dbo.Plataformas_X_Contenido p
+end
+go
+
+create or alter procedure dbo.obtener_estadisticas_publicidades
+	@fecha_inicio date,
+	@fecha_fin date
+as
+begin
+	set nocount on;
+	set transaction isolation level repeatable read;
+
+	select p.id_publicista as id_publicista, a.id_publicidad as id_publicidad, COUNT (a.id_acceso) as cant_accesos
+	from dbo.Accesos_Publicidad a
+	join dbo.Publicidades p on p.id_publicidad = a.id_publicidad
+	where a.fecha_acceso between @fecha_inicio and @fecha_fin
+	group by p.id_publicista, a.id_publicidad
+end
+go
+
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 --                                                                   DATOS
@@ -2179,3 +2248,17 @@ exec dbo.obtener_publicidades_a_mostrar;
 exec dbo.obtener_banners
 
 exec dbo.obtener_contenidos_activos '8a6ceeb81add49d8bb97459c04d35bcc9f69687e2411b2e2ab3e568bf8a08d29';
+
+
+declare @fecha_inicio date, @fecha_fin date;
+set @fecha_fin = GETDATE();
+set @fecha_inicio = DATEADD(DAY, -7, @fecha_fin);
+
+select p.id_publicista as id_publicista, a.id_publicidad as id_publicidad, COUNT (a.id_acceso) as cant_accesos
+	from dbo.Accesos_Publicidad a
+	join dbo.Publicidades p on p.id_publicidad = a.id_publicidad
+	where a.fecha_acceso between @fecha_inicio and @fecha_fin
+	group by p.id_publicista, a.id_publicidad
+
+exec dbo.obtener_estadisticas_publicidades @fecha_inicio, @fecha_fin
+exec dbo.obtener_estadisticas_contenidos @fecha_inicio, @fecha_fin

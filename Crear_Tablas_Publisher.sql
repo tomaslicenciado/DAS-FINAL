@@ -1,4 +1,4 @@
-
+drop table if exists dbo.Estadisticas_Externas_Accesos
 drop table if exists dbo.Publicaciones
 drop table if exists dbo.Publicidades
 drop table if exists dbo.Servicios_Exposicion
@@ -23,6 +23,15 @@ create table dbo.Publicaciones(
 	fecha_inicio date not null,
 	fecha_fin date not null,
 	codigo_unico_id integer not null
+)
+go
+
+create table dbo.Estadisticas_Externas_Accesos(
+	id_estadistica integer identity constraint PK_Id_Estadistica_END primary key,
+	id_publicacion integer constraint FK_Publicacion_Estadistica_END references dbo.Publicaciones(id_publicacion),
+	cant_accesos integer not null default 0,
+	fecha_inicio date not null,
+	fecha_fin date not null
 )
 go
 ---------------------------------------------------------------------------------------------------------------------------------
@@ -78,6 +87,40 @@ BEGIN
         s.token = @token_servicio
         AND @fecha_actual BETWEEN p.fecha_inicio AND p.fecha_fin;
 END;
+go
+
+create or alter procedure dbo.insertar_estadisticas_externas
+	@json nvarchar(max)
+as
+begin
+    SET NOCOUNT ON;
+	SET TRANSACTION ISOLATION LEVEL REPEATABLE READ;
+
+	create table #Estadisticas(
+		codigo_unico_id integer,
+		cant_accesos integer,
+		fecha_inicio date,
+		fecha_fin date
+	)
+
+	insert into #Estadisticas
+	select codigo_unico_id, cant_accesos, fecha_inicio, fecha_fin
+	from openjson(@json) with (
+		codigo_unico_id integer '$.codigo_unico_id',
+		cant_accesos integer '$.cant_accesos',
+		fecha_inicio date '$.fecha_inicio',
+		fecha_fin date '$.fecha_fin'
+	)
+
+	insert into dbo.Estadisticas_Externas_Accesos (id_publicacion, cant_accesos, fecha_inicio, fecha_fin)
+	select (
+		select p.id_publicacion 
+		from dbo.Publicaciones p 
+		where p.codigo_unico_id = e.codigo_unico_id 
+		and GETDATE() between p.fecha_inicio and p.fecha_fin) as id_publicacion, 
+		e.cant_accesos, e.fecha_inicio, e.fecha_fin
+	from #Estadisticas e
+end
 go
 
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------

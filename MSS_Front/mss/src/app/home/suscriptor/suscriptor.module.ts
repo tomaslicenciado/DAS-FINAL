@@ -12,6 +12,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { SuscriptorMainComponent } from './components/suscriptor-main/suscriptor-main.component';
 import { FinalizarFederacionComponent } from './components/finalizar-federacion/finalizar-federacion.component';
 import { VisualizacionService } from './services/visualizacion.service';
+import { AdministrarPlataformasComponent } from './components/administrar-plataformas/administrar-plataformas.component';
 
 
 @NgModule({
@@ -23,7 +24,8 @@ import { VisualizacionService } from './services/visualizacion.service';
     ItemContenidoComponent,
     FiltroBusquedaPipe,
     SuscriptorMainComponent,
-    FinalizarFederacionComponent
+    FinalizarFederacionComponent,
+    AdministrarPlataformasComponent
   ],
   imports: [
     CommonModule,

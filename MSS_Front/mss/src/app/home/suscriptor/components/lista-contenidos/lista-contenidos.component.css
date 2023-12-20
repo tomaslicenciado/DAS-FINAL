@@ -34,7 +34,7 @@
 }
 
 *::-webkit-scrollbar {
-  width: 2px;
+  width: 0;
   height: 2px;
   size: 5px;
 }

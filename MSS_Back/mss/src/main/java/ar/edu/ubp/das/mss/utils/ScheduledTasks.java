@@ -32,9 +32,10 @@ public class ScheduledTasks {
     }
 
     //A realizar a las 12:00:00 del 5 día de cada mes
-    @Scheduled(cron = "0 0 12 5 * *")
+    @Scheduled(cron = "0 21 12 * * ?")
     public void enviarEstadisticas(){
         try {
+            System.out.println("Enviando estadísticas");
             repo.enviarEstadisticas();
         } catch (Exception e) {
             System.err.println(e);
@@ -42,7 +43,7 @@ public class ScheduledTasks {
     }
 
     //A realizar cada 12 horas
-    @Scheduled(cron = "0 6 12 * * ?")
+    @Scheduled(cron = "0 0 */12 * * *")
     public void actualizarCatalogo(){
         try {
             repo.actualizarCatalogo();

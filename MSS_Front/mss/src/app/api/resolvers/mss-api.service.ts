@@ -1,5 +1,5 @@
-import { Injectable, NgZone, inject } from '@angular/core';
-import { ActivatedRouteSnapshot, ResolveFn, Router, RouterStateSnapshot } from '@angular/router';
+import { Injectable, NgZone, OnInit, inject } from '@angular/core';
+import { ActivatedRouteSnapshot, ResolveEnd, ResolveFn, Router, RouterStateSnapshot } from '@angular/router';
 import { MssApiRestResourceService } from '../resources/mss-api-rest-resource.service';
 import { IUser } from '../models/i-user';
 import { Observable, delay } from 'rxjs';
@@ -10,7 +10,7 @@ import { MensajeService } from 'src/app/core/mensajes/service/mensaje.service';
 @Injectable({
   providedIn: 'root'
 })
-export class MssApiService {
+export class MssApiService implements OnInit{
   private _user: IUser | null = null;
   private _isLogged: boolean = false;
 
@@ -18,6 +18,20 @@ export class MssApiService {
               private _ngZone: NgZone,
               private _router: Router,
               private _mensajeService: MensajeService) { 
+    const lsUserSesion = sessionStorage.getItem("mssUser");
+    if (lsUserSesion){
+      const userSesion = JSON.parse(lsUserSesion);
+      if (userSesion.expiry && new Date().getDate() < userSesion.expiry){
+        this._isLogged = true;
+        this._user = userSesion.usuario;
+      }
+      else{
+        sessionStorage.removeItem("mssUser");
+      }
+    }
+  }
+
+  ngOnInit(): void {
     const lsUserSesion = sessionStorage.getItem("mssUser");
     if (lsUserSesion){
       const userSesion = JSON.parse(lsUserSesion);
@@ -88,9 +102,7 @@ export class MssApiService {
   }
 
   getUser(): IUser {
-    if (this._isLogged)
-      return this._user!;
-    return null!;
+    return this._user!;
   }
 
   isLogged(): boolean{
@@ -167,11 +179,4 @@ export const PublicistasResolver: ResolveFn<Observable<RespuestaBean>> = (_route
   const user = userService.getUser();
   
   return inject(MssApiRestResourceService).obtenerListadoPublicistas({token_usuario: user.token!});
-}
-
-export const ContenidosMasVistosResolver: ResolveFn<Observable<RespuestaBean>> = (_route: ActivatedRouteSnapshot, state: RouterStateSnapshot) => {
-  const userService = inject(MssApiService);
-  const user = userService.getUser();
-  
-  return inject(MssApiRestResourceService).obtenerContenidosMasVistos({token_suscriptor: user.token!});
 }

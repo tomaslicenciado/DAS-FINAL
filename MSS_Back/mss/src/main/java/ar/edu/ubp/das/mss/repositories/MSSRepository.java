@@ -47,6 +47,9 @@ import ar.edu.ubp.das.mss.models.GeneroContenidoBean;
 import ar.edu.ubp.das.mss.models.PlataformaBean;
 import ar.edu.ubp.das.mss.models.PublicacionBean;
 import ar.edu.ubp.das.mss.models.PublicistaBean;
+import ar.edu.ubp.das.mss.models.RegistroEstadisticoAcceso;
+import ar.edu.ubp.das.mss.models.RegistroEstadisticoContenido;
+import ar.edu.ubp.das.mss.models.RegistroEstadisticoViewer;
 import ar.edu.ubp.das.mss.models.RespuestaBean;
 import ar.edu.ubp.das.mss.models.TmpFD;
 import ar.edu.ubp.das.mss.models.Usuario;
@@ -327,7 +330,6 @@ public class MSSRepository implements IMSSRepository{
     @Override
     public RespuestaBean registrarVisualizacion(String token_suscriptor, int id_plataforma, String eidr_contenido) {
         try {
-            System.out.println("Me llamaron");
             int nivel = obtenerNivelUsuario(token_suscriptor);
             if (nivel != Nivel.SUSCRIPTOR.getNivel())
                 return ResponseHandler.handleUnauthorizedResponse("No tiene permisos para realizar esta operación");
@@ -758,7 +760,110 @@ public class MSSRepository implements IMSSRepository{
 
     @Override
     public void enviarEstadisticas() throws Exception {
-        //Renovar los registros tarifarios de los suscriptores activos por plataforma
+        Map<Integer, List<RegistroEstadisticoViewer>> estadisticasVPlataformas = new HashMap<>();
+        Map<Integer, List<RegistroEstadisticoContenido>> estadisticasCPlataformas = new HashMap<>();
+        Map<Integer, List<RegistroEstadisticoAcceso>> estadisticasPublicidades = new HashMap<>();
+        Date fecha_fin = new Date();
+        long fn_milisegundos = fecha_fin.getTime();
+        long siete_dias_milisegundos = 7 * 24 * 60 * 60 * 1000;
+        Date fecha_inicio = new Date(fn_milisegundos - siete_dias_milisegundos);
+
+        //Obtengo estadísticas de Viewers por plataforma
+        jdbcCall = nuevaCall("obtener_estadisticas_viewers")
+            .returningResultSet("estadisticas", (rs, rowNum) -> {
+                int id = rs.getInt("id_plataforma");
+                RegistroEstadisticoViewer rv = new RegistroEstadisticoViewer(
+                    fecha_inicio,
+                    fecha_fin,
+                    rs.getInt("cant_usuarios_activos"),
+                    rs.getInt("cant_registros_nuevos")
+                );
+                if (estadisticasVPlataformas.containsKey(id))
+                    estadisticasVPlataformas.get(id).add(rv);
+                else{
+                    estadisticasVPlataformas.put(id, new ArrayList<RegistroEstadisticoViewer>());
+                    estadisticasVPlataformas.get(id).add(rv);
+                }
+                return null;
+            });
+        in = new MapSqlParameterSource().addValue("fecha_inicio", fecha_inicio).addValue("fecha_fin", fecha_fin);
+        jdbcCall.execute(in);
+
+        //Obtengo estadísticas de contenidos por plataforma
+        jdbcCall = nuevaCall("obtener_estadisticas_contenidos")
+            .returningResultSet("estadisticas", (rs, rowNum) -> {
+                int id = rs.getInt("id_plataforma");
+                RegistroEstadisticoContenido rc = new RegistroEstadisticoContenido(
+                    rs.getString("eidr_contenido"),
+                    fecha_inicio,
+                    fecha_fin,
+                    rs.getInt("cant_visualizaciones"),
+                    rs.getInt("cant_likes")
+                );
+                if (estadisticasCPlataformas.containsKey(id))
+                    estadisticasCPlataformas.get(id).add(rc);
+                else{
+                    estadisticasCPlataformas.put(id, new ArrayList<RegistroEstadisticoContenido>());
+                    estadisticasCPlataformas.get(id).add(rc);
+                }
+                return null;
+            });
+        in = new MapSqlParameterSource().addValue("fecha_inicio", fecha_inicio).addValue("fecha_fin", fecha_fin);
+        jdbcCall.execute(in);
+
+        //Obtengo estadísticas de accesos a publicidades
+        jdbcCall = nuevaCall("obtener_estadisticas_publicidades")
+            .returningResultSet("estadisticas", (rs, rowNum) -> {
+                int id = rs.getInt("id_publicista");
+                RegistroEstadisticoAcceso ra = new RegistroEstadisticoAcceso(
+                    rs.getInt("id_publicidad"),
+                    rs.getInt("cant_accesos"),
+                    fecha_inicio, 
+                    fecha_fin
+                );
+                if (estadisticasPublicidades.containsKey(id))
+                    estadisticasPublicidades.get(id).add(ra);
+                else{
+                    estadisticasPublicidades.put(id, new ArrayList<RegistroEstadisticoAcceso>());
+                    estadisticasPublicidades.get(id).add(ra);
+                }
+                return null;
+            });
+        in = new MapSqlParameterSource().addValue("fecha_inicio", fecha_inicio).addValue("fecha_fin", fecha_fin);
+        jdbcCall.execute(in);
+
+        List<RespuestaBean> respuestas = new ArrayList<>();
+        //Enviar estadísticas
+        System.out.println(gson.toJson(estadisticasPublicidades));
+        for (Map.Entry<Integer, List<RegistroEstadisticoAcceso>> entry : estadisticasPublicidades.entrySet()) {
+            Map<String, String> parametros = new HashMap<>();
+            parametros.put("estadisticas_accesos_json", gson.toJson(entry.getValue()));
+            respuestas.add(services.consultarPublicista(entry.getKey(), "insertarEstadisticas", parametros));
+        }
+
+        List<Integer> ids_plataformas = new ArrayList<>();
+        for (Integer i : estadisticasCPlataformas.keySet()) {
+            if (!ids_plataformas.contains(i))
+                ids_plataformas.add(i);
+        }
+        for (Integer i : estadisticasVPlataformas.keySet()) {
+            if (!ids_plataformas.contains(i))
+                ids_plataformas.add(i);
+            
+        }
+
+        for (Integer i : ids_plataformas) {
+            List<RegistroEstadisticoContenido> contenidos = new ArrayList<>();
+            List<RegistroEstadisticoViewer> viewers = new ArrayList<>();
+            if (estadisticasCPlataformas.containsKey(i))
+                contenidos = estadisticasCPlataformas.get(i);
+            if (estadisticasVPlataformas.containsKey(i))
+                viewers = estadisticasVPlataformas.get(i);
+            Map<String, String> parametros = new HashMap<>();
+            parametros.put("estadisticas_contenidos_json", gson.toJson(contenidos));
+            parametros.put("estadisticas_viewers_json", gson.toJson(viewers));
+            respuestas.add(services.consultarPlataforma(i, "insertarEstadisticas", parametros));
+        }
     }
 
     @Override
@@ -824,7 +929,6 @@ public class MSSRepository implements IMSSRepository{
             List<PublicacionBean> pub = (List<PublicacionBean>) obtenerValorDeJsonBody(respPublicista, null, PublicacionBean.class, true);
             publicidades.addAll(pub);
         }
-        System.out.println(gson.toJson(publicidades));
         jdbcCall = nuevaCall("actualizar_publicidades_batch");
         in = new MapSqlParameterSource().addValue("json", gson.toJson(publicidades)); 
         out = jdbcCall.execute(in);
@@ -926,22 +1030,6 @@ public class MSSRepository implements IMSSRepository{
     private SimpleJdbcCall nuevaCall(String procedureName){
         return new SimpleJdbcCall(jdbcTpl).withSchemaName("dbo").withProcedureName(procedureName);
     }
-
-    /*private <T> T obtenerValorDeJsonBody(RespuestaBean resp, String clave, Class<T> clase, boolean esLista) {
-        JsonElement jsonElement;
-        if (clave != null) {
-            jsonElement = JsonParser.parseString(resp.getBody()).getAsJsonObject().get(clave);
-        } else {
-            jsonElement = JsonParser.parseString(resp.getBody());
-        }
-
-        if (esLista) {
-            TypeToken<List<T>> typeToken = new TypeToken<List<T>>(){};
-            return gson.fromJson(jsonElement, typeToken.getType());
-        } else {
-            return gson.fromJson(jsonElement, clase);
-        }
-    }*/
 
     private <T> T obtenerValorDeJsonBody(RespuestaBean resp, String clave, Class<T> clase, boolean esLista) {
         JsonElement jsonElement;

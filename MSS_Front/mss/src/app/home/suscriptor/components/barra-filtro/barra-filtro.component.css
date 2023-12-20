@@ -16,3 +16,12 @@
 .filter-bar input {
     margin-right: 10px; /* Ajusta según tus necesidades */
 }
+
+.btn-todos{
+    float: left;
+    margin-left: 10px;
+    border: none;
+    background-color: rgb(83, 83, 83);
+    margin-top: 2px;
+    color: white;
+}

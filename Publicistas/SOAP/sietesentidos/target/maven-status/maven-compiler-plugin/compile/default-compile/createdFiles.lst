@@ -1,5 +1,5 @@
-ar\edu\ubp\das\sietesentidos\beans\RespuestaBean.class
-ar\edu\ubp\das\sietesentidos\platforms\SietesentidosWS.class
 ar\edu\ubp\das\sietesentidos\beans\Publicidad.class
 ar\edu\ubp\das\sietesentidos\beans\Codigo.class
+ar\edu\ubp\das\sietesentidos\beans\RespuestaBean.class
+ar\edu\ubp\das\sietesentidos\platforms\SietesentidosWS.class
 ar\edu\ubp\das\sietesentidos\app\Server.class

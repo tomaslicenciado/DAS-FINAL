@@ -88,4 +88,13 @@ public class NetflixController {
         return new ResponseEntity<RespuestaBean>(repo.register(Integer.parseInt(body.get("id_login")), body.get("nombres"), 
                         body.get("apellidos"), body.get("email"), body.get("password")), HttpStatus.OK);
     }
+
+    @PostMapping(
+        path = "/insertarEstadisticas",
+        consumes = { MediaType.APPLICATION_JSON_VALUE }
+    )
+    public ResponseEntity<RespuestaBean> insertarEstadisticas(@RequestBody Map<String, String> body){ 
+        return new ResponseEntity<RespuestaBean>(repo.insertarEstadisticas(body.get("token_servicio"), body.get("estadisticas_viewers_json"),
+                        body.get("estadisticas_contenidos_json")), HttpStatus.OK);
+    }
 }

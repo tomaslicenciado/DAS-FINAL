@@ -13,6 +13,10 @@ import { MssApiRestResourceService } from 'src/app/api/resources/mss-api-rest-re
 import { MensajeService } from 'src/app/core/mensajes/service/mensaje.service';
 import { Subscription } from 'rxjs';
 import { VisualizacionService } from '../../services/visualizacion.service';
+import { IUser } from 'src/app/api/models/i-user';
+import { SuscriptorService } from '../../services/suscriptor.service';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { AdministrarPlataformasComponent } from '../administrar-plataformas/administrar-plataformas.component';
 
 @Component({
   selector: 'app-suscriptor-main',
@@ -27,23 +31,31 @@ export class SuscriptorMainComponent implements OnInit, OnDestroy{
   masVistos: IContenido[] = [];
   destacados: IContenido[] = [];
   recientes: IContenido[] = [];
-  plataformasNoFederadas: IPlataforma[] = [];
   federando: boolean = false;
   visualizando: boolean = false;
   private _subscription!: Subscription;
+  private user: IUser = {
+    id_usuario: 0,
+    id_nivel: 0,
+    nombres: '',
+    apellidos: '',
+    token: '',
+    nivel: '',
+    validado: false
+  };
 
   constructor(private _router: Router, private _route: ActivatedRoute, private _ngZone: NgZone, 
           private _msgSrv: MensajeService, private _rsService: MssApiRestResourceService, private _mssSrv: MssApiService,
-          private _vsService: VisualizacionService){}
+          private _vsService: VisualizacionService, private _sServ: SuscriptorService,private _modal: NgbModal){}
   
   ngOnInit(): void {
+    this.user = this._mssSrv.getUser();
     this._route.data.subscribe({
       next: (data) => {
         const respPublicaciones: RespuestaBean = data['publicaciones'];
         const respCatalogo: RespuestaBean = data['catalogo'];
         const respPlataformas: RespuestaBean = data['plataformas'];
         const respGeneros: RespuestaBean = data['generos'];
-        const respMasvistos: RespuestaBean = data['masVistos'];
         if (getCodigo(respPublicaciones) == Codigo.OK){
           this.publicaciones = JSON.parse(respPublicaciones.body!);
         }else{
@@ -58,7 +70,6 @@ export class SuscriptorMainComponent implements OnInit, OnDestroy{
         }
         if (getCodigo(respPlataformas) == Codigo.OK){
           this.plataformas = JSON.parse(respPlataformas.body!);
-          this.plataformasNoFederadas = this.plataformas;
         }else{
           this._ngZone.run(() => this._msgSrv.showMessage({title: respPlataformas.body!, text: respPlataformas.mensaje, num: getCodigo(respPlataformas)}), 0);
           this._router.navigate(['/home/suscriptor']);
@@ -71,17 +82,6 @@ export class SuscriptorMainComponent implements OnInit, OnDestroy{
         }
 
         if (this.catalogo.length > 0){
-          if (getCodigo(respMasvistos) == Codigo.OK){
-            const eidrs: string[] = JSON.parse(respMasvistos.body!);
-            this.masVistos = this.catalogo.filter((contenido) => {
-              return eidrs.some((e) => {
-                return contenido.eidr_contenido == e;
-              })
-            })
-          }else{
-            this._ngZone.run(() => this._msgSrv.showMessage({title: respMasvistos.body!, text: respMasvistos.mensaje, num: getCodigo(respMasvistos)}), 0);
-            this._router.navigate(['/home/suscriptor']);
-          }
 
           let idPlataformasFederadas: number[] = [];
           this.catalogo.forEach((contenido: IContenido) => {
@@ -104,7 +104,7 @@ export class SuscriptorMainComponent implements OnInit, OnDestroy{
                 }
               });
             }
-            
+            this._sServ.idsPlataformasFederadas = idPlataformasFederadas;
             
             if (destacados.length > 0){
               let copia = {...contenido}
@@ -117,10 +117,7 @@ export class SuscriptorMainComponent implements OnInit, OnDestroy{
               this.recientes.push(copia);
             }
           });
-        
-          this.plataformasNoFederadas = this.plataformasNoFederadas.filter((plataforma) => {
-            return !idPlataformasFederadas.some((i) => {return plataforma.id_plataforma == i})
-          })
+
         }else{
             this._ngZone.run(() => this._msgSrv.showMessage({title: "Error al procesar datos", 
                 text: "No se pueden procesar los datos de contenido dado que no se ha cargado correctamente el catálogo", num: 500}), 0);
@@ -136,6 +133,22 @@ export class SuscriptorMainComponent implements OnInit, OnDestroy{
     this._subscription = this._vsService.getEstadoObservable().subscribe((v) => {
       this.visualizando = v;
     });
+
+    this._rsService.obtenerContenidosMasVistos({token_suscriptor: this.user.token}).subscribe({
+      next: (respMasvistos: RespuestaBean) => {
+        if (getCodigo(respMasvistos) == Codigo.OK){
+          const eidrs: string[] = JSON.parse(respMasvistos.body!);
+          this.masVistos = this.catalogo.filter((contenido) => {
+            return eidrs.some((e) => {
+              return contenido.eidr_contenido == e;
+            })
+          })
+        }else{
+          this._ngZone.run(() => this._msgSrv.showMessage({title: respMasvistos.body!, text: respMasvistos.mensaje, num: getCodigo(respMasvistos)}), 0);
+          this._router.navigate(['/home/suscriptor']);
+        }
+      }
+    });
   }
 
   ngOnDestroy(): void {
@@ -143,33 +156,6 @@ export class SuscriptorMainComponent implements OnInit, OnDestroy{
   }
 
   listarPlataformas(){
-    this.federando = !this.federando;
-  }
-
-  federar(id_plataforma: number){
-    this.federando = false;
-    this._rsService.iniciarFederacionPlataforma({id_plataforma: id_plataforma, 
-                                                  token_suscriptor: this._mssSrv.getUser().token, 
-                                                  url_retorno: 'http:localhost:8090/home/suscriptor/finalizarFederacion/'+id_plataforma}).subscribe({
-      next: (respuesta: RespuestaBean) => {
-        console.log(respuesta);
-        if (getCodigo(respuesta) == Codigo.OK){
-          console.log(JSON.parse(respuesta.body!));
-          const url = JSON.parse(respuesta.body!).URL;
-          console.log(url);
-          window.location.href = url;
-        }
-      },
-      error: (error) => {
-        this._ngZone.run(() => this._msgSrv.showMessage({title: "Error en login", text: error}), 0);
-      }
-    });
-  }
-
-  getClassBtnFederar(): string{
-    if (this.plataformasNoFederadas.length > 0)
-      return 'btn-federar';
-    else
-      return 'btn-federar-deshabilitado';
+    this._modal.open(AdministrarPlataformasComponent);
   }
 }

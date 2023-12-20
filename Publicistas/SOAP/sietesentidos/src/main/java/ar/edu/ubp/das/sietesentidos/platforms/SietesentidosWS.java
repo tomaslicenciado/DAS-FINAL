@@ -10,9 +10,12 @@ import java.util.List;
 import java.util.Properties;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 
 import ar.edu.ubp.das.sietesentidos.beans.Codigo;
 import ar.edu.ubp.das.sietesentidos.beans.Publicidad;
+import ar.edu.ubp.das.sietesentidos.beans.RegistroEstadisticoAcceso;
 import ar.edu.ubp.das.sietesentidos.beans.RespuestaBean;
 import jakarta.jws.WebMethod;
 import jakarta.jws.WebParam;
@@ -27,6 +30,7 @@ public class SietesentidosWS {
     private String sql_conection_string;
     private String sql_user;
     private String sql_pass;
+    private Gson gson;
 
     public SietesentidosWS(){
         Properties properties = new Properties();
@@ -39,13 +43,17 @@ public class SietesentidosWS {
         } catch (Exception e) {
             e.printStackTrace(); 
         }
+        
+        GsonBuilder gsonBuilder = new GsonBuilder();
+        gsonBuilder.setDateFormat("dd-MM-yyyy");
+        gson = gsonBuilder.create();
     }
 
     @WebMethod()
     @WebResult(name = "publicidades")
     public RespuestaBean obtenerPublicidades(@WebParam(name = "token_servicio") String token_servicio){
         RespuestaBean respuesta = new RespuestaBean();
-        if (!token_valid(token_servicio)){
+        if (!tokenValid(token_servicio)){
             respuesta.setStatus(Codigo.NO_AUTORIZADO);
             respuesta.setMensaje("El token proporcionado no es válido");
             respuesta.setBody("Error");
@@ -79,7 +87,7 @@ public class SietesentidosWS {
             rs.close();
 
             respuesta.setStatus(Codigo.OK);
-            respuesta.setBody(new Gson().toJson(publicidades));
+            respuesta.setBody(gson.toJson(publicidades));
             respuesta.setMensaje("Publicidades obtenidas");
             return respuesta;
         }
@@ -91,7 +99,31 @@ public class SietesentidosWS {
         }
     }
 
-    private boolean token_valid(String token_servicio){
+    @WebMethod()
+    @WebResult(name = "respuesta")
+    public RespuestaBean insertarEstadisticas(@WebParam(name = "token_servicio") String token_servicio, 
+                                @WebParam(name = "estadisticas_accesos_json") String estadisticas_accesos_json){
+        try {
+            if (!tokenValid(token_servicio))
+                return new RespuestaBean(Codigo.NO_AUTORIZADO, "El token de servicio proporcionado no es válido", "ERROR");
+            Connection conn;
+            CallableStatement stmt;
+            ResultSet rs;
+            Class.forName(driver_sql);
+            conn = DriverManager.getConnection(sql_conection_string, sql_user, sql_pass);
+            conn.setAutoCommit(true);
+            
+            stmt = conn.prepareCall("{CALL dbo.insertar_estadisticas_externas(?)}");
+            stmt.setString("json", estadisticas_accesos_json);
+            
+            stmt.execute();
+            return new RespuestaBean(Codigo.OK, "Estadísticas registradas con éxito", null);
+        } catch (Exception e) {
+            return new RespuestaBean(Codigo.ERROR, "Error al insertar estadísticas",e.getMessage());
+        }
+    }
+
+    private boolean tokenValid(String token_servicio){
         try {
             Connection conn;
             CallableStatement stmt;
