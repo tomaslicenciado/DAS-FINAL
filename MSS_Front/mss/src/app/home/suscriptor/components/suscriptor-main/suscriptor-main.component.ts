@@ -118,11 +118,12 @@ export class SuscriptorMainComponent implements OnInit, OnDestroy{
             }
           });
 
-        }else{
+        }
+        /*else{
             this._ngZone.run(() => this._msgSrv.showMessage({title: "Error al procesar datos", 
                 text: "No se pueden procesar los datos de contenido dado que no se ha cargado correctamente el catálogo", num: 500}), 0);
             this._router.navigate(['/home/suscriptor']);
-          }
+          }*/
         
       },
       error: (error) => {

@@ -203,6 +203,7 @@ public class MSSRepository implements IMSSRepository{
                 jdbcCall = nuevaCall("insertar_registro_tarifario_federacion");
                 in = new MapSqlParameterSource().addValue("transaction_id", transaction_id);
                 jdbcCall.execute(in);
+                actualizarCatalogo();
             }
             return new RespuestaBean(Codigo.OK, "Federación finalizada con éxito","");
         } catch (Exception e) {

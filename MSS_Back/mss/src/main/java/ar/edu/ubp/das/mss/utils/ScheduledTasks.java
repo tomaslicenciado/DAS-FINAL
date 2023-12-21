@@ -43,7 +43,7 @@ public class ScheduledTasks {
     }
 
     //A realizar cada 12 horas
-    @Scheduled(cron = "0 0 */12 * * *")
+    @Scheduled(cron = "0 11 17 * * ?")
     public void actualizarCatalogo(){
         try {
             repo.actualizarCatalogo();

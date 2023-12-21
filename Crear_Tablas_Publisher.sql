@@ -165,7 +165,7 @@ insert into dbo.Servicios_Exposicion (nombre, token)
 values ('MSS', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJub21icmUiOiJNU1MiLCJmZWNoYSI6IjEzLzEyLzIwMjMgMDA6MDA6MDAiLCJzZXJ2aWNpbyI6InBvc2l0aXZvIn0.Q4ihAhMVdfHN0_EueMizfpTMLftozw9NApTNxeIctPA')
 
 insert into dbo.Publicidades (url_contenido, url_imagen)
-values ('https://betos.com.ar/', 'https://epxus.com.ar/wp-content/uploads/2019/02/twitter.jpg'), --H
+values ('https://www.verisure.com.ar/', 'https://www.verisure.com.ar/sites/ar/files/flmngr/kit-home-24_1.png?no-cache=1703009254287'), --H
 		('https://www.fiat.com.ar/','https://c8.alamy.com/compes/2awap6d/1959-ca-torino-italia-la-industria-automovilistica-italiana-fiat-f-i-a-t-fabbrica-italiana-automobili-torino-publicidad-para-fiat-500-automatico-automatico-2awap6d.jpg') --V
 
 insert into dbo.Publicaciones (id_publicidad, id_servicio, banner_code, fecha_inicio, fecha_fin, codigo_unico_id)

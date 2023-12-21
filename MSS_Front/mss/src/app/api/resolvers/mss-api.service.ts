@@ -60,7 +60,7 @@ export class MssApiService implements OnInit{
         }
         else{
           this._isLogged = false;
-          this._ngZone.run(() => this._mensajeService.showMessage({title: respuesta.body!, text: respuesta.mensaje, num: getCodigo(respuesta)}), 0);
+          this._ngZone.run(() => this._mensajeService.showMessage({title: "Login icorrecto", text: "El usuario y/o contraseña no coinciden", num: getCodigo(respuesta)}), 0);
         }
       },
       error: (error: Error) => {
@@ -85,7 +85,7 @@ export class MssApiService implements OnInit{
         }
         else{
           this._isLogged = false;
-          this._ngZone.run(() => this._mensajeService.showMessage({title: respuesta.body!, text: respuesta.mensaje, num: getCodigo(respuesta)}), 0);
+          this._ngZone.run(() => this._mensajeService.showMessage({title: "Error al registrar el usuario", text: respuesta.mensaje, num: getCodigo(respuesta)}), 0);
         }
       },
       error: (error: Error) => {
