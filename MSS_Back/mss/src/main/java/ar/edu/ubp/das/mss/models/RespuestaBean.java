@@ -5,12 +5,12 @@ public class RespuestaBean {
     private String mensaje;
     private String body;
 
-    public RespuestaBean (){};
+    public RespuestaBean (){}
 
-    public RespuestaBean (Codigo cod, String msj, String bod){
+    public RespuestaBean (Codigo cod, String msj, String body){
         this.status = cod;
         this.mensaje = msj;
-        this.body = bod;
+        this.body = body;
     }
 
     public Codigo getStatus() {

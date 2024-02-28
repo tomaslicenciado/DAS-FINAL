@@ -16,15 +16,12 @@ import org.springframework.stereotype.Repository;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
 
 import ar.edu.ubp.das.netflix.beans.ActuacionCatalogo;
 import ar.edu.ubp.das.netflix.beans.Catalogo;
 import ar.edu.ubp.das.netflix.beans.Codigo;
 import ar.edu.ubp.das.netflix.beans.ContenidoCatalogo;
 import ar.edu.ubp.das.netflix.beans.DireccionCatalogo;
-import ar.edu.ubp.das.netflix.beans.RegistroEstadisticoContenido;
-import ar.edu.ubp.das.netflix.beans.RegistroEstadisticoViewer;
 import ar.edu.ubp.das.netflix.beans.RespuestaBean;
 import ar.edu.ubp.das.netflix.utils.TokenGenerator;
 
@@ -40,7 +37,7 @@ public class NetflixRepository implements INetflixRepository {
 
     NetflixRepository(){
         GsonBuilder gsonBuilder = new GsonBuilder();
-        gsonBuilder.setDateFormat("dd-MM-yyyy");
+        gsonBuilder.setDateFormat("yyyy-MM-dd");
         gson = gsonBuilder.create();
     }
 

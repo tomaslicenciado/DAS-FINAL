@@ -69,7 +69,6 @@ export class RegisterComponent implements OnInit{
       let nombres = this.form.controls['nombres'].value;
       let apellidos = this.form.controls['apellidos'].value;
       this._service.register(email, password, nombres, apellidos, []);
-      this._router.navigate(['/home/suscriptor']);
     }
   }
 }

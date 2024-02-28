@@ -1,5 +1,5 @@
 <div [formGroup]="filterForm" class="filter-bar">
-  <button type="button" class="btn-todos">Todos los contenidos</button>
+  <button type="button" class="btn-todos" (click)="selectAll()">Todos los contenidos</button>
   <!-- Dropdown para Tipo de Contenido -->
   <label for="tipoContenido" i18n>Tipo de Contenido:</label>
   <select id="tipoContenido" formControlName="tipo">
@@ -17,5 +17,5 @@
 
   <!-- Buscador -->
   <label for="buscador" i18n>Buscar:</label>
-  <input type="text" id="buscador" formControlName="searchTerm" />
+  <input type="text" id="buscador" formControlName="searchTerm" [ngStyle]="filterStyle" (focus)="cleanfilter()"/>
 </div>

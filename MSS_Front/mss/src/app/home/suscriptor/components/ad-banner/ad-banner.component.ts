@@ -22,13 +22,13 @@ export class AdBannerComponent implements OnInit, OnDestroy{
   visualizando: boolean = false;
 
   constructor(private _vsServ: VisualizacionService, private _rsService: MssApiRestResourceService, private _mssServ: MssApiService) {
-    
+
   }
 
   ngOnDestroy(): void {
     this._subscription.unsubscribe();
   }
-  
+
   ngOnInit(): void {
     this._subscription = this._vsServ.getEstadoObservable().subscribe((vis: boolean) => {
       this.visualizando = vis;
@@ -77,5 +77,12 @@ export class AdBannerComponent implements OnInit, OnDestroy{
         console.log(respuesta);
       }
     });
+  }
+
+  getClaseOculta(): string[] {
+    if (this.publicacion.url_contenido == "" || this.publicacion.url_imagen == ""
+      || this.publicacion.url_contenido == null || this.publicacion.url_imagen == null)
+      return ['d-none']
+    return ['ad'];
   }
 }

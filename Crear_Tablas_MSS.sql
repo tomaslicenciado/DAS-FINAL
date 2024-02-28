@@ -266,7 +266,7 @@ go
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 -----------------TRIGGERS----------------------------------------------------------
--- Actualización de monto de factura al agregar un detalle
+-- Actualizaciï¿½n de monto de factura al agregar un detalle
 CREATE OR ALTER TRIGGER tr_ActualizarMontoFactura
 ON dbo.Detalles_Factura
 AFTER INSERT
@@ -371,7 +371,7 @@ BEGIN
     SET NOCOUNT ON;
 	SET TRANSACTION ISOLATION LEVEL REPEATABLE READ;
 
-    -- Obtener el token de federación activo correspondiente al usuario y plataforma
+    -- Obtener el token de federaciï¿½n activo correspondiente al usuario y plataforma
     SELECT TOP 1 @token_viewer = F.token
     FROM dbo.Federaciones F
     INNER JOIN dbo.Tokens_Usuario TU ON F.id_usuario = TU.id_usuario
@@ -400,7 +400,7 @@ BEGIN
             @token VARCHAR(255),
 			@validado BIT;
 
-    -- Verificar si el usuario está activo y las credenciales son correctas
+    -- Verificar si el usuario estï¿½ activo y las credenciales son correctas
     SELECT TOP 1
         @id_usuario = U.id_usuario,
         @nombres = U.nombres,
@@ -450,7 +450,7 @@ BEGIN
 
 	if exists (select 1 from dbo.Usuarios u where u.email = @email)
 	begin
-		raiserror('El correo electrónico ya está en uso', 16, 1)
+		raiserror('El correo electrÃ³nico ya estÃ¡ en uso',16,1)
 	end
     -- Registrar el suscriptor en la tabla Usuarios
     INSERT INTO dbo.Usuarios (email, u_password, nombres, apellidos, id_nivel)
@@ -458,10 +458,10 @@ BEGIN
 	
 	if @@ROWCOUNT = 0
 	begin
-		raiserror('Error en la inserción. No se insertó el usuario', 16, 1)
+		raiserror('Error en la inserciÃ³n. No se insertÃ³ el usuario', 16, 1)
 	end
 
-    -- Obtener el id de usuario recién generado
+    -- Obtener el id de usuario reciï¿½n generado
     SET @id_usuario = SCOPE_IDENTITY();
 
     -- Registrar el token en la tabla Tokens_Usuario
@@ -470,7 +470,7 @@ BEGIN
 	
 	if @@ROWCOUNT = 0
 	begin
-		raiserror('Error en la inserción. No se agregó el token', 16, 1)
+		raiserror('Error en la inserciÃ³n. No se agregÃ³ el token', 16, 1)
 	end
 
 	SELECT @nivel = nivel
@@ -478,6 +478,31 @@ BEGIN
 	WHERE id_nivel = 1
 END;
 go
+
+CREATE OR ALTER PROCEDURE dbo.verify_email
+	@email VARCHAR(255),
+	@free BIT OUT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    SET TRANSACTION ISOLATION LEVEL REPEATABLE READ;
+
+	DECLARE @count INT;
+
+	SELECT @count = COUNT(id_usuario)
+	FROM dbo.Usuarios
+	WHERE email = @email
+
+	IF @count = 0
+	BEGIN
+		SET @free = 1
+	END
+	ELSE
+	BEGIN
+		SET @free = 0
+	END
+END
+GO
 
 CREATE OR ALTER PROCEDURE dbo.iniciar_federacion
     @id_plataforma INT,
@@ -499,7 +524,7 @@ BEGIN
     WHERE TU.token = @token_usuario
       AND U.activo = 1;
 
-    -- Verificar si se encontró un usuario activo asociado al token
+    -- Verificar si se encontrï¿½ un usuario activo asociado al token
     IF @id_usuario IS NOT NULL
     BEGIN
         -- Obtener la fecha de inicio del sistema
@@ -522,7 +547,7 @@ BEGIN
     END
     ELSE
     BEGIN
-        -- Devolver un valor negativo o un código de error para indicar que no se encontró un usuario activo
+        -- Devolver un valor negativo o un cï¿½digo de error para indicar que no se encontrï¿½ un usuario activo
         SET @id_federacion = -1;
     END
 END;
@@ -571,7 +596,7 @@ BEGIN
       AND F.activa = 1
       AND F.completa = 0;
 
-    -- Obtener el id de la federación activa correspondiente al usuario y plataforma
+    -- Obtener el id de la federaciï¿½n activa correspondiente al usuario y plataforma
     SELECT TOP 1 @id_federacion = id_federacion
     FROM dbo.Federaciones
     WHERE id_usuario = @id_usuario
@@ -579,7 +604,7 @@ BEGIN
       AND activa = 1
       AND completa = 0;
 
-    -- Actualizar la federación encontrada
+    -- Actualizar la federaciï¿½n encontrada
     IF @id_federacion IS NOT NULL
     BEGIN
         UPDATE dbo.Federaciones
@@ -591,7 +616,7 @@ BEGIN
 		
 		if @@ROWCOUNT = 0
 		begin
-			raiserror('Error en la inserción. No se finalizó la federación', 16, 1)
+			raiserror('Error en la inserciï¿½n. No se finalizï¿½ la federaciï¿½n', 16, 1)
 		end
 
 		if @es_nuevo = 1
@@ -618,7 +643,7 @@ BEGIN
     END
 	ELSE
 	BEGIN
-		RAISERROR('No se encontró federación activa asociada al usuario y plataforma indicados.', 16, 1);
+		RAISERROR('No se encontrï¿½ federaciï¿½n activa asociada al usuario y plataforma indicados.', 16, 1);
 	END
 END;
 go
@@ -629,7 +654,7 @@ BEGIN
     SET NOCOUNT ON;
     SET TRANSACTION ISOLATION LEVEL REPEATABLE READ;
 
-    -- Seleccionar la lista de géneros
+    -- Seleccionar la lista de gï¿½neros
     SELECT id_genero_contenido, genero
     FROM dbo.Generos_Contenido;
 END;
@@ -676,7 +701,7 @@ BEGIN
   
 	if @@ROWCOUNT = 0
 	begin
-		raiserror('Error en la inserción. No se desuscribió la plataforma', 16, 1)
+		raiserror('Error en la inserciï¿½n. No se desuscribiï¿½ la plataforma', 16, 1)
 	end
 END;
 go
@@ -748,7 +773,7 @@ BEGIN
             WHERE pc.pais = c.pais
         );
 
-		-- Desactivar contenidos existentes que no están en la lista
+		-- Desactivar contenidos existentes que no estï¿½n en la lista
         UPDATE c
         SET c.activo = 0
         FROM dbo.Contenidos c
@@ -972,7 +997,7 @@ BEGIN
     BEGIN TRY
         BEGIN TRANSACTION;
 
-        -- Desactivar registros existentes que no están en la lista
+        -- Desactivar registros existentes que no estï¿½n en la lista
         UPDATE px
         SET px.activo = 0
         FROM dbo.Plataformas_X_Contenido px
@@ -1080,6 +1105,13 @@ BEGIN
             SELECT pc.id_plataforma, pc.eidr_contenido, pc.fecha_carga, pc.destacado
             FROM dbo.Plataformas_X_Contenido pc
             WHERE pc.eidr_contenido = c.eidr_contenido
+			AND EXISTS (
+				SELECT 1
+				FROM dbo.Federaciones f
+				LEFT JOIN dbo.Tokens_Usuario tu ON tu.id_usuario = f.id_usuario
+				WHERE f.id_plataforma = pc.id_plataforma
+				AND tu.token = @token_suscriptor
+			)
             FOR JSON AUTO
         ) AS plataformas_x_contenido
     FROM dbo.Contenidos c
@@ -1119,7 +1151,7 @@ BEGIN
     WHERE tu.token = @token_suscriptor
 	AND u.activo = 1;
 
-    -- Verificar que existe una federación activa con la plataforma
+    -- Verificar que existe una federaciï¿½n activa con la plataforma
     IF EXISTS (
         SELECT 1
         FROM dbo.Federaciones f
@@ -1134,19 +1166,19 @@ BEGIN
         WHERE pc.id_plataforma = @id_plataforma
           AND pc.eidr_contenido = @eidr_contenido;
 
-        -- Insertar la visualización
+        -- Insertar la visualizaciï¿½n
         INSERT INTO dbo.Visualizaciones (id_plataforma_contenido, id_usuario, fecha_visualizacion)
         VALUES (@id_plataforma_contenido, @id_usuario, GETDATE());
 		
 		if @@ROWCOUNT = 0
 		begin
-			raiserror('Error en la inserción. No se registró la visualización', 16, 1)
+			raiserror('Error en la inserciï¿½n. No se registrï¿½ la visualizaciï¿½n', 16, 1)
 		end
     END
     ELSE
     BEGIN
-        -- Mensaje de error si no hay federación activa
-        RAISERROR ('Error: No hay federación activa con la plataforma.', 16, 1);
+        -- Mensaje de error si no hay federaciï¿½n activa
+        RAISERROR ('Error: No hay federaciï¿½n activa con la plataforma.', 16, 1);
     END;
 END;
 GO
@@ -1199,20 +1231,22 @@ begin
 
 	if @@ROWCOUNT = 0
 	begin
-		raiserror('Error en la inserción. No se agregó la plataforma', 16, 1)
+		raiserror('Error en la inserciÃ³n. No se agregÃ³ la plataforma', 16, 1)
 	end
 end;
 go
 
 create or alter procedure dbo.registrar_acceso_publicidad
 	@token_usuario varchar(255),
-	@id_publicidad integer
+	@id_publicidad integer,
+	@fecha_acceso datetime out
 as
 begin
 	set nocount on;
 	set transaction isolation level repeatable read;
 	
 	declare @id_usuario integer;
+	set @fecha_acceso = GETDATE();
 
 	select @id_usuario = tu.id_usuario
 	from dbo.Tokens_Usuario tu
@@ -1223,11 +1257,11 @@ begin
 	if @id_usuario is not null
 	begin
 		insert into dbo.Accesos_Publicidad (id_publicidad, id_usuario, fecha_acceso)
-		values (@id_publicidad, @id_usuario, GETDATE())
+		values (@id_publicidad, @id_usuario, @fecha_acceso)
 
 		if @@ROWCOUNT = 0
 		begin
-			raiserror('Error en la inserción. No se registró el acceso a la publicidad', 16, 1)
+			raiserror('Error en la inserciÃ³n. No se registrÃ³ el acceso a la publicidad', 16, 1)
 		end
 	end
 	else
@@ -1235,6 +1269,21 @@ begin
 		raiserror('El usuario no existe', 16, 1);
 	end
 end;
+go
+
+create or alter procedure dbo.obtener_publicista_de_publicidad
+	@id_publicidad INT
+AS
+BEGIN
+	set nocount on;
+	set transaction isolation level repeatable read;
+
+	select p.id_publicista, p.nombre, p.razon_social, p.email, p.telefono, p.nombre_contacto, p.id_tipo_servicio, p.url_servicio as url_conexion, p.token_servicio
+	from dbo.Publicistas p
+	LEFT JOIN dbo.Publicidades pu on pu.id_publicista = p.id_publicista
+	WHERE pu.id_publicidad = @id_publicidad
+	
+END
 go
 
 create or alter procedure dbo.insertar_plataforma
@@ -1271,7 +1320,7 @@ begin
 
 		if @@ROWCOUNT = 0
 		begin
-			raiserror('Error en la inserción. No se agregó la plataforma', 16, 1)
+			raiserror('Error en la inserciï¿½n. No se agregï¿½ la plataforma', 16, 1)
 		end
 	end
 end;
@@ -1339,7 +1388,7 @@ begin
 	
 	if @@ROWCOUNT = 0
 	begin
-		raiserror('Error en la actualización. No se modificó la plataforma', 16, 1)
+		raiserror('Error en la actualizaciï¿½n. No se modificï¿½ la plataforma', 16, 1)
 	end
 end;
 go
@@ -1358,7 +1407,7 @@ begin
 
 	if @@ROWCOUNT = 0
 	begin
-		raiserror('Error en la desactivación. No se modificó la plataforma', 16, 1)
+		raiserror('Error en la desactivaciï¿½n. No se modificï¿½ la plataforma', 16, 1)
 	end
 
 	update f
@@ -1418,12 +1467,12 @@ begin
 
 			if @@ROWCOUNT = 0
 			begin
-				raiserror('Error en la modificación. No se modificó el banner', 16, 1)
+				raiserror('Error en la modificaciï¿½n. No se modificï¿½ el banner', 16, 1)
 			end
 		end
 		else
 		begin
-			raiserror('Error en la modificación. No se modificó el banner', 16, 1)
+			raiserror('Error en la modificaciï¿½n. No se modificï¿½ el banner', 16, 1)
 		end
 	end
 
@@ -1448,12 +1497,12 @@ begin
 
 			if @@ROWCOUNT = 0
 			begin
-				raiserror('Error en la modificación. No se modificó el banner', 16, 1)
+				raiserror('Error en la modificaciï¿½n. No se modificï¿½ el banner', 16, 1)
 			end
 		end
 		else
 		begin
-			raiserror('Error en la modificación. No se modificó el banner', 16, 1)
+			raiserror('Error en la modificaciï¿½n. No se modificï¿½ el banner', 16, 1)
 		end
 	end
 end;
@@ -1513,7 +1562,7 @@ begin
 
 		if @@ROWCOUNT = 0
 		begin
-			raiserror('Error en la inserción de Publcista. No se registró el usuario', 16, 1)
+			raiserror('Error en la inserciï¿½n de Publcista. No se registrï¿½ el usuario', 16, 1)
 		end
 	
 		set @id_usuario = SCOPE_IDENTITY()
@@ -1523,7 +1572,7 @@ begin
 
 		if @@ROWCOUNT = 0
 		begin
-			raiserror('Error en la inserción de Publcista. No se registró el token de usuario', 16, 1)
+			raiserror('Error en la inserciï¿½n de Publcista. No se registrï¿½ el token de usuario', 16, 1)
 		end
 
 		insert into dbo.Publicistas (id_tipo_servicio, id_usuario, nombre, nombre_contacto, razon_social, telefono, token_servicio, url_servicio, email)
@@ -1531,7 +1580,7 @@ begin
 
 		if @@ROWCOUNT = 0
 		begin
-			raiserror('Error en la inserción de Publcista. No se registró el publicista', 16, 1)
+			raiserror('Error en la inserciï¿½n de Publcista. No se registrï¿½ el publicista', 16, 1)
 		end
 	end
 	else
@@ -1574,7 +1623,7 @@ begin
 
 		if @@ROWCOUNT = 0
 		begin
-			raiserror('Error en la modificación del Publcista. No se registraron los nuevos datos', 16, 1)
+			raiserror('Error en la modificaciï¿½n del Publcista. No se registraron los nuevos datos', 16, 1)
 		end
 	end
 	else
@@ -1611,7 +1660,7 @@ begin
 
 		if @@ROWCOUNT = 0
 		begin
-			raiserror('Error en la eliminación del Publcista. No se registraron los cambios', 16, 1)
+			raiserror('Error en la eliminaciï¿½n del Publcista. No se registraron los cambios', 16, 1)
 		end
 
 		update ps
@@ -1711,7 +1760,7 @@ begin
 
 	if @@ROWCOUNT = 0
 	begin
-		raiserror('Error en la actualización de datos', 16, 1)
+		raiserror('Error en la actualizaciï¿½n de datos', 16, 1)
 	end
 end
 go
@@ -1775,7 +1824,7 @@ begin
 
 	if @id_usuario is null
 	begin
-		raiserror('El token proporcionado no corresponde a ningún usuario', 16, 1)
+		raiserror('El token proporcionado no corresponde a ningï¿½n usuario', 16, 1)
 	end
 
 	update u
@@ -2052,13 +2101,13 @@ BEGIN
 
     DECLARE @min_id_publicidad INT;
 
-    -- Obtener el id_publicidad más bajo cuando no hay ninguna publicidad que cumpla la condición
+    -- Obtener el id_publicidad mï¿½s bajo cuando no hay ninguna publicidad que cumpla la condiciï¿½n
     SELECT TOP 1 @min_id_publicidad = id_publicidad
     FROM dbo.Publicidades
     WHERE fecha_fin >= GETDATE()
     ORDER BY id_publicidad;
 
-    -- Seleccionar el id_publicidad de las publicidades que cumplen la condición o el mínimo si no hay ninguna
+    -- Seleccionar el id_publicidad de las publicidades que cumplen la condiciï¿½n o el mï¿½nimo si no hay ninguna
     SELECT COALESCE(p.id_publicidad, @min_id_publicidad) AS codigo_unico_id, p.banner_code, p.url_conexion as url_contenido, p.url_imagen
     FROM dbo.Publicidades p
     JOIN dbo.Banners b ON b.banner_code = p.banner_code
@@ -2177,11 +2226,9 @@ begin
 	set nocount on;
 	set transaction isolation level repeatable read;
 
-	select p.id_publicista as id_publicista, a.id_publicidad as id_publicidad, COUNT (a.id_acceso) as cant_accesos
+	select p.id_publicista as id_publicista, a.id_publicidad as id_publicidad, a.fecha_acceso as fecha_acceso
 	from dbo.Accesos_Publicidad a
 	join dbo.Publicidades p on p.id_publicidad = a.id_publicidad
-	where a.fecha_acceso between @fecha_inicio and @fecha_fin
-	group by p.id_publicista, a.id_publicidad
 end
 go
 
@@ -2195,7 +2242,7 @@ insert into dbo.Niveles_Usuario (nivel)
 values ('Suscriptor'), ('Publicista'), ('Administrador'),('Sistema')
 
 insert into dbo.Usuarios (apellidos, email, id_nivel, nombres, u_password, validado)
-values ('Ferreyra', 'tomaslicenciado@gmail.com',3,'Tomás','123456',1)
+values ('Ferreyra', 'tomaslicenciado@gmail.com',3,'TomÃ¡s','123456',1)
 
 insert into dbo.Tokens_Usuario (id_usuario, token) values (1,'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJub21icmUiOiIxMjM0NTY3ODkwIiwiYXBlbGxpZG8iOiJKb2huIERvZSIsImVtYWlsIjoiVG9tYSQ2NDEzNjAifQ.HydLQ_FWDzv7yjPvntHXu3Ewk5lvKsUz1V32gJiQj7Y')
 
@@ -2234,7 +2281,7 @@ select * from dbo.Usuarios
 insert into dbo.Publicistas(nombre,razon_social, id_tipo_servicio, telefono, nombre_contacto, url_servicio, token_servicio, id_usuario, email)
 values ('Positivo BGH','Positivo BGH',2,2,'Juan','http://localhost:8083/positivo','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJub21icmUiOiJNU1MiLCJmZWNoYSI6IjEzLzEyLzIwMjMgMDA6MDA6MDAiLCJzZXJ2aWNpbyI6InBvc2l0aXZvIn0.Q4ihAhMVdfHN0_EueMizfpTMLftozw9NApTNxeIctPA',2,'tomaslicenciado@gmail.com'),
 ('Siete Sentidos','Siete Sentidos',1,4,'Paco','http://localhost:8081/sietesentidos','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJub21icmUiOiJNU1MiLCJmZWNoYSI6IjEzLzEyLzIwMjMgMDA6MDA6MDAiLCJzZXJ2aWNpbyI6InNpZXRlc2VudGlkb3MifQ.AeHMr9DjJt9dC37D8kHa4TllK7GQjPqzqEIg3h3Aneg',4,'tomaslicenciado@gmail.com'),
-('JPG Grupo de Comunicación','JPG Grupo de Comunicación',1,3,'Pedro','http://localhost:8082/jpg','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJub21icmUiOiJNU1MiLCJmZWNoYSI6IjEzLzEyLzIwMjMgMDA6MDA6MDAiLCJzZXJ2aWNpbyI6IkpQRyJ9.Lo1_nZVLhP09NtnWQJ4dCH5AITyViPYZrz0Ko2BJDJY',3,'tomaslicenciado@gmail.com')
+('JPG Grupo de ComunicaciÃ³n','JPG Grupo de ComunicaciÃ³n',1,3,'Pedro','http://localhost:8082/jpg','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJub21icmUiOiJNU1MiLCJmZWNoYSI6IjEzLzEyLzIwMjMgMDA6MDA6MDAiLCJzZXJ2aWNpbyI6IkpQRyJ9.Lo1_nZVLhP09NtnWQJ4dCH5AITyViPYZrz0Ko2BJDJY',3,'tomaslicenciado@gmail.com')
 
 select * from dbo.Publicistas
 
@@ -2252,6 +2299,8 @@ select * from dbo.Publicidades p left join dbo.Publicistas pl on p.id_publicista
 exec dbo.obtener_publicidades_a_mostrar;
 
 exec dbo.obtener_banners
+
+exec dbo.listar_generos
 
 exec dbo.obtener_contenidos_activos '8a6ceeb81add49d8bb97459c04d35bcc9f69687e2411b2e2ab3e568bf8a08d29';
 

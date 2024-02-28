@@ -1,6 +1,5 @@
 package ar.edu.ubp.das.mss.repositories;
 
-import java.io.StringWriter;
 import java.lang.reflect.Type;
 import java.sql.SQLException;
 import java.sql.Types;
@@ -23,7 +22,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcCall;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Repository;
 
 import com.google.gson.Gson;
@@ -54,7 +52,6 @@ import ar.edu.ubp.das.mss.models.RespuestaBean;
 import ar.edu.ubp.das.mss.models.TmpFD;
 import ar.edu.ubp.das.mss.models.Usuario;
 import ar.edu.ubp.das.mss.utils.ResponseHandler;
-import ar.edu.ubp.das.mss.utils.ThreadPoolConfig;
 import ar.edu.ubp.das.mss.utils.TokenGenerator;
 
 @Repository
@@ -64,9 +61,6 @@ public class MSSRepository implements IMSSRepository{
 
     @Autowired
     private ServicesRepository services;
-    
-    @Autowired
-    private ThreadPoolTaskExecutor taskExecutor;
 
     private SqlParameterSource in;
     private SimpleJdbcCall jdbcCall;
@@ -105,7 +99,7 @@ public class MSSRepository implements IMSSRepository{
             in = new MapSqlParameterSource().addValue("email", email).addValue("password", password);
             out = jdbcCall.execute(in);
             if (!out.containsKey("datos"))
-                return ResponseHandler.handleSQLErrorResponse("Resulset vacío al realizar la consulta.", "dbo.obtener_usuario");
+                return ResponseHandler.handleSQLErrorResponse("Usuario y o contraseña incorrectos", "dbo.obtener_usuario");
             List<Usuario> users = (List<Usuario>)out.get("datos");
             Usuario user = users.get(0);
             if (user.getId_nivel() == 0 || user.getToken() == null || user.getToken().isEmpty() || user.getId_nivel() == 0)
@@ -120,6 +114,11 @@ public class MSSRepository implements IMSSRepository{
     public RespuestaBean registrarSuscriptor(String email, String password, String nombres, String apellidos,
             List<Integer> id_preferencias_generos) {
         try {
+            jdbcCall = nuevaCall("verify_email");
+            in = new MapSqlParameterSource().addValue("email", email).addValue("free", null, Types.BIT);
+            out = jdbcCall.execute(in);
+            if (!(boolean)out.get("free"))
+                return ResponseHandler.handleUnauthorizedResponse("El correo electrónico ya está en uso");
             String token_usuario = TokenGenerator.generateToken(nombres+apellidos+email+password);
             jdbcCall = nuevaCall("registrar_suscriptor");
             in = new MapSqlParameterSource().addValue("email", email)
@@ -322,6 +321,23 @@ public class MSSRepository implements IMSSRepository{
             if (!out.containsKey("publicidades"))
                 return ResponseHandler.handleSQLErrorResponse("Resultado de consulta vacío", "dbo.obtener_publicidades_a_mostrar");
             List<PublicacionBean> publicidades = (List<PublicacionBean>)out.get("publicidades");
+            boolean url_vacia = false;
+            for (PublicacionBean publicidad : publicidades) {
+                String url_contenido = publicidad.getUrl_contenido();
+                String url_imagen = publicidad.getUrl_imagen();
+                if (url_contenido == null || url_imagen == null || url_contenido.isEmpty() || url_imagen.isEmpty()){
+                    url_vacia = true;
+                }
+            }
+            if (url_vacia){
+                actualizarPublicidades();
+                jdbcCall = nuevaCall("obtener_publicidades_a_mostrar").returningResultSet("publicidades", BeanPropertyRowMapper.newInstance(PublicacionBean.class));
+                in = new MapSqlParameterSource();
+                out = jdbcCall.execute(in);
+                if (!out.containsKey("publicidades"))
+                    return ResponseHandler.handleSQLErrorResponse("Resultado de consulta vacío", "dbo.obtener_publicidades_a_mostrar");
+                publicidades = (List<PublicacionBean>)out.get("publicidades");
+            }
             return new RespuestaBean(Codigo.OK, "Publicidades obtenidas con éxito", gson.toJson(publicidades));
         } catch (Exception e) {
             return ResponseHandler.handleErrorResponse("Error al obtener las publicidades", e);
@@ -353,7 +369,22 @@ public class MSSRepository implements IMSSRepository{
                 return ResponseHandler.handleUnauthorizedResponse("No tiene permisos para realizar esta operación");
             jdbcCall = nuevaCall("registrar_acceso_publicidad");
             in = new MapSqlParameterSource().addValue("token_usuario", token_suscriptor).addValue("id_publicidad", id_publicidad);
-            jdbcCall.execute(in);
+            out = jdbcCall.execute(in);
+
+            jdbcCall = nuevaCall("obtener_publicista_de_publicidad")
+            .returningResultSet("publicista", BeanPropertyRowMapper.newInstance(PublicistaBean.class));
+            in = new MapSqlParameterSource().addValue("id_publicidad", id_publicidad);
+            out = jdbcCall.execute(in);
+            List<PublicistaBean> resp = (List<PublicistaBean>)out.get("publicista");
+            if (resp.size() == 1){
+                PublicistaBean publicista = resp.get(0);
+                if (publicista.getNombre().contains("JPG")){
+                    Map<String, String> parametros = new HashMap<>();
+                    parametros.put("codigo_unico_id", gson.toJson(id_publicidad));
+                    services.consultarPublicista(publicista.getId_publicista(), "registrarAccesoPublicidad", parametros);
+                }
+            }
+            /* Si la publicidad es de JPG, enviarla al método registrarAccesoPublicidad */
             return new RespuestaBean(Codigo.OK, "Acceso a publicidad registrado con éxito", null);
         } catch (Exception e) {
             return ResponseHandler.handleErrorResponse("Error al intentar registrar el acceso a la publicidad", e);
@@ -818,9 +849,7 @@ public class MSSRepository implements IMSSRepository{
                 int id = rs.getInt("id_publicista");
                 RegistroEstadisticoAcceso ra = new RegistroEstadisticoAcceso(
                     rs.getInt("id_publicidad"),
-                    rs.getInt("cant_accesos"),
-                    fecha_inicio, 
-                    fecha_fin
+                    rs.getDate("fecha_acceso")
                 );
                 if (estadisticasPublicidades.containsKey(id))
                     estadisticasPublicidades.get(id).add(ra);
@@ -835,7 +864,6 @@ public class MSSRepository implements IMSSRepository{
 
         List<RespuestaBean> respuestas = new ArrayList<>();
         //Enviar estadísticas
-        System.out.println(gson.toJson(estadisticasPublicidades));
         for (Map.Entry<Integer, List<RegistroEstadisticoAcceso>> entry : estadisticasPublicidades.entrySet()) {
             Map<String, String> parametros = new HashMap<>();
             parametros.put("estadisticas_accesos_json", gson.toJson(entry.getValue()));
@@ -850,7 +878,6 @@ public class MSSRepository implements IMSSRepository{
         for (Integer i : estadisticasVPlataformas.keySet()) {
             if (!ids_plataformas.contains(i))
                 ids_plataformas.add(i);
-            
         }
 
         for (Integer i : ids_plataformas) {
@@ -882,8 +909,6 @@ public class MSSRepository implements IMSSRepository{
                 throw new Exception("Error al obtener el catálogo - " + resp.getBody() + " - " + resp.getMensaje());
             catalogosObtenidos.put(token.getKey(), gson.fromJson(resp.getBody(), new TypeToken<Catalogo>(){}.getType()));
         }
-        //Espero que se completen todas las llamadas paralelas
-        //Verifico si hay alguna excepción
         List<DireccionCatalogo> direcciones = new ArrayList<>();
         List<ActuacionCatalogo> actuaciones = new ArrayList<>();
         List<ContenidoSqlBean> contenidos = new ArrayList<>();
@@ -902,7 +927,6 @@ public class MSSRepository implements IMSSRepository{
                 contenidosXPlataformas.add(new ContenidoXPlataformaSqlBean(id_plataforma, cont.getEidr_contenido(),cont.getFecha_Carga(),cont.isDestacado()));
             }
         }
-
         jdbcCall = nuevaCall("insertar_contenidos_batch");
         in = new MapSqlParameterSource().addValue("json", gson.toJson(contenidos));
         jdbcCall.execute(in);

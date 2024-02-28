@@ -23,3 +23,27 @@
 .btn-federar:active{
   background-color: #a5d7e0;
 }
+
+.welcome-container
+{
+  color: white;
+  width: 60%;
+  height: 50vh;
+  display: flex;
+  position: absolute;
+  left: 20%;
+  top: 15%;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  box-shadow: 15px 15px 25px white;
+  border-radius: 50%;
+  background: radial-gradient(black 50%, white);
+}
+
+.welcome-container h2{
+  margin-bottom: 50px;
+  font-weight: 700;
+  text-shadow: orange 1px 1px 5px;
+  font-size: 50px;
+}

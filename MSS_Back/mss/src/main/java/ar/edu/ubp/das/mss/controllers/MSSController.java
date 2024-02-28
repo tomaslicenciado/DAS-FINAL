@@ -37,7 +37,14 @@ public class MSSController {
         consumes = { MediaType.APPLICATION_JSON_VALUE }
     )
     public ResponseEntity<RespuestaBean> iniciarSesion(@RequestBody Map<String, String> body){
-        return new ResponseEntity<RespuestaBean>(repo.iniciarSesion(body.get("email"), body.get("password")), HttpStatus.OK);
+        RespuestaBean respuesta = repo.iniciarSesion(body.get("email"), body.get("password"));
+        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
+        try {
+            status = HttpStatus.valueOf(respuesta.getStatus().getCodigo());
+        } catch (Exception e) {
+            System.err.println("Error al generar HttpStatus desde el código de respuesta");
+        }
+        return new ResponseEntity<RespuestaBean>(respuesta, status);
     }
 
     @PostMapping(
@@ -45,9 +52,17 @@ public class MSSController {
         consumes = { MediaType.APPLICATION_JSON_VALUE }
     )
     public ResponseEntity<RespuestaBean> registrarSuscriptor(@RequestBody Map<String, String> body){
-        return new ResponseEntity<RespuestaBean>(repo.registrarSuscriptor(body.get("email"), body.get("password"),
-                                                body.get("nombres"),body.get("apellidos"),new Gson().fromJson(body.get("preferencias")
-                                                ,new TypeToken<List<Integer>>(){}.getType())), HttpStatus.OK);
+        
+        RespuestaBean respuesta = repo.registrarSuscriptor(body.get("email"), body.get("password"),
+        body.get("nombres"),body.get("apellidos"),new Gson().fromJson(body.get("preferencias")
+        ,new TypeToken<List<Integer>>(){}.getType()));
+        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
+        try {
+            status = HttpStatus.valueOf(respuesta.getStatus().getCodigo());
+        } catch (Exception e) {
+            System.err.println("Error al generar HttpStatus desde el código de respuesta");
+        }
+        return new ResponseEntity<RespuestaBean>(respuesta, status);
     }
     
     @PostMapping(
@@ -55,8 +70,15 @@ public class MSSController {
         consumes = { MediaType.APPLICATION_JSON_VALUE }
     )
     public ResponseEntity<RespuestaBean> iniciarFederacionPlataforma(@RequestBody Map<String, String> body){
-        return new ResponseEntity<RespuestaBean>(repo.iniciarFederacionPlataforma(Integer.parseInt(body.get("id_plataforma")), body.get("token_suscriptor"),
-                                    body.get("url_retorno")), HttpStatus.OK);
+        RespuestaBean respuesta = repo.iniciarFederacionPlataforma(Integer.parseInt(body.get("id_plataforma")), body.get("token_suscriptor"),
+        body.get("url_retorno"));
+        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
+        try {
+            status = HttpStatus.valueOf(respuesta.getStatus().getCodigo());
+        } catch (Exception e) {
+            System.err.println("Error al generar HttpStatus desde el código de respuesta");
+        }
+        return new ResponseEntity<RespuestaBean>(respuesta, status);
     }
     
     @PostMapping(
@@ -64,8 +86,15 @@ public class MSSController {
         consumes = { MediaType.APPLICATION_JSON_VALUE }
     )
     public ResponseEntity<RespuestaBean> finalizarFederacionPlataforma(@RequestBody Map<String, String> body){
-        return new ResponseEntity<RespuestaBean>(repo.finalizarFederacionPlataforma(body.get("token_suscriptor"), 
-                            Integer.parseInt(body.get("id_plataforma"))), HttpStatus.OK);
+        RespuestaBean respuesta = repo.finalizarFederacionPlataforma(body.get("token_suscriptor"), 
+        Integer.parseInt(body.get("id_plataforma")));
+        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
+        try {
+            status = HttpStatus.valueOf(respuesta.getStatus().getCodigo());
+        } catch (Exception e) {
+            System.err.println("Error al generar HttpStatus desde el código de respuesta");
+        }
+        return new ResponseEntity<RespuestaBean>(respuesta, status);
     }
     
     @PostMapping(
@@ -73,7 +102,14 @@ public class MSSController {
         consumes = { MediaType.APPLICATION_JSON_VALUE }
     )
     public ResponseEntity<RespuestaBean> desuscribirPlataforma(@RequestBody Map<String, String> body){
-        return new ResponseEntity<RespuestaBean>(repo.desuscribirPlataforma(Integer.parseInt(body.get("id_plataforma")), body.get("token_suscriptor")), HttpStatus.OK);
+        RespuestaBean respuesta = repo.desuscribirPlataforma(Integer.parseInt(body.get("id_plataforma")), body.get("token_suscriptor"));
+        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
+        try {
+            status = HttpStatus.valueOf(respuesta.getStatus().getCodigo());
+        } catch (Exception e) {
+            System.err.println("Error al generar HttpStatus desde el código de respuesta");
+        }
+        return new ResponseEntity<RespuestaBean>(respuesta, status);
     }
     
     @PostMapping(
@@ -81,7 +117,14 @@ public class MSSController {
         consumes = { MediaType.APPLICATION_JSON_VALUE }
     )
     public ResponseEntity<RespuestaBean> obtenerContenido(@RequestBody Map<String, String> body){
-        return new ResponseEntity<RespuestaBean>(repo.obtenerContenido(body.get("token_suscriptor"), Integer.parseInt(body.get("id_plataforma")), body.get("eidr_contenido")), HttpStatus.OK);
+        RespuestaBean respuesta = repo.obtenerContenido(body.get("token_suscriptor"), Integer.parseInt(body.get("id_plataforma")), body.get("eidr_contenido"));
+        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
+        try {
+            status = HttpStatus.valueOf(respuesta.getStatus().getCodigo());
+        } catch (Exception e) {
+            System.err.println("Error al generar HttpStatus desde el código de respuesta");
+        }
+        return new ResponseEntity<RespuestaBean>(respuesta,status);
     }
     
     @PostMapping(
@@ -89,7 +132,14 @@ public class MSSController {
         consumes = { MediaType.APPLICATION_JSON_VALUE }
     )
     public ResponseEntity<RespuestaBean> obtenerListadoGenerosContenido(@RequestBody Map<String, String> body){
-        return new ResponseEntity<RespuestaBean>(repo.obtenerListadoGenerosContenido(body.get("token_usuario")), HttpStatus.OK);
+        RespuestaBean respuesta = repo.obtenerListadoGenerosContenido(body.get("token_usuario"));
+        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
+        try {
+            status = HttpStatus.valueOf(respuesta.getStatus().getCodigo());
+        } catch (Exception e) {
+            System.err.println("Error al generar HttpStatus desde el código de respuesta");
+        }
+        return new ResponseEntity<RespuestaBean>(respuesta,status);
     }
     
     @PostMapping(
@@ -97,7 +147,14 @@ public class MSSController {
         consumes = { MediaType.APPLICATION_JSON_VALUE }
     )
     public ResponseEntity<RespuestaBean> obtenerListadoPlataformas(@RequestBody Map<String, String> body){
-        return new ResponseEntity<RespuestaBean>(repo.obtenerListadoPlataformas(body.get("token_usuario")), HttpStatus.OK);
+        RespuestaBean respuesta = repo.obtenerListadoPlataformas(body.get("token_usuario"));
+        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
+        try {
+            status = HttpStatus.valueOf(respuesta.getStatus().getCodigo());
+        } catch (Exception e) {
+            System.err.println("Error al generar HttpStatus desde el código de respuesta");
+        }
+        return new ResponseEntity<RespuestaBean>(respuesta,status);
     }
     
     @PostMapping(
@@ -105,7 +162,14 @@ public class MSSController {
         consumes = { MediaType.APPLICATION_JSON_VALUE }
     )
     public ResponseEntity<RespuestaBean> obtenerCatalogo(@RequestBody Map<String, String> body){
-        return new ResponseEntity<RespuestaBean>(repo.obtenerCatalogo(body.get("token_suscriptor")), HttpStatus.OK);
+        RespuestaBean respuesta = repo.obtenerCatalogo(body.get("token_suscriptor"));
+        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
+        try {
+            status = HttpStatus.valueOf(respuesta.getStatus().getCodigo());
+        } catch (Exception e) {
+            System.err.println("Error al generar HttpStatus desde el código de respuesta");
+        }
+        return new ResponseEntity<RespuestaBean>(respuesta,status);
     }
     
     @PostMapping(
@@ -113,7 +177,14 @@ public class MSSController {
         consumes = { MediaType.APPLICATION_JSON_VALUE }
     )
     public ResponseEntity<RespuestaBean> obtenerPublicidades(@RequestBody Map<String, String> body){
-        return new ResponseEntity<RespuestaBean>(repo.obtenerPublicidades(body.get("token_suscriptor")), HttpStatus.OK);
+        RespuestaBean respuesta = repo.obtenerPublicidades(body.get("token_suscriptor"));
+        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
+        try {
+            status = HttpStatus.valueOf(respuesta.getStatus().getCodigo());
+        } catch (Exception e) {
+            System.err.println("Error al generar HttpStatus desde el código de respuesta");
+        }
+        return new ResponseEntity<RespuestaBean>(respuesta,status);
     }
     
     @PostMapping(
@@ -121,7 +192,14 @@ public class MSSController {
         consumes = { MediaType.APPLICATION_JSON_VALUE }
     )
     public ResponseEntity<RespuestaBean> registrarVisualizacion(@RequestBody Map<String, String> body){
-        return new ResponseEntity<RespuestaBean>(repo.registrarVisualizacion(body.get("token_suscriptor"), Integer.parseInt(body.get("id_plataforma")), body.get("eidr_contenido")), HttpStatus.OK);
+        RespuestaBean respuesta = repo.registrarVisualizacion(body.get("token_suscriptor"), Integer.parseInt(body.get("id_plataforma")), body.get("eidr_contenido"));
+        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
+        try {
+            status = HttpStatus.valueOf(respuesta.getStatus().getCodigo());
+        } catch (Exception e) {
+            System.err.println("Error al generar HttpStatus desde el código de respuesta");
+        }
+        return new ResponseEntity<RespuestaBean>(respuesta,status);
     }
     
     @PostMapping(
@@ -129,7 +207,14 @@ public class MSSController {
         consumes = { MediaType.APPLICATION_JSON_VALUE }
     )
     public ResponseEntity<RespuestaBean> registrarAccesoPublicidad(@RequestBody Map<String, String> body){
-        return new ResponseEntity<RespuestaBean>(repo.registrarAccesoPublicidad(body.get("token_suscriptor"), Integer.parseInt(body.get("id_publicidad"))), HttpStatus.OK);
+        RespuestaBean respuesta = repo.registrarAccesoPublicidad(body.get("token_suscriptor"), Integer.parseInt(body.get("id_publicidad")));
+        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
+        try {
+            status = HttpStatus.valueOf(respuesta.getStatus().getCodigo());
+        } catch (Exception e) {
+            System.err.println("Error al generar HttpStatus desde el código de respuesta");
+        }
+        return new ResponseEntity<RespuestaBean>(respuesta,status);
     }
     
     @PostMapping(
@@ -137,9 +222,16 @@ public class MSSController {
         consumes = { MediaType.APPLICATION_JSON_VALUE }
     )
     public ResponseEntity<RespuestaBean> registrarNuevaPlataforma(@RequestBody Map<String, String> body){
-        return new ResponseEntity<RespuestaBean>(repo.registrarNuevaPlataforma(body.get("token_usuario"), body.get("nombre"), body.get("url_conexion"), 
-                                                body.get("url_icono"), body.get("email"), Integer.parseInt(body.get("id_tipo_servicio")), body.get("token_servicio"), 
-                                                Float.parseFloat(body.get("tarifa_nuevos_viewers")), Float.parseFloat(body.get("tarifa_viewers_activos"))), HttpStatus.OK);
+        RespuestaBean respuesta = repo.registrarNuevaPlataforma(body.get("token_usuario"), body.get("nombre"), body.get("url_conexion"), 
+        body.get("url_icono"), body.get("email"), Integer.parseInt(body.get("id_tipo_servicio")), body.get("token_servicio"), 
+        Float.parseFloat(body.get("tarifa_nuevos_viewers")), Float.parseFloat(body.get("tarifa_viewers_activos")));
+        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
+        try {
+            status = HttpStatus.valueOf(respuesta.getStatus().getCodigo());
+        } catch (Exception e) {
+            System.err.println("Error al generar HttpStatus desde el código de respuesta");
+        }
+        return new ResponseEntity<RespuestaBean>(respuesta,status);
     }
     
     @PostMapping(
@@ -147,9 +239,16 @@ public class MSSController {
         consumes = { MediaType.APPLICATION_JSON_VALUE }
     )
     public ResponseEntity<RespuestaBean> actualizarPlataforma(@RequestBody Map<String, String> body){
-        return new ResponseEntity<RespuestaBean>(repo.actualizarPlataforma(body.get("token_usuario"), Integer.parseInt(body.get("id_plataforma")), body.get("nombre"), body.get("url_conexion"), 
-                                                body.get("url_icono"), body.get("email"), Integer.parseInt(body.get("id_tipo_servicio")), body.get("token_servicio"), 
-                                                Float.parseFloat(body.get("tarifa_nuevos_viewers")), Float.parseFloat(body.get("tarifa_viewers_activos"))), HttpStatus.OK);
+        RespuestaBean respuesta = repo.actualizarPlataforma(body.get("token_usuario"), Integer.parseInt(body.get("id_plataforma")), body.get("nombre"), body.get("url_conexion"), 
+        body.get("url_icono"), body.get("email"), Integer.parseInt(body.get("id_tipo_servicio")), body.get("token_servicio"), 
+        Float.parseFloat(body.get("tarifa_nuevos_viewers")), Float.parseFloat(body.get("tarifa_viewers_activos")));
+        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
+        try {
+            status = HttpStatus.valueOf(respuesta.getStatus().getCodigo());
+        } catch (Exception e) {
+            System.err.println("Error al generar HttpStatus desde el código de respuesta");
+        }
+        return new ResponseEntity<RespuestaBean>(respuesta,status);
     }
     
     @PostMapping(
@@ -157,7 +256,14 @@ public class MSSController {
         consumes = { MediaType.APPLICATION_JSON_VALUE }
     )
     public ResponseEntity<RespuestaBean> eliminarPlataforma(@RequestBody Map<String, String> body){
-        return new ResponseEntity<RespuestaBean>(repo.eliminarPlataforma(body.get("token_usuario"), Integer.parseInt(body.get("id_plataforma"))), HttpStatus.OK);
+        RespuestaBean respuesta = repo.eliminarPlataforma(body.get("token_usuario"), Integer.parseInt(body.get("id_plataforma")));
+        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
+        try {
+            status = HttpStatus.valueOf(respuesta.getStatus().getCodigo());
+        } catch (Exception e) {
+            System.err.println("Error al generar HttpStatus desde el código de respuesta");
+        }
+        return new ResponseEntity<RespuestaBean>(respuesta,status);
     }
     
     @PostMapping(
@@ -165,8 +271,15 @@ public class MSSController {
         consumes = { MediaType.APPLICATION_JSON_VALUE }
     )
     public ResponseEntity<RespuestaBean> modificarBanner(@RequestBody Map<String, String> body){
-        return new ResponseEntity<RespuestaBean>(repo.modificarBanner(body.get("token_usuario"), Integer.parseInt(body.get("banner_code")), 
-                        Float.parseFloat(body.get("tarifa_base")), Float.parseFloat(body.get("tarifa_exclusividad"))), HttpStatus.OK);
+        RespuestaBean respuesta = repo.modificarBanner(body.get("token_usuario"), Integer.parseInt(body.get("banner_code")), 
+        Float.parseFloat(body.get("tarifa_base")), Float.parseFloat(body.get("tarifa_exclusividad")));
+        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
+        try {
+            status = HttpStatus.valueOf(respuesta.getStatus().getCodigo());
+        } catch (Exception e) {
+            System.err.println("Error al generar HttpStatus desde el código de respuesta");
+        }
+        return new ResponseEntity<RespuestaBean>(respuesta,status);
     }
     
     @PostMapping(
@@ -174,9 +287,16 @@ public class MSSController {
         consumes = { MediaType.APPLICATION_JSON_VALUE }
     )
     public ResponseEntity<RespuestaBean> agregarPublicista(@RequestBody Map<String, String> body){
-        return new ResponseEntity<RespuestaBean>(repo.agregarPublicista(body.get("token_usuario"), body.get("nombre"), body.get("razon_social"), 
-                                            body.get("email"), Integer.parseInt(body.get("telefono")), body.get("nombre_contacto"), 
-                                            body.get("url_conexion"), body.get("token_servicio"), Integer.parseInt(body.get("id_tipo_servicio"))), HttpStatus.OK);
+        RespuestaBean respuesta = repo.agregarPublicista(body.get("token_usuario"), body.get("nombre"), body.get("razon_social"), 
+        body.get("email"), Integer.parseInt(body.get("telefono")), body.get("nombre_contacto"), 
+        body.get("url_conexion"), body.get("token_servicio"), Integer.parseInt(body.get("id_tipo_servicio")));
+        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
+        try {
+            status = HttpStatus.valueOf(respuesta.getStatus().getCodigo());
+        } catch (Exception e) {
+            System.err.println("Error al generar HttpStatus desde el código de respuesta");
+        }
+        return new ResponseEntity<RespuestaBean>(respuesta,status);
     }
     
     @PostMapping(
@@ -184,9 +304,16 @@ public class MSSController {
         consumes = { MediaType.APPLICATION_JSON_VALUE }
     )
     public ResponseEntity<RespuestaBean> modificarPublicista(@RequestBody Map<String, String> body){
-        return new ResponseEntity<RespuestaBean>(repo.modificarPublicista(body.get("token_usuario"), Integer.parseInt(body.get("id_publicista")), body.get("nombre"), body.get("razon_social"), 
-                                            body.get("email"), Integer.parseInt(body.get("telefono")), body.get("nombre_contacto"), Integer.parseInt(body.get("id_tipo_servicio")), 
-                                            body.get("url_conexion"), body.get("token_servicio")), HttpStatus.OK);
+        RespuestaBean respuesta = repo.modificarPublicista(body.get("token_usuario"), Integer.parseInt(body.get("id_publicista")), body.get("nombre"), body.get("razon_social"), 
+        body.get("email"), Integer.parseInt(body.get("telefono")), body.get("nombre_contacto"), Integer.parseInt(body.get("id_tipo_servicio")), 
+        body.get("url_conexion"), body.get("token_servicio"));
+        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
+        try {
+            status = HttpStatus.valueOf(respuesta.getStatus().getCodigo());
+        } catch (Exception e) {
+            System.err.println("Error al generar HttpStatus desde el código de respuesta");
+        }
+        return new ResponseEntity<RespuestaBean>(respuesta,status);
     }
     
     @PostMapping(
@@ -194,7 +321,14 @@ public class MSSController {
         consumes = { MediaType.APPLICATION_JSON_VALUE }
     )
     public ResponseEntity<RespuestaBean> eliminarPublicista(@RequestBody Map<String, String> body){
-        return new ResponseEntity<RespuestaBean>(repo.eliminarPublicista(body.get("token_usuario"), Integer.parseInt(body.get("id_publicista"))), HttpStatus.OK);
+        RespuestaBean respuesta = repo.eliminarPublicista(body.get("token_usuario"), Integer.parseInt(body.get("id_publicista")));
+        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
+        try {
+            status = HttpStatus.valueOf(respuesta.getStatus().getCodigo());
+        } catch (Exception e) {
+            System.err.println("Error al generar HttpStatus desde el código de respuesta");
+        }
+        return new ResponseEntity<RespuestaBean>(respuesta,status);
     }
     
     @PostMapping(
@@ -211,8 +345,15 @@ public class MSSController {
         } catch (ParseException e) {
             return new ResponseEntity<>(new RespuestaBean(Codigo.ERROR, "Error al formatear la fecha", e.toString()), HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity<RespuestaBean>(repo.agregarPublicidad(body.get("token_usuario"), Integer.parseInt(body.get("id_publicista")), Integer.parseInt(body.get("banner_code")), 
-                                                            Boolean.parseBoolean(body.get("exclusiva")), fecha_inicio, fecha_fin), HttpStatus.OK);
+        RespuestaBean respuesta = repo.agregarPublicidad(body.get("token_usuario"), Integer.parseInt(body.get("id_publicista")), Integer.parseInt(body.get("banner_code")), 
+        Boolean.parseBoolean(body.get("exclusiva")), fecha_inicio, fecha_fin);
+        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
+        try {
+            status = HttpStatus.valueOf(respuesta.getStatus().getCodigo());
+        } catch (Exception e) {
+            System.err.println("Error al generar HttpStatus desde el código de respuesta");
+        }
+        return new ResponseEntity<RespuestaBean>(respuesta,status);
     }
     
     @PostMapping(
@@ -229,8 +370,15 @@ public class MSSController {
         } catch (ParseException e) {
             return new ResponseEntity<>(new RespuestaBean(Codigo.ERROR, "Error al formatear la fecha", e.toString()), HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity<RespuestaBean>(repo.modificarPublicidad(body.get("token_usuario"), Integer.parseInt(body.get("id_publicidad")), 
-                                                                Boolean.parseBoolean(body.get("exclusiva")), fecha_inicio, fecha_fin), HttpStatus.OK);
+        RespuestaBean respuesta = repo.modificarPublicidad(body.get("token_usuario"), Integer.parseInt(body.get("id_publicidad")), 
+        Boolean.parseBoolean(body.get("exclusiva")), fecha_inicio, fecha_fin);
+        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
+        try {
+            status = HttpStatus.valueOf(respuesta.getStatus().getCodigo());
+        } catch (Exception e) {
+            System.err.println("Error al generar HttpStatus desde el código de respuesta");
+        }
+        return new ResponseEntity<RespuestaBean>(respuesta,status);
     }
     
     @PostMapping(
@@ -238,7 +386,14 @@ public class MSSController {
         consumes = { MediaType.APPLICATION_JSON_VALUE }
     )
     public ResponseEntity<RespuestaBean> eliminarPublicidad(@RequestBody Map<String, String> body){
-        return new ResponseEntity<RespuestaBean>(repo.eliminarPublicidad(body.get("token_usuario"), Integer.parseInt(body.get("id_publicidad"))), HttpStatus.OK);
+        RespuestaBean respuesta = repo.eliminarPublicidad(body.get("token_usuario"), Integer.parseInt(body.get("id_publicidad")));
+        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
+        try {
+            status = HttpStatus.valueOf(respuesta.getStatus().getCodigo());
+        } catch (Exception e) {
+            System.err.println("Error al generar HttpStatus desde el código de respuesta");
+        }
+        return new ResponseEntity<RespuestaBean>(respuesta,status);
     }
     
     @PostMapping(
@@ -246,7 +401,14 @@ public class MSSController {
         consumes = { MediaType.APPLICATION_JSON_VALUE }
     )
     public ResponseEntity<RespuestaBean> obtenerFeesAPagar(@RequestBody Map<String, String> body){
-        return new ResponseEntity<RespuestaBean>(repo.obtenerFeesAPagar(body.get("token_usuario")), HttpStatus.OK);
+        RespuestaBean respuesta = repo.obtenerFeesAPagar(body.get("token_usuario"));
+        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
+        try {
+            status = HttpStatus.valueOf(respuesta.getStatus().getCodigo());
+        } catch (Exception e) {
+            System.err.println("Error al generar HttpStatus desde el código de respuesta");
+        }
+        return new ResponseEntity<RespuestaBean>(respuesta,status);
     }
     
     @PostMapping(
@@ -254,7 +416,14 @@ public class MSSController {
         consumes = { MediaType.APPLICATION_JSON_VALUE }
     )
     public ResponseEntity<RespuestaBean> modificarDatosPersonales(@RequestBody Map<String, String> body){
-        return new ResponseEntity<RespuestaBean>(repo.modificarDatosPersonales(body.get("token_usuario"), body.get("nombres"), body.get("apellidos"), body.get("password")), HttpStatus.OK);
+        RespuestaBean respuesta = repo.modificarDatosPersonales(body.get("token_usuario"), body.get("nombres"), body.get("apellidos"), body.get("password"));
+        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
+        try {
+            status = HttpStatus.valueOf(respuesta.getStatus().getCodigo());
+        } catch (Exception e) {
+            System.err.println("Error al generar HttpStatus desde el código de respuesta");
+        }
+        return new ResponseEntity<RespuestaBean>(respuesta,status);
     }
     
     @PostMapping(
@@ -262,7 +431,14 @@ public class MSSController {
         consumes = { MediaType.APPLICATION_JSON_VALUE }
     )
     public ResponseEntity<RespuestaBean> obtenerListadoPublicistas(@RequestBody Map<String, String> body){
-        return new ResponseEntity<RespuestaBean>(repo.obtenerListadoPublicistas(body.get("token_usuario")), HttpStatus.OK);
+        RespuestaBean respuesta = repo.obtenerListadoPublicistas(body.get("token_usuario"));
+        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
+        try {
+            status = HttpStatus.valueOf(respuesta.getStatus().getCodigo());
+        } catch (Exception e) {
+            System.err.println("Error al generar HttpStatus desde el código de respuesta");
+        }
+        return new ResponseEntity<RespuestaBean>(respuesta,status);
     }
 
     @PostMapping(
@@ -270,7 +446,14 @@ public class MSSController {
         consumes = { MediaType.APPLICATION_JSON_VALUE }
     )
     public ResponseEntity<RespuestaBean> obtenerListadoTiposServicio(@RequestBody Map<String, String> body){
-        return new ResponseEntity<RespuestaBean>(repo.obtenerListadoTiposServicio(body.get("token_usuario")), HttpStatus.OK);
+        RespuestaBean respuesta = repo.obtenerListadoTiposServicio(body.get("token_usuario"));
+        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
+        try {
+            status = HttpStatus.valueOf(respuesta.getStatus().getCodigo());
+        } catch (Exception e) {
+            System.err.println("Error al generar HttpStatus desde el código de respuesta");
+        }
+        return new ResponseEntity<RespuestaBean>(respuesta,status);
     }
 
     @PostMapping(
@@ -278,7 +461,14 @@ public class MSSController {
         consumes = { MediaType.APPLICATION_JSON_VALUE }
     )
     public ResponseEntity<RespuestaBean> obtenerListadoBanners(@RequestBody Map<String, String> body){
-        return new ResponseEntity<RespuestaBean>(repo.obtenerListadoBanners(body.get("token_usuario")), HttpStatus.OK);
+        RespuestaBean respuesta = repo.obtenerListadoBanners(body.get("token_usuario"));
+        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
+        try {
+            status = HttpStatus.valueOf(respuesta.getStatus().getCodigo());
+        } catch (Exception e) {
+            System.err.println("Error al generar HttpStatus desde el código de respuesta");
+        }
+        return new ResponseEntity<RespuestaBean>(respuesta,status);
     }
 
     @PostMapping(
@@ -366,6 +556,13 @@ public class MSSController {
         consumes = { MediaType.APPLICATION_JSON_VALUE }
     )
     public ResponseEntity<RespuestaBean> obtenerContenidosMasVistos(@RequestBody Map<String, String> body){
-        return new ResponseEntity<RespuestaBean>(repo.obtenerContenidosMasVistos(body.get("token_suscriptor")), HttpStatus.OK);
+        RespuestaBean respuesta = repo.obtenerContenidosMasVistos(body.get("token_suscriptor"));
+        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
+        try {
+            status = HttpStatus.valueOf(respuesta.getStatus().getCodigo());
+        } catch (Exception e) {
+            System.err.println("Error al generar HttpStatus desde el código de respuesta");
+        }
+        return new ResponseEntity<RespuestaBean>(respuesta,status);
     }
 }

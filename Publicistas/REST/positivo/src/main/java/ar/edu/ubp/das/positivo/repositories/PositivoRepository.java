@@ -14,11 +14,9 @@ import org.springframework.stereotype.Repository;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
 
 import ar.edu.ubp.das.positivo.beans.Codigo;
 import ar.edu.ubp.das.positivo.beans.Publicidad;
-import ar.edu.ubp.das.positivo.beans.RegistroEstadisticoAcceso;
 import ar.edu.ubp.das.positivo.beans.RespuestaBean;
 
 @Repository
@@ -30,7 +28,7 @@ public class PositivoRepository implements IPositivoRepository {
 
     PositivoRepository(){
         GsonBuilder gsonBuilder = new GsonBuilder();
-        gsonBuilder.setDateFormat("dd-MM-yyyy");
+        gsonBuilder.setDateFormat("yyyy-MM-dd");
         gson = gsonBuilder.create();
     }
 
@@ -53,7 +51,6 @@ public class PositivoRepository implements IPositivoRepository {
     @Override
     public RespuestaBean insertarEstadisticas(String token_servicio, String estadisticas_accesos_json){
         try {
-            System.out.println("Me llamaron");
             if (!tokenValid(token_servicio))
                 return new RespuestaBean(Codigo.NO_AUTORIZADO, "El token de servicio proporcionado no es válido", "ERROR");
             System.out.println(estadisticas_accesos_json);

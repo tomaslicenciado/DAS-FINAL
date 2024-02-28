@@ -11,8 +11,7 @@ import { ModalPublicistaComponent } from './modals/modal-publicista/modal-public
 import { ModalPublicidadComponent } from './modals/modal-publicidad/modal-publicidad.component';
 import { AdministradorMainComponent } from './components/administrador-main/administrador-main.component';
 import { ReactiveFormsModule } from '@angular/forms';
-import { NgbActiveModal, NgbModule } from '@ng-bootstrap/ng-bootstrap';
-import { ScheduledTasksComponent } from './components/scheduled-tasks/scheduled-tasks.component';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 
 @NgModule({
@@ -24,8 +23,7 @@ import { ScheduledTasksComponent } from './components/scheduled-tasks/scheduled-
     ModalPlataformaComponent,
     ModalPublicistaComponent,
     ModalPublicidadComponent,
-    AdministradorMainComponent,
-    ScheduledTasksComponent
+    AdministradorMainComponent
   ],
   imports: [
     CommonModule,

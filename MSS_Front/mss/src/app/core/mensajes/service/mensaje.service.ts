@@ -9,7 +9,7 @@ import { MensajeComponent } from '../component/mensaje/mensaje.component';
 export class MensajeService {
   mensaje: IMensaje;
 
-  constructor(private _modal: NgbModal) { 
+  constructor(private _modal: NgbModal) {
     this.mensaje = { text: ''}
   }
 

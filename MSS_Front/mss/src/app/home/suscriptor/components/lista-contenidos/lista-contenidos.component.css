@@ -7,7 +7,7 @@
   width: 1150px;
   height: 680px;
 }
-  
+
 .contenido-content {
   max-height: calc(100vh - 120px); /* Ajusta según tus necesidades; 120px es la altura del menú fijo */
   padding: 10px; /* Ajusta según tus necesidades */

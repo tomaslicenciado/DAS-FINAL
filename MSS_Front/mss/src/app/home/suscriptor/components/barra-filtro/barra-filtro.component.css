@@ -1,14 +1,13 @@
 .filter-bar {
-    max-width: 1200px;
-    margin: 0 auto;
+    max-width: 900px;
     text-align: center;
-    margin-top: 20px;
+    margin-top: 0;
     position: fixed;
-    top: 60px; /* Altura del menú fijo */
+    top: 2%; /* Altura del menú fijo */
     width: 100%;
     background-color: #333; /* Ajusta el color de fondo según tu diseño */
     z-index: 1000;
-    left: 20%;
+    left: 25%;
 }
 
 .filter-bar label,

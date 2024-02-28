@@ -8,14 +8,13 @@ import java.sql.ResultSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
+import java.util.Date;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
 
 import ar.edu.ubp.das.jpg.beans.Codigo;
 import ar.edu.ubp.das.jpg.beans.Publicidad;
-import ar.edu.ubp.das.jpg.beans.RegistroEstadisticoAcceso;
 import ar.edu.ubp.das.jpg.beans.RespuestaBean;
 import jakarta.jws.WebMethod;
 import jakarta.jws.WebParam;
@@ -45,7 +44,7 @@ public class JPGWS {
         }
         
         GsonBuilder gsonBuilder = new GsonBuilder();
-        gsonBuilder.setDateFormat("dd-MM-yyyy");
+        gsonBuilder.setDateFormat("yyyy-MM-dd");
         gson = gsonBuilder.create();
     }
 
@@ -108,7 +107,6 @@ public class JPGWS {
                 return new RespuestaBean(Codigo.NO_AUTORIZADO, "El token de servicio proporcionado no es válido", "ERROR");
             Connection conn;
             CallableStatement stmt;
-            ResultSet rs;
             Class.forName(driver_sql);
             conn = DriverManager.getConnection(sql_conection_string, sql_user, sql_pass);
             conn.setAutoCommit(true);
@@ -121,6 +119,31 @@ public class JPGWS {
         } catch (Exception e) {
             return new RespuestaBean(Codigo.ERROR, "Error al insertar estadísticas",e.getMessage());
         }
+    }
+
+    @WebMethod()
+    @WebResult(name = "respuesta")
+    public RespuestaBean registrarAccesoPublicidad(@WebParam(name = "token_servicio") String token_servicio,
+                                                    @WebParam(name = "codigo_unico_id") int codigo_unico_id){
+        try {
+            if (!tokenValid(token_servicio))
+                return new RespuestaBean(Codigo.NO_AUTORIZADO, "El token de servicio proporcionado no es válido", "ERROR");
+            Connection conn;
+            CallableStatement stmt;
+            Class.forName(driver_sql);
+            conn = DriverManager.getConnection(sql_conection_string, sql_user, sql_pass);
+            conn.setAutoCommit(true);
+            
+            stmt = conn.prepareCall("{CALL dbo.registrar_acceso_publicitario(?)}");
+            stmt.setInt("codigo_unico_id", codigo_unico_id);
+
+            stmt.execute();
+            return new RespuestaBean(Codigo.OK, "Acceso publicitario registrado con éxito", null);
+        } catch (Exception e) {
+            System.out.println("Error");
+            System.out.println(e.getMessage());
+            return new RespuestaBean(Codigo.ERROR, "Error al registrar el acceso publicitario",e.getMessage());
+        }    
     }
 
     private boolean tokenValid(String token_servicio){

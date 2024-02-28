@@ -1,26 +1,22 @@
 import { Injectable } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
 
-export declare type Loader = { 
-  loaded: boolean
-};
-
 @Injectable({
   providedIn: 'root'
 })
 export class LoaderService {
 
-  private _subject = new Subject<Loader>();
+  private _subject = new Subject<boolean>();
 
-  public getObservable(): Observable<Loader> {
+  public getObservable(): Observable<boolean> {
     return this._subject.asObservable();
   }
 
   public start(): void {
-    this._subject.next(<Loader>{ loaded: true });
+    this._subject.next(true);
   }
 
   public complete(): void {
-    this._subject.next(<Loader>{ loaded: false });
+    this._subject.next(false);
   }
 }

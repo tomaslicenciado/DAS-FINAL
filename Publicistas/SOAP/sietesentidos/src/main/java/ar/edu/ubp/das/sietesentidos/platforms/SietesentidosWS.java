@@ -11,11 +11,9 @@ import java.util.Properties;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
 
 import ar.edu.ubp.das.sietesentidos.beans.Codigo;
 import ar.edu.ubp.das.sietesentidos.beans.Publicidad;
-import ar.edu.ubp.das.sietesentidos.beans.RegistroEstadisticoAcceso;
 import ar.edu.ubp.das.sietesentidos.beans.RespuestaBean;
 import jakarta.jws.WebMethod;
 import jakarta.jws.WebParam;
@@ -45,7 +43,7 @@ public class SietesentidosWS {
         }
         
         GsonBuilder gsonBuilder = new GsonBuilder();
-        gsonBuilder.setDateFormat("dd-MM-yyyy");
+        gsonBuilder.setDateFormat("yyyy-MM-dd");
         gson = gsonBuilder.create();
     }
 

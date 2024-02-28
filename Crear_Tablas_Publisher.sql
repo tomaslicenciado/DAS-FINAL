@@ -6,7 +6,7 @@ drop table if exists dbo.Servicios_Exposicion
 create table dbo.Publicidades(
 	id_publicidad integer identity constraint PK_Id_Publicidad_END primary key,
 	url_contenido varchar(255) not null,
-	url_imagen varchar(255) not null
+	url_imagen varchar(MAX) not null
 )
 
 create table dbo.Servicios_Exposicion(
@@ -29,11 +29,10 @@ go
 create table dbo.Estadisticas_Externas_Accesos(
 	id_estadistica integer identity constraint PK_Id_Estadistica_END primary key,
 	id_publicacion integer constraint FK_Publicacion_Estadistica_END references dbo.Publicaciones(id_publicacion),
-	cant_accesos integer not null default 0,
-	fecha_inicio date not null,
-	fecha_fin date not null
+	fecha_acceso datetime not null
 )
 go
+
 ---------------------------------------------------------------------------------------------------------------------------------
 CREATE OR ALTER PROCEDURE dbo.validar_token
     @token varchar(255),
@@ -98,31 +97,55 @@ begin
 
 	create table #Estadisticas(
 		codigo_unico_id integer,
-		cant_accesos integer,
-		fecha_inicio date,
-		fecha_fin date
+		fecha_acceso datetime,
 	)
 
 	insert into #Estadisticas
-	select codigo_unico_id, cant_accesos, fecha_inicio, fecha_fin
+	select codigo_unico_id, fecha_acceso
 	from openjson(@json) with (
 		codigo_unico_id integer '$.codigo_unico_id',
-		cant_accesos integer '$.cant_accesos',
-		fecha_inicio date '$.fecha_inicio',
-		fecha_fin date '$.fecha_fin'
+		fecha_acceso datetime '$.fecha_acceso'
 	)
-
-	insert into dbo.Estadisticas_Externas_Accesos (id_publicacion, cant_accesos, fecha_inicio, fecha_fin)
+	
+	insert into dbo.Estadisticas_Externas_Accesos (id_publicacion, fecha_acceso)
 	select (
 		select p.id_publicacion 
 		from dbo.Publicaciones p 
-		where p.codigo_unico_id = e.codigo_unico_id 
-		and GETDATE() between p.fecha_inicio and p.fecha_fin) as id_publicacion, 
-		e.cant_accesos, e.fecha_inicio, e.fecha_fin
+		where p.codigo_unico_id = e.codigo_unico_id ) as id_publicacion, 
+		e.fecha_acceso
 	from #Estadisticas e
 end
 go
 
+/*Sólo para JPG*/
+create or alter procedure dbo.registrar_acceso_publicitario
+	@codigo_unico_id integer
+AS
+begin
+    SET NOCOUNT ON;
+	SET TRANSACTION ISOLATION LEVEL REPEATABLE READ;
+
+	declare @id_publicacion integer;
+	set @id_publicacion = 0;
+
+	select @id_publicacion = p.id_publicacion
+	from dbo.Publicaciones p
+	where p.codigo_unico_id = @codigo_unico_id
+
+	if @id_publicacion = 0
+	BEGIN
+		RAISERROR('No se encontró la publicidad asociada al acceso publicitario a registrar', 16, 0)
+	end
+
+	insert into dbo.Estadisticas_Externas_Accesos (id_publicacion, fecha_acceso)
+	values (@id_publicacion, GETDATE())
+
+	if @@ROWCOUNT = 0
+	BEGIN
+		RAISERROR('No se pudo insertar',16,0)
+	END
+END
+go
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 --                                                                   DATOS
@@ -140,8 +163,8 @@ insert into dbo.Servicios_Exposicion (nombre, token)
 values ('MSS', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJub21icmUiOiJNU1MiLCJmZWNoYSI6IjEzLzEyLzIwMjMgMDA6MDA6MDAiLCJzZXJ2aWNpbyI6InNpZXRlc2VudGlkb3MifQ.AeHMr9DjJt9dC37D8kHa4TllK7GQjPqzqEIg3h3Aneg')
 
 insert into dbo.Publicidades (url_contenido, url_imagen)
-values ('https://www.ubp.edu.ar/', 'https://lawapa.com.ar/02-2021/resize_1613736109.jpg'), --V
-		('https://www.unc.edu.ar/','https://sociales.unc.edu.ar/sites/default/files/Lotman%20revisitado.jpg') --V
+values ('https://www.princessauto.com', 'https://www.atvmag.com/wp-content/uploads/2021/11/PrincessAuto-Background-2019-e1648965668976.jpg'), --V
+		('https://www.avon.com.ar/','https://i.ebayimg.com/images/g/7z4AAOSwfqBhgrGI/s-l1600.png') --V
 
 insert into dbo.Publicaciones (id_publicidad, id_servicio, banner_code, fecha_inicio, fecha_fin, codigo_unico_id)
 values (1, 1, 1001, GETDATE(), DATEADD(MONTH,1,GETDATE()), 1)
@@ -152,8 +175,8 @@ insert into dbo.Servicios_Exposicion (nombre, token)
 values ('MSS', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJub21icmUiOiJNU1MiLCJmZWNoYSI6IjEzLzEyLzIwMjMgMDA6MDA6MDAiLCJzZXJ2aWNpbyI6IkpQRyJ9.Lo1_nZVLhP09NtnWQJ4dCH5AITyViPYZrz0Ko2BJDJY')
 
 insert into dbo.Publicidades (url_contenido, url_imagen)
-values ('https://store.steampowered.com/', 'https://cl.buscafs.com/www.qore.com/public/uploads/images/98372/98372.png'), --V
-		('https://www.microsoft.com/es-es/software-download/windows10','https://i.blogs.es/3a9f3d/win10/1366_2000.jpg') --H
+values ('https://store.steampowered.com/app/1608230/Planet_of_Lana/', 'https://drws-production.s3.amazonaws.com/uploads/screenshot/9041/thumb_api-20210622-10-19oaq3e.jpg'), --V
+		('https://www.bmw.com.ar/es/index.html','https://di-uploads-pod28.dealerinspire.com/bmwofalbany/uploads/2023/06/BMWAlbany_i5_Banners_CTA_Update-1344x150_09-23.jpg') --H
 
 insert into dbo.Publicaciones (id_publicidad, id_servicio, banner_code, fecha_inicio, fecha_fin, codigo_unico_id)
 values (1, 1, 2001, GETDATE(), DATEADD(MONTH,1,GETDATE()), 2)
@@ -165,8 +188,8 @@ insert into dbo.Servicios_Exposicion (nombre, token)
 values ('MSS', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJub21icmUiOiJNU1MiLCJmZWNoYSI6IjEzLzEyLzIwMjMgMDA6MDA6MDAiLCJzZXJ2aWNpbyI6InBvc2l0aXZvIn0.Q4ihAhMVdfHN0_EueMizfpTMLftozw9NApTNxeIctPA')
 
 insert into dbo.Publicidades (url_contenido, url_imagen)
-values ('https://www.verisure.com.ar/', 'https://www.verisure.com.ar/sites/ar/files/flmngr/kit-home-24_1.png?no-cache=1703009254287'), --H
-		('https://www.fiat.com.ar/','https://c8.alamy.com/compes/2awap6d/1959-ca-torino-italia-la-industria-automovilistica-italiana-fiat-f-i-a-t-fabbrica-italiana-automobili-torino-publicidad-para-fiat-500-automatico-automatico-2awap6d.jpg') --V
+values ('https://www.usgolfpro.com', 'https://www.usgolfpro.com/wp-content/uploads/2017/03/USGolfPro_com-logo.jpg'), --H
+		('https://www.coca-cola.com/ar/es/brands/fanta','https://www.google.com/imgres?imgurl=https%3A%2F%2Fmineralka.store%2Fwa-data%2Fpublic%2Fshop%2Fproducts%2F22%2F79%2F7922%2Fimages%2F9673%2F9673.970.png&tbnid=qsLKWSVzK8FvKM&vet=12ahUKEwjzo-jjwsqEAxXEUbgEHc95AssQMygvegUIARCPAQ..i&imgrefurl=https%3A%2F%2Fmineralka.store%2Ffanta--fanta-05l24-pet-kazakh%2F&docid=N4EOHN4ARk6g0M&w=270&h=970&q=imagesize%3A270x970&ved=2ahUKEwjzo-jjwsqEAxXEUbgEHc95AssQMygvegUIARCPAQ') --V
 
 insert into dbo.Publicaciones (id_publicidad, id_servicio, banner_code, fecha_inicio, fecha_fin, codigo_unico_id)
 values (1, 1, 3001, GETDATE(), DATEADD(MONTH,1,GETDATE()), 3)

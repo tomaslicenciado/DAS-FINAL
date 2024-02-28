@@ -40,7 +40,7 @@ export class VisualizarContenidoComponent implements OnInit, OnDestroy{
     }
   }
   mostrarPlataformas: boolean = false;
-  
+
   ngOnDestroy(): void {
   }
 
@@ -51,22 +51,23 @@ export class VisualizarContenidoComponent implements OnInit, OnDestroy{
   toggleReproducir(id_p: number) {
     this._mssService.obtenerContenido({token_suscriptor: this._apiService.getUser().token, id_plataforma: id_p, eidr_contenido: this.contenido.eidr_contenido}).subscribe({
       next: (respuesta: RespuestaBean) => {
-        if (getCodigo(respuesta) == Codigo.OK){
-          const urls = JSON.parse(respuesta.body!);
-          this.contenidoUrl = this.sanitizer.bypassSecurityTrustResourceUrl(urls['url1']+"&autoplay=1");
-          this.reproducir = !this.reproducir;
-        }
+        const urls = JSON.parse(respuesta.body!);
+        this.contenidoUrl = this.sanitizer.bypassSecurityTrustResourceUrl(urls['url1']+"&autoplay=1");
+        this.reproducir = !this.reproducir;
       },
-      error: (error) => {
-        this._ngZone.run(() => this._msgSrv.showMessage({title: "Error en visualización de contenido", text: error}), 0);
+      error: (error: RespuestaBean) => {
+        let e: RespuestaBean = JSON.parse(JSON.stringify(error.body!));
+        this._ngZone.run(() => this._msgSrv.showMessage({title: "Error en visualización de contenido", text: e.mensaje}), 0);
       }
     });
+
     this._mssService.registrarVisualizacion({token_suscriptor: this._apiService.getUser().token,id_plataforma: id_p, eidr_contenido: this.contenido.eidr_contenido}).subscribe({
       next: (respuesta: RespuestaBean) => {
         console.log(respuesta);
       },
-      error: (error) => {
-        this._ngZone.run(() => this._msgSrv.showMessage({title: "Error en registro de visualización", text: error}), 0);
+      error: (error: RespuestaBean) => {
+        let e: RespuestaBean = JSON.parse(JSON.stringify(error.body!));
+        this._ngZone.run(() => this._msgSrv.showMessage({title: "Error en registro de visualización", text: e.mensaje}), 0);
       }
     });
   }
@@ -74,7 +75,6 @@ export class VisualizarContenidoComponent implements OnInit, OnDestroy{
   volver(){
     this._vsServ.detener();
     window.location.reload();
-    //this._router.navigate(['/']);
   }
 
   seleccionarPlataforma(idPlataforma: number) {
@@ -113,7 +113,7 @@ export class VisualizarContenidoComponent implements OnInit, OnDestroy{
 
   obtenerDirecciones(contenido: IContenido): string {
     console.log(this.contenido);
-    
+
     const direcciones: IDireccion[] = contenido.direcciones;
     return direcciones.map((direccion) => {return direccion.nombres + " " + direccion.apellidos}).join(", ");
   }

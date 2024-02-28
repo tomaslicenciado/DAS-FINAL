@@ -48,7 +48,7 @@ export class DatosPersonalesComponent implements OnInit{
     });
   }
 
-            
+
   private inicializarFormulario(): void {
     this.formulario = this._fb.group({
       nombres: [this.user.nombres, Validators.required],
@@ -58,7 +58,7 @@ export class DatosPersonalesComponent implements OnInit{
       repetirNuevaContrasena: [''],
     });
   }
-            
+
   guardarCambios(): void {
     this.submited = true;
     this.validar();
@@ -70,19 +70,13 @@ export class DatosPersonalesComponent implements OnInit{
       let apellidos = this.formulario.controls['apellidos'].value;
       this._rsService.modificarDatosPersonales({token_usuario: this.user.token, nombres: nombres, apellidos: apellidos, password: password}).subscribe({
         next: (respuesta: RespuestaBean) => {
-          if (getCodigo(respuesta) == Codigo.OK){
-            this.user.apellidos = apellidos;
-            this.user.nombres = nombres;
-            this.activeModal.close();
-          }
-          else
-            this._ngZone.run(() => this._msgSrv.showMessage({title: respuesta.body!, text: respuesta.mensaje}), 0);
+          this.user.apellidos = apellidos;
+          this.user.nombres = nombres;
+          this.activeModal.close();
         },
-        error: (error) => {
-          this._ngZone.run(() => this._msgSrv.showMessage({title: "Error en modificación de datos personales", text: error}), 0);
-        },
-        complete: () => {
-          this._loader.complete();
+        error: (error: RespuestaBean) => {
+          let e: RespuestaBean = JSON.parse(JSON.stringify(error.body!));
+          this._ngZone.run(() => this._msgSrv.showMessage({title: "Error en modificación de datos personales", text: e.mensaje}), 0);
         }
       });
     }

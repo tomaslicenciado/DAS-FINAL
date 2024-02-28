@@ -213,7 +213,7 @@ BEGIN
     FROM dbo.Servicios_Externos
     WHERE token_servicio = @token_servicio;
 
-    -- Verificar si se encontró el id de servicio
+    -- Verificar si se encontrï¿½ el id de servicio
     IF @id_servicio IS NOT NULL
     BEGIN
         -- Insertar un nuevo registro en la tabla logins
@@ -245,7 +245,7 @@ BEGIN
     FROM dbo.Servicios_Externos
     WHERE token_servicio = @token_servicio;
 
-    -- Verificar si se encontró el id de servicio
+    -- Verificar si se encontrï¿½ el id de servicio
     IF @id_servicio IS NOT NULL
     BEGIN
         -- Obtener el token de la tabla Logins asociado al transaction_id y al id_servicio correspondiente
@@ -309,7 +309,7 @@ begin
     FROM dbo.Servicios_Externos
     WHERE token_servicio = @token_servicio;
 
-    -- Verificar si se encontró el id de servicio
+    -- Verificar si se encontrï¿½ el id de servicio
     IF @id_servicio IS NOT NULL
 	begin
 		select @resultado = new, @id_viewer = id_viewer
@@ -395,7 +395,7 @@ BEGIN
     SET NOCOUNT ON;
 	SET TRANSACTION ISOLATION LEVEL REPEATABLE READ;
 
-    -- Actualizar la fecha de uso de la sesión
+    -- Actualizar la fecha de uso de la sesiï¿½n
     UPDATE dbo.Sesiones
     SET fecha_uso = GETDATE()
     WHERE sesion = @sesion;
@@ -419,10 +419,10 @@ BEGIN
 	WHERE s.token_servicio = @token_servicio
 
 	SELECT @resultado = CASE
-								WHEN fecha_uso IS NOT NULL THEN 2 -- Sesión usada
-								WHEN fecha_vencimiento < GETDATE() THEN 3 -- Sesión vencida
-								WHEN fecha_baja IS NOT NULL THEN 4 -- Sesión dada de baja
-								WHEN id_sesion IS NOT NULL THEN 1 -- Sesión válida
+								WHEN fecha_uso IS NOT NULL THEN 2 -- Sesiï¿½n usada
+								WHEN fecha_vencimiento < GETDATE() THEN 3 -- Sesiï¿½n vencida
+								WHEN fecha_baja IS NOT NULL THEN 4 -- Sesiï¿½n dada de baja
+								WHEN id_sesion IS NOT NULL THEN 1 -- Sesiï¿½n vï¿½lida
 								ELSE 5 -- Sesion inexistente
 							END
 	FROM dbo.Sesiones
@@ -489,7 +489,7 @@ BEGIN
     FROM dbo.Logins
     WHERE token = @token_viewer AND id_servicio = @id_servicio;
 
-    -- Insertar la sesión con fecha de vencimiento media hora después de la creación
+    -- Insertar la sesiï¿½n con fecha de vencimiento media hora despuï¿½s de la creaciï¿½n
     INSERT INTO dbo.Sesiones (id_login, sesion, fecha_creacion, fecha_vencimiento, fecha_uso, fecha_baja)
     VALUES (
         @id_login,
@@ -530,13 +530,13 @@ BEGIN
     SET @valido = 0;
     SET @id_servicio = 0;
 
-    -- Obtener la información del login
+    -- Obtener la informaciï¿½n del login
     SELECT @valido = 1,
            @id_servicio = l.id_servicio
     FROM dbo.Logins l
     WHERE l.id_login = @id_login
-          AND l.fecha_baja IS NULL  -- No está dado de baja
-          AND (l.fecha_expiracion IS NULL OR l.fecha_expiracion > GETDATE()) -- No está expirado
+          AND l.fecha_baja IS NULL  -- No estï¿½ dado de baja
+          AND (l.fecha_expiracion IS NULL OR l.fecha_expiracion > GETDATE()) -- No estï¿½ expirado
 		  AND (l.id_viewer IS NULL OR l.id_viewer = 0); --No se encuentra en uso
 END;
 go
@@ -556,7 +556,7 @@ BEGIN
 
     DECLARE @id_viewer INT;
 
-    -- Validar el email y contraseña en la tabla viewers
+    -- Validar el email y contraseï¿½a en la tabla viewers
     SELECT @id_viewer = id_viewer
     FROM dbo.Viewers
     WHERE email = @email AND v_password = @password;
@@ -699,16 +699,16 @@ values
   ('Helen', 'Mirren'),
   ('Tinto', 'Brass');
 
-insert into dbo.Generos_Contenidos (genero) values ('Drama'),('Acción'),('Erótica')
+insert into dbo.Generos_Contenidos (genero) values ('Drama'),('AcciÃ³n'),('ErÃ³tica')
 
-insert into dbo.Tipos_Contenidos (tipo) values ('Películas'), ('Series')
+insert into dbo.Tipos_Contenidos (tipo) values ('PelÃ­culas'), ('Series')
 
 insert into dbo.Paises_Contenidos (pais) values ('EEUU'),('Italia')
 
 insert into dbo.Contenidos (eidr_contenido, titulo, descripcion, url_imagen, fecha_estreno, id_genero, id_tipo_contenido, id_pais, fecha_carga, destacado)
-values ('10.5240/FC9B-BB73-4B80-E953-D8A2-U','Grey`s Anatomy','La serie se centra en la vida de los cirujanos internos, residentes y especialistas a medida de que se convierten en médicos cirujanos experimentados mientras tratan de equilibrar sus relaciones personales y profesionales. ','https://mx.web.img3.acsta.net/pictures/22/10/06/21/38/5529680.jpg',CONVERT(DATE,'2005-01-01'),(select id_genero from dbo.Generos_Contenidos where genero = 'Drama'),(select id_tipo_contenido from dbo.Tipos_Contenidos where tipo = 'Series'),(select id_pais from dbo.Paises_Contenidos where pais = 'EEUU'),CONVERT(DATE,'2022-01-01'),0),
-('10.5240/21A6-ED2A-A2C0-619A-9746-4','Rápidos y Furiosos 6','Después de su exitoso golpe en Río de Janeiro, Brasil, Dominic "Dom" Toretto (Vin Diesel) y Brian O`Conner (Paul Walker) están en una carrera en las Islas Canarias, España, hasta llegar a un hospital, ya que el hijo de Brian está a punto de nacer. ','https://m.media-amazon.com/images/S/pv-target-images/2a711d2b91761c98205aa9f8b62e8cb47f423cc8f7697bfac5e76b71af850fda.jpg',CONVERT(DATE,'2013-01-01'),(select id_genero from dbo.Generos_Contenidos where genero = 'Acción'),(select id_tipo_contenido from dbo.Tipos_Contenidos where tipo = 'Películas'),(select id_pais from dbo.Paises_Contenidos where pais = 'EEUU'),GETDATE(),1),
-('10.5240/7C73-9E06-C6D2-3C33-4DFC-5','Calígula','El impopular emperador romano Tiberio, quien se encuentra enfermo de sífilis y con una salud frágil, también padece de inestabilidad mental y lleva años autoexiliado de Roma','https://es.web.img3.acsta.net/medias/nmedia/18/83/26/26/20533346.jpg',CONVERT(DATE,'1979-01-01'),(select id_genero from dbo.Generos_Contenidos where genero = 'Erótica'),(select id_tipo_contenido from dbo.Tipos_Contenidos where tipo = 'Películas'),(select id_pais from dbo.Paises_Contenidos where pais = 'Italia'),CONVERT(DATE,'2015-01-01'),0)
+values ('10.5240/FC9B-BB73-4B80-E953-D8A2-U','Grey`s Anatomy','La serie se centra en la vida de los cirujanos internos, residentes y especialistas a medida de que se convierten en mÃ©dicos cirujanos experimentados mientras tratan de equilibrar sus relaciones personales y profesionales. ','https://mx.web.img3.acsta.net/pictures/22/10/06/21/38/5529680.jpg',CONVERT(DATE,'2005-01-01'),(select id_genero from dbo.Generos_Contenidos where genero = 'Drama'),(select id_tipo_contenido from dbo.Tipos_Contenidos where tipo = 'Series'),(select id_pais from dbo.Paises_Contenidos where pais = 'EEUU'),CONVERT(DATE,'2022-01-01'),0),
+('10.5240/21A6-ED2A-A2C0-619A-9746-4','RÃ¡pidos y Furiosos 6','DespuÃ©s de su exitoso golpe en RÃ­o de Janeiro, Brasil, Dominic "Dom" Toretto (Vin Diesel) y Brian O`Conner (Paul Walker) estÃ¡n en una carrera en las Islas Canarias, EspaÃ±a, hasta llegar a un hospital, ya que el hijo de Brian estÃ¡ a punto de nacer. ','https://m.media-amazon.com/images/S/pv-target-images/2a711d2b91761c98205aa9f8b62e8cb47f423cc8f7697bfac5e76b71af850fda.jpg',CONVERT(DATE,'2013-01-01'),(select id_genero from dbo.Generos_Contenidos where genero = 'AcciÃ³n'),(select id_tipo_contenido from dbo.Tipos_Contenidos where tipo = 'PelÃ­culas'),(select id_pais from dbo.Paises_Contenidos where pais = 'EEUU'),GETDATE(),1),
+('10.5240/7C73-9E06-C6D2-3C33-4DFC-5','CalÃ­gula','El impopular emperador romano Tiberio, quien se encuentra enfermo de sÃ­filis y con una salud frÃ¡gil, tambiÃ©n padece de inestabilidad mental y lleva aÃ±os autoexiliado de Roma','https://es.web.img3.acsta.net/medias/nmedia/18/83/26/26/20533346.jpg',CONVERT(DATE,'1979-01-01'),(select id_genero from dbo.Generos_Contenidos where genero = 'ErÃ³tica'),(select id_tipo_contenido from dbo.Tipos_Contenidos where tipo = 'PelÃ­culas'),(select id_pais from dbo.Paises_Contenidos where pais = 'Italia'),CONVERT(DATE,'2015-01-01'),0)
 
 insert into dbo.Direcciones (eidr_contenido, id_persona)
 values ('10.5240/FC9B-BB73-4B80-E953-D8A2-U',(select id_persona from dbo.Personas where nombres = 'Shonda' and apellidos = 'Rhimes')),
@@ -743,7 +743,7 @@ values
   ('Hong', 'Chou'),
   ('Sadie', 'Sink'),
   ('Darren', 'Aronofsky'),
-  ('Timothée', 'Chalamet'),
+  ('TimothÃ©e', 'Chalamet'),
   ('Rebecca', 'Ferguson'),
   ('Zendaya', 'Coleman'),
   ('Denis', 'Villeneuve'),
@@ -754,16 +754,16 @@ values
   ('Orlando', 'Bloom'),
   ('Peter', 'Jackson');
 
-insert into dbo.Generos_Contenidos (genero) values ('Drama'),('Ciencia Ficción'),('Fantasía')
+insert into dbo.Generos_Contenidos (genero) values ('Drama'),('Ciencia FicciÃ³n'),('FantasÃ­a')
 
-insert into dbo.Tipos_Contenidos (tipo) values ('Películas')
+insert into dbo.Tipos_Contenidos (tipo) values ('PelÃ­culas')
 
 insert into dbo.Paises_Contenidos (pais) values ('EEUU')
 
 insert into dbo.Contenidos (eidr_contenido, titulo, descripcion, url_imagen, fecha_estreno, id_genero, id_tipo_contenido, id_pais, fecha_carga, destacado)
-values ('10.5240/DB77-E21B-22E7-F52D-2084-I','The Whale','Charlie (Brendan Fraser) es un profesor de inglés con 272 kg, se avergüenza de tener obesidad mórbida y tiene miedo de mostrar su apariencia a los estudiantes','https://resizer.glanacion.com/resizer/v2/la-ballena-el-gran-regreso-de-brendan-fraser-4INVGSI3TZCJZMOZMSV6JPPCGY.webp?auth=338dc5c17ea0ab21e38d1db4ca16a3deec5b88607758ff3e23c0d832cb16448e&width=768&quality=70&smart=false',CONVERT(DATE,'2022-01-01'),(select id_genero from dbo.Generos_Contenidos where genero = 'Drama'),(select id_tipo_contenido from dbo.Tipos_Contenidos where tipo = 'Películas'),(select id_pais from dbo.Paises_Contenidos where pais = 'EEUU'),CONVERT(DATE,'2023-01-01'),1),
-('10.5240/DA52-689A-551F-3066-2DEE-B','Dune','En el año 10191, el duque Leto de la Casa Atreides, gobernante del planeta oceánico Caladan, es asignado por el emperador Padishah Shaddam Corrino IV para reemplazar a la Casa Harkonnen como gobernante del feudo de Arrakis.','https://www.lavanguardia.com/files/content_image_mobile_filter/uploads/2021/09/01/612fa2a1f0ba5.jpeg',CONVERT(DATE,'2021-01-01'),(select id_genero from dbo.Generos_Contenidos where genero = 'Ciencia Ficción'),(select id_tipo_contenido from dbo.Tipos_Contenidos where tipo = 'Películas'),(select id_pais from dbo.Paises_Contenidos where pais = 'EEUU'),GETDATE(),1),
-('10.5240/A825-3C17-2202-0C96-A34C-P','El Señor de los Anillos','En la Segunda Edad de la Tierra Media, los señores de los Elfos, los Enanos y los Hombres reciben anillos de poder. Sin saberlo, el Señor Oscuro Sauron forja el anillo Único en el Monte del Destino','https://play-lh.googleusercontent.com/imeAs3_Nb9fyoj56LgLzSRBs3UXTZTH_TLg2xMkg6J90ZPzxscAXPvtsR9Q9azxe-WCy5A',CONVERT(DATE,'2001-01-01'),(select id_genero from dbo.Generos_Contenidos where genero = 'Fantasía'),(select id_tipo_contenido from dbo.Tipos_Contenidos where tipo = 'Películas'),(select id_pais from dbo.Paises_Contenidos where pais = 'EEUU'),CONVERT(DATE,'2005-01-01'),0)
+values ('10.5240/DB77-E21B-22E7-F52D-2084-I','The Whale','Charlie (Brendan Fraser) es un profesor de inglÃ©s con 272 kg, se avergÃ¼enza de tener obesidad mÃ³rbida y tiene miedo de mostrar su apariencia a los estudiantes','https://resizer.glanacion.com/resizer/v2/la-ballena-el-gran-regreso-de-brendan-fraser-4INVGSI3TZCJZMOZMSV6JPPCGY.webp?auth=338dc5c17ea0ab21e38d1db4ca16a3deec5b88607758ff3e23c0d832cb16448e&width=768&quality=70&smart=false',CONVERT(DATE,'2022-01-01'),(select id_genero from dbo.Generos_Contenidos where genero = 'Drama'),(select id_tipo_contenido from dbo.Tipos_Contenidos where tipo = 'PelÃ­culas'),(select id_pais from dbo.Paises_Contenidos where pais = 'EEUU'),CONVERT(DATE,'2023-01-01'),1),
+('10.5240/DA52-689A-551F-3066-2DEE-B','Dune','En el aÃ±o 10191, el duque Leto de la Casa Atreides, gobernante del planeta oceÃ¡nico Caladan, es asignado por el emperador Padishah Shaddam Corrino IV para reemplazar a la Casa Harkonnen como gobernante del feudo de Arrakis.','https://www.lavanguardia.com/files/content_image_mobile_filter/uploads/2021/09/01/612fa2a1f0ba5.jpeg',CONVERT(DATE,'2021-01-01'),(select id_genero from dbo.Generos_Contenidos where genero = 'Ciencia FicciÃ³n'),(select id_tipo_contenido from dbo.Tipos_Contenidos where tipo = 'PelÃ­culas'),(select id_pais from dbo.Paises_Contenidos where pais = 'EEUU'),GETDATE(),1),
+('10.5240/A825-3C17-2202-0C96-A34C-P','El SeÃ±or de los Anillos','En la Segunda Edad de la Tierra Media, los seÃ±ores de los Elfos, los Enanos y los Hombres reciben anillos de poder. Sin saberlo, el SeÃ±or Oscuro Sauron forja el anillo Ãºnico en el Monte del Destino','https://play-lh.googleusercontent.com/imeAs3_Nb9fyoj56LgLzSRBs3UXTZTH_TLg2xMkg6J90ZPzxscAXPvtsR9Q9azxe-WCy5A',CONVERT(DATE,'2001-01-01'),(select id_genero from dbo.Generos_Contenidos where genero = 'FantasÃ­a'),(select id_tipo_contenido from dbo.Tipos_Contenidos where tipo = 'PelÃ­culas'),(select id_pais from dbo.Paises_Contenidos where pais = 'EEUU'),CONVERT(DATE,'2005-01-01'),0)
 
 insert into dbo.Direcciones (eidr_contenido, id_persona)
 values ('10.5240/DB77-E21B-22E7-F52D-2084-I',(select id_persona from dbo.Personas where nombres = 'Darren' and apellidos = 'Aronofsky')),
@@ -774,7 +774,7 @@ insert into dbo.Actuaciones (eidr_contenido, id_persona)
 values ('10.5240/DB77-E21B-22E7-F52D-2084-I',(select id_persona from dbo.Personas where nombres = 'Brendan' and apellidos = 'Fraser')),
 ('10.5240/DB77-E21B-22E7-F52D-2084-I',(select id_persona from dbo.Personas where nombres = 'Hong' and apellidos = 'Chou')),
 ('10.5240/DB77-E21B-22E7-F52D-2084-I',(select id_persona from dbo.Personas where nombres = 'Sadie' and apellidos = 'Sink')),
-('10.5240/DA52-689A-551F-3066-2DEE-B',(select id_persona from dbo.Personas where nombres = 'Timothée' and apellidos = 'Chalamet')),
+('10.5240/DA52-689A-551F-3066-2DEE-B',(select id_persona from dbo.Personas where nombres = 'TimothÃ©e' and apellidos = 'Chalamet')),
 ('10.5240/DA52-689A-551F-3066-2DEE-B',(select id_persona from dbo.Personas where nombres = 'Rebecca' and apellidos = 'Ferguson')),
 ('10.5240/DA52-689A-551F-3066-2DEE-B',(select id_persona from dbo.Personas where nombres = 'Zendaya' and apellidos = 'Coleman')),
 ('10.5240/A825-3C17-2202-0C96-A34C-P',(select id_persona from dbo.Personas where nombres = 'Vigo' and apellidos = 'Mortensen')),
@@ -802,36 +802,36 @@ values
   ('Tim', 'Van Patten'),
   ('Brian', 'Kirk'),
   ('Daniel', 'Minahan'),
-  ('Alejo', 'García Pintos'),
+  ('Alejo', 'GarcÃ­a Pintos'),
   ('Pepe', 'Monje'),
-  ('Vita', 'Escardó'),
-  ('Héctor', 'Olivera'),
-  ('Ricardo', 'Darín'),
-  ('Gastón', 'Pauls'),
-  ('Leticia', 'Brédice'),
+  ('Vita', 'EscardÃ³'),
+  ('HÃ©ctor', 'Olivera'),
+  ('Ricardo', 'DarÃ­n'),
+  ('GastÃ³n', 'Pauls'),
+  ('Leticia', 'BrÃ©dice'),
   ('Tomas', 'Fonzi'),
-  ('Fabián', 'Bielinsky'),
+  ('FabiÃ¡n', 'Bielinsky'),
   ('Clint', 'Eastwood'),
   ('Bee', 'Vang');;
 
-insert into dbo.Generos_Contenidos (genero) values ('Fantasía'),('Histórica'),('Suspenso'), ('Drama')
+insert into dbo.Generos_Contenidos (genero) values ('FantasÃ­a'),('HistÃ³rica'),('Suspenso'), ('Drama')
 
-insert into dbo.Tipos_Contenidos (tipo) values ('Películas'), ('Series')
+insert into dbo.Tipos_Contenidos (tipo) values ('PelÃ­culas'), ('Series')
 
 insert into dbo.Paises_Contenidos (pais) values ('EEUU'),('Argentina')
 
 insert into dbo.Contenidos (eidr_contenido, titulo, descripcion, url_imagen, fecha_estreno, id_genero, id_tipo_contenido, id_pais, fecha_carga, destacado)
-values ('10.5240/C1B5-3BA1-8991-A571-8472-W','Juego de Tronos','La primera temporada comienza quince años después de la guerra civil conocida como la «rebelión de Robert», con la cual Robert Baratheon expulsó del Trono de Hierro a los Targaryen y se proclamó gobernante de Poniente','https://es.web.img3.acsta.net/pictures/19/03/22/10/08/5883111.jpg?coixp=50&coiyp=40',CONVERT(DATE,'2011-01-01'),(select id_genero from dbo.Generos_Contenidos where genero = 'Fantasía'),(select id_tipo_contenido from dbo.Tipos_Contenidos where tipo = 'Series'),(select id_pais from dbo.Paises_Contenidos where pais = 'EEUU'),CONVERT(DATE,'2012-01-01'),0),
-('10.5240/2FF5-DE47-6253-4E94-7A63-4','La Noche de los Lápices','Corre el año 1975 en Argentina, a los estudiantes de diferentes colegios se les quita el boleto estudiantil —con el que obtenían un importante descuento en la tarifa del viaje en colectivo— durante el gobierno de Isabel Martínez de Perón.','https://m.media-amazon.com/images/S/pv-target-images/47ed4001b825ca6a084a0f78a7c1b84945dded10d200d5399f97353d90b7984e.jpg',CONVERT(DATE,'1986-01-01'),(select id_genero from dbo.Generos_Contenidos where genero = 'Histórica'),(select id_tipo_contenido from dbo.Tipos_Contenidos where tipo = 'Películas'),(select id_pais from dbo.Paises_Contenidos where pais = 'Argentina'),CONVERT(DATE,'2008-01-01'),0),
-('10.5240/9B6C-ED71-5811-2A48-5809-T','Nueve Reinas','Cuenta la historia de dos estafadores que se conocen por casualidad y deciden unirse para trabajar juntos.','https://cloudfront-us-east-1.images.arcpublishing.com/infobae/WAIMDDPU2ZDL7FB62INBQA6PZY.jpg',CONVERT(DATE,'2000-01-01'),(select id_genero from dbo.Generos_Contenidos where genero = 'Suspenso'),(select id_tipo_contenido from dbo.Tipos_Contenidos where tipo = 'Películas'),(select id_pais from dbo.Paises_Contenidos where pais = 'Argentina'),CONVERT(DATE,'2015-01-01'),0),
-('10.5240/8212-4AA9-5A03-63AE-638B-W','Gran Torino','Walt Kowalski (Clint Eastwood) es un anciano veterano de la guerra de Corea y trabajador jubilado de la fábrica de Ford, de actitud amargada, quien acaba de enviudar','https://static.independent.co.uk/s3fs-public/thumbnails/image/2009/07/02/18/204860.jpg?width=1200',CONVERT(DATE,'2008-01-01'),(select id_genero from dbo.Generos_Contenidos where genero = 'Drama'),(select id_tipo_contenido from dbo.Tipos_Contenidos where tipo = 'Películas'),(select id_pais from dbo.Paises_Contenidos where pais = 'EEUU'),CONVERT(DATE,'2015-01-01'),1)
+values ('10.5240/C1B5-3BA1-8991-A571-8472-W','Juego de Tronos','La primera temporada comienza quince aÃ±os despuÃ©s de la guerra civil conocida como la "rebeliÃ³n de Robert", con la cual Robert Baratheon expulsÃ³ del Trono de Hierro a los Targaryen y se proclamÃ³ gobernante de Poniente','https://es.web.img3.acsta.net/pictures/19/03/22/10/08/5883111.jpg?coixp=50&coiyp=40',CONVERT(DATE,'2011-01-01'),(select id_genero from dbo.Generos_Contenidos where genero = 'FantasÃ­a'),(select id_tipo_contenido from dbo.Tipos_Contenidos where tipo = 'Series'),(select id_pais from dbo.Paises_Contenidos where pais = 'EEUU'),CONVERT(DATE,'2012-01-01'),0),
+('10.5240/2FF5-DE47-6253-4E94-7A63-4','La Noche de los LÃ¡pices','Corre el aÃ±o 1975 en Argentina, a los estudiantes de diferentes colegios se les quita el boleto estudiantil "con el que obtenÃ­an un importante descuento en la tarifa del viaje en colectivo" durante el gobierno de Isabel MartÃ­nez de PerÃ³n.','https://m.media-amazon.com/images/S/pv-target-images/47ed4001b825ca6a084a0f78a7c1b84945dded10d200d5399f97353d90b7984e.jpg',CONVERT(DATE,'1986-01-01'),(select id_genero from dbo.Generos_Contenidos where genero = 'HistÃ³rica'),(select id_tipo_contenido from dbo.Tipos_Contenidos where tipo = 'PelÃ­culas'),(select id_pais from dbo.Paises_Contenidos where pais = 'Argentina'),CONVERT(DATE,'2008-01-01'),0),
+('10.5240/9B6C-ED71-5811-2A48-5809-T','Nueve Reinas','Cuenta la historia de dos estafadores que se conocen por casualidad y deciden unirse para trabajar juntos.','https://cloudfront-us-east-1.images.arcpublishing.com/infobae/WAIMDDPU2ZDL7FB62INBQA6PZY.jpg',CONVERT(DATE,'2000-01-01'),(select id_genero from dbo.Generos_Contenidos where genero = 'Suspenso'),(select id_tipo_contenido from dbo.Tipos_Contenidos where tipo = 'PelÃ­culas'),(select id_pais from dbo.Paises_Contenidos where pais = 'Argentina'),CONVERT(DATE,'2015-01-01'),0),
+('10.5240/8212-4AA9-5A03-63AE-638B-W','Gran Torino','Walt Kowalski (Clint Eastwood) es un anciano veterano de la guerra de Corea y trabajador jubilado de la fÃ¡brica de Ford, de actitud amargada, quien acaba de enviudar','https://static.independent.co.uk/s3fs-public/thumbnails/image/2009/07/02/18/204860.jpg?width=1200',CONVERT(DATE,'2008-01-01'),(select id_genero from dbo.Generos_Contenidos where genero = 'Drama'),(select id_tipo_contenido from dbo.Tipos_Contenidos where tipo = 'PelÃ­culas'),(select id_pais from dbo.Paises_Contenidos where pais = 'EEUU'),CONVERT(DATE,'2015-01-01'),1)
 
 insert into dbo.Direcciones (eidr_contenido, id_persona)
 values ('10.5240/C1B5-3BA1-8991-A571-8472-W',(select id_persona from dbo.Personas where nombres = 'Tim' and apellidos = 'Van Patten')),
 ('10.5240/C1B5-3BA1-8991-A571-8472-W',(select id_persona from dbo.Personas where nombres = 'Brian' and apellidos = 'Kirk')),
 ('10.5240/C1B5-3BA1-8991-A571-8472-W',(select id_persona from dbo.Personas where nombres = 'Daniel' and apellidos = 'Minahan')),
-('10.5240/2FF5-DE47-6253-4E94-7A63-4',(select id_persona from dbo.Personas where nombres = 'Héctor' and apellidos = 'Olivera')),
-('10.5240/9B6C-ED71-5811-2A48-5809-T',(select id_persona from dbo.Personas where nombres = 'Fabián' and apellidos = 'Bielinsky')),
+('10.5240/2FF5-DE47-6253-4E94-7A63-4',(select id_persona from dbo.Personas where nombres = 'HÃ©ctor' and apellidos = 'Olivera')),
+('10.5240/9B6C-ED71-5811-2A48-5809-T',(select id_persona from dbo.Personas where nombres = 'FabiÃ¡n' and apellidos = 'Bielinsky')),
 ('10.5240/8212-4AA9-5A03-63AE-638B-W',(select id_persona from dbo.Personas where nombres = 'Clint' and apellidos = 'Eastwood'))
 
 insert into dbo.Actuaciones (eidr_contenido, id_persona)
@@ -839,12 +839,12 @@ values ('10.5240/C1B5-3BA1-8991-A571-8472-W',(select id_persona from dbo.Persona
 ('10.5240/C1B5-3BA1-8991-A571-8472-W',(select id_persona from dbo.Personas where nombres = 'Emilia' and apellidos = 'Clarke')),
 ('10.5240/C1B5-3BA1-8991-A571-8472-W',(select id_persona from dbo.Personas where nombres = 'Jason' and apellidos = 'Momoa')),
 ('10.5240/C1B5-3BA1-8991-A571-8472-W',(select id_persona from dbo.Personas where nombres = 'Kit' and apellidos = 'Harington')),
-('10.5240/2FF5-DE47-6253-4E94-7A63-4',(select id_persona from dbo.Personas where nombres = 'Alejo' and apellidos = 'García Pintos')),
+('10.5240/2FF5-DE47-6253-4E94-7A63-4',(select id_persona from dbo.Personas where nombres = 'Alejo' and apellidos = 'GarcÃ­a Pintos')),
 ('10.5240/2FF5-DE47-6253-4E94-7A63-4',(select id_persona from dbo.Personas where nombres = 'Pepe' and apellidos = 'Monje')),
-('10.5240/2FF5-DE47-6253-4E94-7A63-4',(select id_persona from dbo.Personas where nombres = 'Vita' and apellidos = 'Escardó')),
-('10.5240/9B6C-ED71-5811-2A48-5809-T',(select id_persona from dbo.Personas where nombres = 'Ricardo' and apellidos = 'Darín')),
-('10.5240/9B6C-ED71-5811-2A48-5809-T',(select id_persona from dbo.Personas where nombres = 'Gastón' and apellidos = 'Pauls')),
-('10.5240/9B6C-ED71-5811-2A48-5809-T',(select id_persona from dbo.Personas where nombres = 'Leticia' and apellidos = 'Brédice')),
+('10.5240/2FF5-DE47-6253-4E94-7A63-4',(select id_persona from dbo.Personas where nombres = 'Vita' and apellidos = 'EscardÃ³')),
+('10.5240/9B6C-ED71-5811-2A48-5809-T',(select id_persona from dbo.Personas where nombres = 'Ricardo' and apellidos = 'DarÃ­n')),
+('10.5240/9B6C-ED71-5811-2A48-5809-T',(select id_persona from dbo.Personas where nombres = 'GastÃ³n' and apellidos = 'Pauls')),
+('10.5240/9B6C-ED71-5811-2A48-5809-T',(select id_persona from dbo.Personas where nombres = 'Leticia' and apellidos = 'BrÃ©dice')),
 ('10.5240/9B6C-ED71-5811-2A48-5809-T',(select id_persona from dbo.Personas where nombres = 'Tomas' and apellidos = 'Fonzi')),
 ('10.5240/8212-4AA9-5A03-63AE-638B-W',(select id_persona from dbo.Personas where nombres = 'Clint' and apellidos = 'Eastwood')),
 ('10.5240/8212-4AA9-5A03-63AE-638B-W',(select id_persona from dbo.Personas where nombres = 'Bee' and apellidos = 'Vang'))
@@ -879,18 +879,18 @@ values
   ('Michelle', 'Rodriguez'),
   ('Justin', 'Lin');;
 
-insert into dbo.Generos_Contenidos (genero) values ('Drama'),('Aventura'),('Comedia'),('Acción')
+insert into dbo.Generos_Contenidos (genero) values ('Drama'),('Aventura'),('Comedia'),('AcciÃ³n')
 
-insert into dbo.Tipos_Contenidos (tipo) values ('Películas')
+insert into dbo.Tipos_Contenidos (tipo) values ('PelÃ­culas')
 
 insert into dbo.Paises_Contenidos (pais) values ('EEUU')
 
 insert into dbo.Contenidos (eidr_contenido, titulo, descripcion, url_imagen, fecha_estreno, id_genero, id_tipo_contenido, id_pais, fecha_carga, destacado)
-values ('10.5240/3240-057D-88D7-9A82-A5E5-V','Wall-E','En el siglo XXIX, específicamente en el año 2805, el consumismo desenfrenado, la codicia empresarial y la negligencia ambiental han convertido al planeta Tierra en un páramo lleno de basura','https://lumiere-a.akamaihd.net/v1/images/p_walle_19753_69f7ff00.jpeg',CONVERT(DATE,'2008-01-01'),(select id_genero from dbo.Generos_Contenidos where genero = 'Aventura'),(select id_tipo_contenido from dbo.Tipos_Contenidos where tipo = 'Películas'),(select id_pais from dbo.Paises_Contenidos where pais = 'EEUU'),CONVERT(DATE,'2022-01-01'),0),
-('10.5240/32B1-B567-14AC-65C2-B8EF-X','Lilo y Stich','La historia gira en torno a dos personajes: Lilo Pelekai (Daveigh Chase), una niña solitaria y un extraterrestre llamado Stitch','https://es.web.img3.acsta.net/pictures/14/03/27/11/39/176864.jpg',CONVERT(DATE,'2002-01-01'),(select id_genero from dbo.Generos_Contenidos where genero = 'Comedia'),(select id_tipo_contenido from dbo.Tipos_Contenidos where tipo = 'Películas'),(select id_pais from dbo.Paises_Contenidos where pais = 'EEUU'),GETDATE(),1),
-('10.5240/A87B-E087-FA21-D93C-66A4-U','Los Puentes de Madison','Una solitaria ama de casa del Medio Oeste natural de la ciudad de Bari (Italia), casada con un soldado estadounidense destinado en Italia y llegada con él a los Estados Unidos.','https://es.web.img2.acsta.net/medias/nmedia/18/68/46/37/20340605.jpg',CONVERT(DATE,'1995-01-01'),(select id_genero from dbo.Generos_Contenidos where genero = 'Drama'),(select id_tipo_contenido from dbo.Tipos_Contenidos where tipo = 'Películas'),(select id_pais from dbo.Paises_Contenidos where pais = 'EEUU'),CONVERT(DATE,'2015-01-01'),0),
-('10.5240/8212-4AA9-5A03-63AE-638B-W','Gran Torino','Walt Kowalski (Clint Eastwood) es un anciano veterano de la guerra de Corea y trabajador jubilado de la fábrica de Ford, de actitud amargada, quien acaba de enviudar','https://static.independent.co.uk/s3fs-public/thumbnails/image/2009/07/02/18/204860.jpg?width=1200',CONVERT(DATE,'2008-01-01'),(select id_genero from dbo.Generos_Contenidos where genero = 'Drama'),(select id_tipo_contenido from dbo.Tipos_Contenidos where tipo = 'Películas'),(select id_pais from dbo.Paises_Contenidos where pais = 'EEUU'),CONVERT(DATE,'2015-01-01'),1),
-('10.5240/21A6-ED2A-A2C0-619A-9746-4','Rápidos y Furiosos 6','Después de su exitoso golpe en Río de Janeiro, Brasil, Dominic "Dom" Toretto (Vin Diesel) y Brian O`Conner (Paul Walker) están en una carrera en las Islas Canarias, España, hasta llegar a un hospital, ya que el hijo de Brian está a punto de nacer. ','https://m.media-amazon.com/images/S/pv-target-images/2a711d2b91761c98205aa9f8b62e8cb47f423cc8f7697bfac5e76b71af850fda.jpg',CONVERT(DATE,'2013-01-01'),(select id_genero from dbo.Generos_Contenidos where genero = 'Acción'),(select id_tipo_contenido from dbo.Tipos_Contenidos where tipo = 'Películas'),(select id_pais from dbo.Paises_Contenidos where pais = 'EEUU'),GETDATE(),1)
+values ('10.5240/3240-057D-88D7-9A82-A5E5-V','Wall-E','En el siglo XXIX, especÃ­ficamente en el aÃ±o 2805, el consumismo desenfrenado, la codicia empresarial y la negligencia ambiental han convertido al planeta Tierra en un pÃ¡ramo lleno de basura','https://lumiere-a.akamaihd.net/v1/images/p_walle_19753_69f7ff00.jpeg',CONVERT(DATE,'2008-01-01'),(select id_genero from dbo.Generos_Contenidos where genero = 'Aventura'),(select id_tipo_contenido from dbo.Tipos_Contenidos where tipo = 'PelÃ­culas'),(select id_pais from dbo.Paises_Contenidos where pais = 'EEUU'),CONVERT(DATE,'2022-01-01'),0),
+('10.5240/32B1-B567-14AC-65C2-B8EF-X','Lilo y Stich','La historia gira en torno a dos personajes: Lilo Pelekai (Daveigh Chase), una niÃ±a solitaria y un extraterrestre llamado Stitch','https://es.web.img3.acsta.net/pictures/14/03/27/11/39/176864.jpg',CONVERT(DATE,'2002-01-01'),(select id_genero from dbo.Generos_Contenidos where genero = 'Comedia'),(select id_tipo_contenido from dbo.Tipos_Contenidos where tipo = 'PelÃ­culas'),(select id_pais from dbo.Paises_Contenidos where pais = 'EEUU'),GETDATE(),1),
+('10.5240/A87B-E087-FA21-D93C-66A4-U','Los Puentes de Madison','Una solitaria ama de casa del Medio Oeste natural de la ciudad de Bari (Italia), casada con un soldado estadounidense destinado en Italia y llegada con Ã©l a los Estados Unidos.','https://es.web.img2.acsta.net/medias/nmedia/18/68/46/37/20340605.jpg',CONVERT(DATE,'1995-01-01'),(select id_genero from dbo.Generos_Contenidos where genero = 'Drama'),(select id_tipo_contenido from dbo.Tipos_Contenidos where tipo = 'PelÃ­culas'),(select id_pais from dbo.Paises_Contenidos where pais = 'EEUU'),CONVERT(DATE,'2015-01-01'),0),
+('10.5240/8212-4AA9-5A03-63AE-638B-W','Gran Torino','Walt Kowalski (Clint Eastwood) es un anciano veterano de la guerra de Corea y trabajador jubilado de la fÃ¡brica de Ford, de actitud amargada, quien acaba de enviudar','https://static.independent.co.uk/s3fs-public/thumbnails/image/2009/07/02/18/204860.jpg?width=1200',CONVERT(DATE,'2008-01-01'),(select id_genero from dbo.Generos_Contenidos where genero = 'Drama'),(select id_tipo_contenido from dbo.Tipos_Contenidos where tipo = 'PelÃ­culas'),(select id_pais from dbo.Paises_Contenidos where pais = 'EEUU'),CONVERT(DATE,'2015-01-01'),1),
+('10.5240/21A6-ED2A-A2C0-619A-9746-4','RÃ¡pidos y Furiosos 6','DespuÃ©s de su exitoso golpe en RÃ­o de Janeiro, Brasil, Dominic "Dom" Toretto (Vin Diesel) y Brian O`Conner (Paul Walker) estÃ¡n en una carrera en las Islas Canarias, EspaÃ±a, hasta llegar a un hospital, ya que el hijo de Brian estÃ¡ a punto de nacer. ','https://m.media-amazon.com/images/S/pv-target-images/2a711d2b91761c98205aa9f8b62e8cb47f423cc8f7697bfac5e76b71af850fda.jpg',CONVERT(DATE,'2013-01-01'),(select id_genero from dbo.Generos_Contenidos where genero = 'AcciÃ³n'),(select id_tipo_contenido from dbo.Tipos_Contenidos where tipo = 'PelÃ­culas'),(select id_pais from dbo.Paises_Contenidos where pais = 'EEUU'),GETDATE(),1)
 
 insert into dbo.Direcciones (eidr_contenido, id_persona)
 values ('10.5240/3240-057D-88D7-9A82-A5E5-V',(select id_persona from dbo.Personas where nombres = 'Andrew' and apellidos = 'Stanton')),
@@ -929,7 +929,7 @@ values ('10.5240/3240-057D-88D7-9A82-A5E5-V','https://www.youtube.com/embed/4rDD
 
 
 
-
+exec dbo.obtener_contenidos
 
 
 

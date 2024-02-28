@@ -4,6 +4,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { IUser } from 'src/app/api/models/i-user';
 import { MssApiService } from 'src/app/api/resolvers/mss-api.service';
 import { DatosPersonalesComponent } from '../datos-personales/datos-personales.component';
+import { AdministrarPlataformasComponent } from 'src/app/home/suscriptor/components/administrar-plataformas/administrar-plataformas.component';
 
 @Component({
   selector: 'app-menu-bar',
@@ -37,14 +38,12 @@ export class MenuBarComponent implements OnInit{
   }
 
   generarOpciones(){
-    switch (this.user.id_nivel){
-      case 3:
+    if (this.user.id_nivel == 3){
         this.opcionesMenu.push({ref: '/administrador/abm-banners', titulo: 'Banners'})
         this.opcionesMenu.push({ref: '/administrador/abm-plataformas', titulo: 'Plataformas'})
         this.opcionesMenu.push({ref: '/administrador/abm-publicidades', titulo: 'Publicidades'})
         this.opcionesMenu.push({ref: '/administrador/abm-publicistas', titulo: 'Publicistas'})
         this.opcionesMenu.push({ref: '/administrador/scheduled-tasks', titulo: 'Scheduled Tasks'})
-        break;
     }
   }
 
@@ -54,5 +53,9 @@ export class MenuBarComponent implements OnInit{
 
   logout(){
     this._service.logout();
+  }
+
+  listarPlataformas(){
+    this._modal.open(AdministrarPlataformasComponent);
   }
 }

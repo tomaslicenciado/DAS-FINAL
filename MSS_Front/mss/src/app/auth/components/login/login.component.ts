@@ -45,7 +45,6 @@ export class LoginComponent implements OnInit {
       this.form.controls['email'].setValue('');
       this.form.controls['password'].setValue('');
       this._service.login(email, password);
-      this._router.navigate(['/home/suscriptor']);
     }
   }
 }

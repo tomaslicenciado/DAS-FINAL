@@ -16,6 +16,7 @@
 				{{user.apellidos}} {{user.nombres}}
 			</button>
 			<div ngbDropdownMenu aria-labelledby="dropdownBasic1">
+        <button ngbDropdownItem (click)="listarPlataformas()" *ngIf="user.id_nivel == 1">Administrar Plataformas</button>
 				<button ngbDropdownItem (click)="modificarDatos()" i18n>Mis datos</button>
 				<button ngbDropdownItem (click)="logout()" i18n>Logout</button>
 			</div>

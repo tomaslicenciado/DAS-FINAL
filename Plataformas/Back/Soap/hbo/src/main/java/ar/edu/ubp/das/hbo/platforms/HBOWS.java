@@ -7,7 +7,6 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -15,15 +14,12 @@ import org.apache.cxf.interceptor.Fault;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
 
 import ar.edu.ubp.das.hbo.beans.ActuacionCatalogo;
 import ar.edu.ubp.das.hbo.beans.Catalogo;
 import ar.edu.ubp.das.hbo.beans.Codigo;
 import ar.edu.ubp.das.hbo.beans.ContenidoCatalogo;
 import ar.edu.ubp.das.hbo.beans.DireccionCatalogo;
-import ar.edu.ubp.das.hbo.beans.RegistroEstadisticoContenido;
-import ar.edu.ubp.das.hbo.beans.RegistroEstadisticoViewer;
 import ar.edu.ubp.das.hbo.beans.RespuestaBean;
 import ar.edu.ubp.das.hbo.utils.TokenGenerator;
 import jakarta.jws.WebMethod;
@@ -55,7 +51,7 @@ public class HBOWS {
             e.printStackTrace(); 
         }
         GsonBuilder gsonBuilder = new GsonBuilder();
-        gsonBuilder.setDateFormat("dd-MM-yyyy");
+        gsonBuilder.setDateFormat("yyyy-MM-dd");
         gson = gsonBuilder.create();
     }
     

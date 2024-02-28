@@ -25,7 +25,7 @@
                 <button (click)="scrollRight(2)" class="btn-sig btn-scroll" *ngIf="contenidosMasVistos.length > 4">></button>
             </div>
         </div>
-        
+
         <div class="contenido-filtrado" *ngIf="filtrando">
             <div class="contenido-grid-filtrado">
                 <app-item-contenido *ngFor="let contenido of contenidosFiltrados | filtroBusqueda:searchTerm" [contenido]="contenido"></app-item-contenido>

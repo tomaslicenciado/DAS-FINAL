@@ -30,12 +30,12 @@ import { AppErrorHandler } from './core/errorHandler/app-error-handler';
     HomeModule,
     NgbModule
   ],
-  providers: [ 
-    MssApiService, 
+  providers: [
+    MssApiService,
     MssApiRestResourceService,
     {provide: HTTP_INTERCEPTORS, useClass: LoaderInterceptor, multi: true},
     NgbActiveModal,
-    {provide: ErrorHandler, useClass: AppErrorHandler},
+    {provide: ErrorHandler, useClass: AppErrorHandler}
   ],
   bootstrap: [AppComponent]
 })

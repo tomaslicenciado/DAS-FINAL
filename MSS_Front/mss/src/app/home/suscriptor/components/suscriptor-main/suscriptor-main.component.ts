@@ -44,10 +44,10 @@ export class SuscriptorMainComponent implements OnInit, OnDestroy{
     validado: false
   };
 
-  constructor(private _router: Router, private _route: ActivatedRoute, private _ngZone: NgZone, 
+  constructor(private _router: Router, private _route: ActivatedRoute, private _ngZone: NgZone,
           private _msgSrv: MensajeService, private _rsService: MssApiRestResourceService, private _mssSrv: MssApiService,
           private _vsService: VisualizacionService, private _sServ: SuscriptorService,private _modal: NgbModal){}
-  
+
   ngOnInit(): void {
     this.user = this._mssSrv.getUser();
     this._route.data.subscribe({
@@ -97,15 +97,15 @@ export class SuscriptorMainComponent implements OnInit, OnDestroy{
                 })[0].url_icono;
                 cxp.nombre_plataforma = this.plataformas.filter((p: IPlataforma) => {return p.id_plataforma == cxp.id_plataforma;})[0].nombre;
                 if (cxp.destacado)
-                  destacados.push(cxp); 
-                          
+                  destacados.push(cxp);
+
                 if ((new Date().getTime() - new Date(cxp.fecha_carga).getTime()) / (1000*60*60*24) <= 15){
                   recientes.push(cxp);
                 }
               });
             }
             this._sServ.idsPlataformasFederadas = idPlataformasFederadas;
-            
+
             if (destacados.length > 0){
               let copia = {...contenido}
               copia.cont_x_plataforma = destacados;
@@ -119,12 +119,7 @@ export class SuscriptorMainComponent implements OnInit, OnDestroy{
           });
 
         }
-        /*else{
-            this._ngZone.run(() => this._msgSrv.showMessage({title: "Error al procesar datos", 
-                text: "No se pueden procesar los datos de contenido dado que no se ha cargado correctamente el catálogo", num: 500}), 0);
-            this._router.navigate(['/home/suscriptor']);
-          }*/
-        
+
       },
       error: (error) => {
         this._ngZone.run(() => this._msgSrv.showMessage({title: "Error en suscriptor home", text: error}), 0);
@@ -137,17 +132,16 @@ export class SuscriptorMainComponent implements OnInit, OnDestroy{
 
     this._rsService.obtenerContenidosMasVistos({token_suscriptor: this.user.token}).subscribe({
       next: (respMasvistos: RespuestaBean) => {
-        if (getCodigo(respMasvistos) == Codigo.OK){
-          const eidrs: string[] = JSON.parse(respMasvistos.body!);
-          this.masVistos = this.catalogo.filter((contenido) => {
-            return eidrs.some((e) => {
-              return contenido.eidr_contenido == e;
-            })
+        const eidrs: string[] = JSON.parse(respMasvistos.body!);
+        this.masVistos = this.catalogo.filter((contenido) => {
+          return eidrs.some((e) => {
+            return contenido.eidr_contenido == e;
           })
-        }else{
-          this._ngZone.run(() => this._msgSrv.showMessage({title: respMasvistos.body!, text: respMasvistos.mensaje, num: getCodigo(respMasvistos)}), 0);
-          this._router.navigate(['/home/suscriptor']);
-        }
+        })
+      },
+      error: (error: RespuestaBean) => {
+        let e: RespuestaBean = JSON.parse(JSON.stringify(error.body!));
+        this._ngZone.run(() => this._msgSrv.showMessage({title: e.body!, text: e.mensaje, num: getCodigo(e)}), 0);
       }
     });
   }

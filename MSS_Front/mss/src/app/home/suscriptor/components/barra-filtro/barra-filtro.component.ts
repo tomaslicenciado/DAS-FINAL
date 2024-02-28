@@ -15,6 +15,7 @@ export class BarraFiltroComponent implements OnInit {
   @Output() filterChange: EventEmitter<any> = new EventEmitter<any>();
 
   constructor(private fb: FormBuilder, private _ngZone: NgZone, private _msgSrv: MensajeService) {}
+  filterStyle : any;
 
   ngOnInit(): void {
     this.filterForm = this.fb.group({
@@ -35,5 +36,15 @@ export class BarraFiltroComponent implements OnInit {
 
   onFilterChange() {
     this.filterChange.emit(this.filterForm.value);
+  }
+
+  selectAll(){
+    this.filterStyle = { 'color': 'transparent'};
+    this.filterForm.patchValue({searchTerm: "*"});
+  }
+
+  cleanfilter(){
+    this.filterStyle = { 'color': 'black'};
+    this.filterForm.patchValue({searchTerm: ""});
   }
 }

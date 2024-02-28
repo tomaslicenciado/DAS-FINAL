@@ -16,15 +16,12 @@ import org.springframework.stereotype.Repository;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
 
 import ar.edu.ubp.das.prime.beans.ActuacionCatalogo;
 import ar.edu.ubp.das.prime.beans.Catalogo;
 import ar.edu.ubp.das.prime.beans.Codigo;
 import ar.edu.ubp.das.prime.beans.ContenidoCatalogo;
 import ar.edu.ubp.das.prime.beans.DireccionCatalogo;
-import ar.edu.ubp.das.prime.beans.RegistroEstadisticoContenido;
-import ar.edu.ubp.das.prime.beans.RegistroEstadisticoViewer;
 import ar.edu.ubp.das.prime.beans.RespuestaBean;
 import ar.edu.ubp.das.prime.utils.TokenGenerator;
 
@@ -40,7 +37,7 @@ public class PrimeRepository implements IPrimeRepository{
 
     PrimeRepository(){
         GsonBuilder gsonBuilder = new GsonBuilder();
-        gsonBuilder.setDateFormat("dd-MM-yyyy");
+        gsonBuilder.setDateFormat("yyyy-MM-dd");
         gson = gsonBuilder.create();
     }
 

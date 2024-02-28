@@ -7,9 +7,7 @@ import { MssApiRestResourceService } from 'src/app/api/resources/mss-api-rest-re
 import { MensajeService } from 'src/app/core/mensajes/service/mensaje.service';
 
 @Component({
-  selector: 'app-finalizar-federacion',
-  templateUrl: './finalizar-federacion.component.html',
-  styleUrls: ['./finalizar-federacion.component.css']
+  template: ""
 })
 export class FinalizarFederacionComponent implements OnInit {
   private id_plataforma: number = 0;
@@ -27,14 +25,13 @@ export class FinalizarFederacionComponent implements OnInit {
     const user = this._basicService.getUser();
     this._rsService.finalizarFederacionPlataforma({token_suscriptor: user.token, id_plataforma: this.id_plataforma}).subscribe({
       next: (respuesta: RespuestaBean) => {
-        if (getCodigo(respuesta) != Codigo.OK)
-        this._ngZone.run(() => this._msgSrv.showMessage({title: "Error al finalizar la federación", text: respuesta.mensaje}), 0);
+          this._router.navigate(['/']);
       },
-      error: (error) => {
-        this._ngZone.run(() => this._msgSrv.showMessage({title: "Error al finalizar la federación", text: error}), 0);
+      error: (error: RespuestaBean) => {
+        let e: RespuestaBean = JSON.parse(JSON.stringify(error.body!));
+        this._ngZone.run(() => this._msgSrv.showMessage({title: "Error al finalizar la federación", text: e.mensaje}), 0);
       }
     })
-    this._router.navigate(['/']);
   }
 
 }

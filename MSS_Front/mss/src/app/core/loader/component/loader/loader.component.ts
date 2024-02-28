@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Loader, LoaderService } from '../../service/loader.service';
+import { LoaderService } from '../../service/loader.service';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -15,8 +15,8 @@ export class LoaderComponent implements OnInit, OnDestroy {
   constructor(private _service: LoaderService) { }
 
   ngOnInit(): void {
-    this._subscription = this._service.getObservable().subscribe((ref: Loader) => {
-      this._loaded = ref.loaded;
+    this._subscription = this._service.getObservable().subscribe((ref: boolean) => {
+      this._loaded = ref;
     });
   }
 

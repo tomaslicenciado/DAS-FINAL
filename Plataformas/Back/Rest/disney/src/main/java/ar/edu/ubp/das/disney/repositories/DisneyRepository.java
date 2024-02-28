@@ -16,15 +16,12 @@ import org.springframework.stereotype.Repository;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
 
 import ar.edu.ubp.das.disney.beans.ActuacionCatalogo;
 import ar.edu.ubp.das.disney.beans.Catalogo;
 import ar.edu.ubp.das.disney.beans.Codigo;
 import ar.edu.ubp.das.disney.beans.ContenidoCatalogo;
 import ar.edu.ubp.das.disney.beans.DireccionCatalogo;
-import ar.edu.ubp.das.disney.beans.RegistroEstadisticoContenido;
-import ar.edu.ubp.das.disney.beans.RegistroEstadisticoViewer;
 import ar.edu.ubp.das.disney.beans.RespuestaBean;
 import ar.edu.ubp.das.disney.utils.TokenGenerator;
 

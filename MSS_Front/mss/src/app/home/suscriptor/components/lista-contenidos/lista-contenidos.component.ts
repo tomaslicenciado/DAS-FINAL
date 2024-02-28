@@ -53,7 +53,7 @@ export class ListaContenidosComponent implements OnInit, OnDestroy{
   ngOnDestroy(): void {
     this._subscription.unsubscribe();
   }
-  
+
   ngOnInit(): void {
     this.contenidosFiltrados = this.contenidos;
     this._subscription = this._vsServ.getEstadoObservable().subscribe((vis) => {
@@ -71,6 +71,10 @@ export class ListaContenidosComponent implements OnInit, OnDestroy{
     if (tipo === 'Todo' && genero === 'Todo' && this.searchTerm === "")
       this.filtrando = false;
     // Aplica los filtros según tus necesidades
+    if (this.searchTerm === "*"){
+      this.filtrando = true;
+      this.searchTerm= "";
+    }
     this.contenidosFiltrados = this.contenidos.filter((contenido) => {
       return (
         (tipo === 'Todo' || contenido.tipo_contenido === tipo) &&

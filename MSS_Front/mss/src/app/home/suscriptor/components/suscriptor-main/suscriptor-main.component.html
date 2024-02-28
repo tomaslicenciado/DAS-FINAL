@@ -1,10 +1,13 @@
-<div class="federar" *ngIf="!visualizando">
-    <button class="btn-federar" type="button" (click)="listarPlataformas()">Administrar Plataformas</button>
-</div>
 <app-ad-banner *ngFor="let publicacion of publicaciones" [publicacion]="publicacion"></app-ad-banner>
 <div class="contenido">
-    <app-lista-contenidos [generos]="generos" [contenidos]="catalogo" 
-                            [contenidosRecientes]="recientes" 
-                            [contenidosDestacados]="destacados"
-                            [contenidosMasVistos]="masVistos"></app-lista-contenidos>
+  <div class="welcome-container" *ngIf="catalogo.length == 0">
+    <h2>Bienvenido a MSS</h2>
+    <p>Para comenzar a disfrutar de nuestro sistema, agregue una plataforma de streaming.</p>
+    <p>Puede realizarlo desde el menú de usuario, o desde el siguiente botón:</p>
+    <button class="btn-federar" type="button" (click)="listarPlataformas()">Administrar Plataformas</button>
+  </div>
+  <app-lista-contenidos [generos]="generos" [contenidos]="catalogo"
+                          [contenidosRecientes]="recientes"
+                          [contenidosDestacados]="destacados"
+                          [contenidosMasVistos]="masVistos"></app-lista-contenidos>
 </div>

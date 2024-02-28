@@ -18,9 +18,9 @@ export class AdministrarPlataformasComponent implements OnInit{
   plataformas: IPlataforma[] = []
   plataformasNoFederadas: IPlataforma[] = []
 
-  constructor(private _sServ: SuscriptorService,public activeModal: NgbActiveModal, private _rsService: MssApiRestResourceService, 
+  constructor(private _sServ: SuscriptorService,public activeModal: NgbActiveModal, private _rsService: MssApiRestResourceService,
           private _mssSrv: MssApiService, private _ngZone: NgZone, private _msgSrv: MensajeService, private _router: Router) {
-    
+
   }
 
   ngOnInit(): void {
@@ -30,19 +30,17 @@ export class AdministrarPlataformasComponent implements OnInit{
 
   federar(plataforma: IPlataforma){
     const id_plataforma = plataforma.id_plataforma;
-    this._rsService.iniciarFederacionPlataforma({id_plataforma: id_plataforma, 
-                                                  token_suscriptor: this._mssSrv.getUser().token, 
+    this._rsService.iniciarFederacionPlataforma({id_plataforma: id_plataforma,
+                                                  token_suscriptor: this._mssSrv.getUser().token,
                                                   url_retorno: 'http://localhost:8090/home/suscriptor/finalizarFederacion/'+id_plataforma}).subscribe({
       next: (respuesta: RespuestaBean) => {
-        console.log(respuesta);
-        if (getCodigo(respuesta) == Codigo.OK){
-          const url = JSON.parse(respuesta.body!).URL;
-          this._sServ.idsPlataformasFederadas.push(id_plataforma);
-          window.location.href = url;
-        }
+        const url = JSON.parse(respuesta.body!).URL;
+        this._sServ.idsPlataformasFederadas.push(id_plataforma);
+        window.location.href = url;
       },
-      error: (error) => {
-        this._ngZone.run(() => this._msgSrv.showMessage({title: "Error al federar una plataforma", text: error}), 0);
+      error: (error: RespuestaBean) => {
+        let e: RespuestaBean = JSON.parse(JSON.stringify(error.body!));
+        this._ngZone.run(() => this._msgSrv.showMessage({title: "Error al federar una plataforma", text: e.mensaje}), 0);
       }
     });
   }
@@ -55,14 +53,12 @@ export class AdministrarPlataformasComponent implements OnInit{
     const id_plataforma = plataforma.id_plataforma;
     this._rsService.desuscribirPlataforma({id_plataforma: id_plataforma, token_suscriptor: this._mssSrv.getUser().token}).subscribe({
       next: (respuesta: RespuestaBean) => {
-        console.log(respuesta);
-        if (getCodigo(respuesta) == Codigo.OK){
-          this._sServ.idsPlataformasFederadas = this._sServ.idsPlataformasFederadas.filter(i => i != id_plataforma);
-          this.plataformasNoFederadas = this._sServ.actualizarListadoPlataformas();
-        }
+        this._sServ.idsPlataformasFederadas = this._sServ.idsPlataformasFederadas.filter(i => i != id_plataforma);
+        this.plataformasNoFederadas = this._sServ.actualizarListadoPlataformas();
       },
-      error: (error) => {
-        this._ngZone.run(() => this._msgSrv.showMessage({title: "Error al desuscribir la plataforma", text: error}), 0);
+      error: (error: RespuestaBean) => {
+        let e: RespuestaBean = JSON.parse(JSON.stringify(error.body!));
+        this._ngZone.run(() => this._msgSrv.showMessage({title: "Error al desuscribir la plataforma", text: e.mensaje}), 0);
       }
     });
   }

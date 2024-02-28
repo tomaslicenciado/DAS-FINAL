@@ -2,10 +2,11 @@ import { Injectable, NgZone, OnInit, inject } from '@angular/core';
 import { ActivatedRouteSnapshot, ResolveEnd, ResolveFn, Router, RouterStateSnapshot } from '@angular/router';
 import { MssApiRestResourceService } from '../resources/mss-api-rest-resource.service';
 import { IUser } from '../models/i-user';
-import { Observable, delay } from 'rxjs';
+import { Observable, catchError, delay, of, tap } from 'rxjs';
 import { RespuestaBean, getCodigo } from '../models/respuesta-bean';
 import { Codigo } from '../models/codigo';
 import { MensajeService } from 'src/app/core/mensajes/service/mensaje.service';
+import { PublicidadesService } from 'src/app/core/services/publicidades.service';
 
 @Injectable({
   providedIn: 'root'
@@ -17,7 +18,7 @@ export class MssApiService implements OnInit{
   constructor(private _service: MssApiRestResourceService,
               private _ngZone: NgZone,
               private _router: Router,
-              private _mensajeService: MensajeService) { 
+              private _mensajeService: MensajeService) {
     const lsUserSesion = sessionStorage.getItem("mssUser");
     if (lsUserSesion){
       const userSesion = JSON.parse(lsUserSesion);
@@ -48,23 +49,18 @@ export class MssApiService implements OnInit{
   login(email: string, password: string): void {
     this._service.iniciarSesion({email: email, password: password}).subscribe({
       next: (respuesta: RespuestaBean) => {
-        if (getCodigo(respuesta) == Codigo.OK){
-          this._isLogged = true;
-          this._user = JSON.parse(respuesta.body!);
-          sessionStorage.setItem("mssUser",JSON.stringify({
-            expiry: new Date().getTime() + 7200000,
-            usuario: this._user
-          }));
-          this._router.navigateByUrl('/');
-          window.location.reload();
-        }
-        else{
-          this._isLogged = false;
-          this._ngZone.run(() => this._mensajeService.showMessage({title: "Login icorrecto", text: "El usuario y/o contraseña no coinciden", num: getCodigo(respuesta)}), 0);
-        }
+        this._isLogged = true;
+        this._user = JSON.parse(respuesta.body!);
+        sessionStorage.setItem("mssUser",JSON.stringify({
+          expiry: new Date().getTime() + 7200000,
+          usuario: this._user
+        }));
+        this._router.navigateByUrl('/');
+        window.location.reload();
       },
-      error: (error: Error) => {
-        this._ngZone.run(() => this._mensajeService.showMessage({title: "Error en login", text: error.message}), 0);
+      error: (error: RespuestaBean) => {
+        let e:RespuestaBean = JSON.parse(JSON.stringify(error.body!));
+        this._ngZone.run(() => this._mensajeService.showMessage({title: "Login incorrecto", text: e.mensaje}), 0);
       }
     })
   }
@@ -73,23 +69,17 @@ export class MssApiService implements OnInit{
     let prefStr = JSON.stringify(preferencias);
     this._service.registrarSuscriptor({email: email, password: password, preferencias: prefStr, nombres: nombres, apellidos: apellidos}).subscribe({
       next: (respuesta: RespuestaBean) => {
-        console.log(respuesta);
-        if (getCodigo(respuesta) == Codigo.CREADO){
-          this._isLogged = true;
-          this._user = JSON.parse(respuesta.body!);
-          sessionStorage.setItem("mssUser",JSON.stringify({
-            expiry: new Date().getTime() + 7200000,
-            usuario: this._user
-          }));
-          this._router.navigateByUrl('/');
-        }
-        else{
-          this._isLogged = false;
-          this._ngZone.run(() => this._mensajeService.showMessage({title: "Error al registrar el usuario", text: respuesta.mensaje, num: getCodigo(respuesta)}), 0);
-        }
+        this._isLogged = true;
+        this._user = JSON.parse(respuesta.body!);
+        sessionStorage.setItem("mssUser",JSON.stringify({
+          expiry: new Date().getTime() + 7200000,
+          usuario: this._user
+        }));
+        this._router.navigateByUrl('/');
       },
-      error: (error: Error) => {
-        this._ngZone.run(() => this._mensajeService.showMessage({title: "Error en registro", text: error.message}), 0);
+      error: (error: RespuestaBean) => {
+        let e:RespuestaBean = JSON.parse(JSON.stringify(error.body!));
+        this._ngZone.run(() => this._mensajeService.showMessage({title: "Error en registro", text: e.mensaje}), 0);
       }
     });
   }
@@ -116,8 +106,9 @@ export class MssApiService implements OnInit{
           //Mensaje error
         }
       },
-      error: (error) => {
-        this._ngZone.run(() => this._mensajeService.showMessage({title: "Error en login", text: error}), 0);
+      error: (error: RespuestaBean) => {
+        let e: RespuestaBean = JSON.parse(JSON.stringify(error.body!));
+        this._ngZone.run(() => this._mensajeService.showMessage({title: "Error en login", text: e.mensaje}), 0);
       }
     });
   }
@@ -133,11 +124,29 @@ export class MssApiService implements OnInit{
   }
 }
 
-export const PublicacionesResolver: ResolveFn<Observable<RespuestaBean>> = (_route: ActivatedRouteSnapshot, state: RouterStateSnapshot) => {
-  const userService = inject(MssApiService);
-  const user = userService.getUser();
-
-  return inject(MssApiRestResourceService).obtenerPublicidades({token_suscriptor: user.token});
+export const PublicacionesResolver: ResolveFn<Observable<RespuestaBean>> | Observable<RespuestaBean> = (_route: ActivatedRouteSnapshot, state: RouterStateSnapshot) => {
+  const publicacionesService = inject(PublicidadesService)
+  if (publicacionesService.PublicacionesCargadas() && publicacionesService.MinutesFromLastUpdate() < 60){
+    let resp: RespuestaBean = {status: Codigo.OK, body: JSON.stringify(publicacionesService.GetPublicaciones()), mensaje: ""};
+    return of(resp);
+  }
+  else{
+    const userService = inject(MssApiService);
+    const user = userService.getUser();
+    console.log(user.token);
+    return inject(MssApiRestResourceService).obtenerPublicidades({token_suscriptor: user.token}).pipe(
+      tap({
+        next: (respuesta: RespuestaBean) => {
+          publicacionesService.SetPublicidades(JSON.parse(respuesta.body!))
+        },
+        error: (error: RespuestaBean) => {
+          let e:RespuestaBean = JSON.parse(JSON.stringify(error.body!));
+          inject(NgZone).run(() => inject(MensajeService).showMessage({title: "Error al obtener publicidades", text: e.mensaje}), 0);
+          return of();
+        }
+      })
+    );
+  }
 }
 
 export const UserResolver: ResolveFn<IUser> = (route: ActivatedRouteSnapshot, state: RouterStateSnapshot) => {
@@ -149,34 +158,34 @@ export const UserResolver: ResolveFn<IUser> = (route: ActivatedRouteSnapshot, st
 export const BannersResolver: ResolveFn<Observable<RespuestaBean>> = (_route: ActivatedRouteSnapshot, state: RouterStateSnapshot) => {
   const userService = inject(MssApiService);
   const user = userService.getUser();
-  
-  return inject(MssApiRestResourceService).obtenerListadoBanners({token_usuario: user.token!});
+
+  return inject(MssApiRestResourceService).obtenerListadoBanners({token_usuario: user.token});
 }
 
 export const CatalogoResolver: ResolveFn<Observable<RespuestaBean>> = (_route: ActivatedRouteSnapshot, state: RouterStateSnapshot) => {
   const userService = inject(MssApiService);
   const user = userService.getUser();
-  
+
   return inject(MssApiRestResourceService).obtenerCatalogo({token_suscriptor: user.token!});
 }
 
 export const PlataformasResolver: ResolveFn<Observable<RespuestaBean>> = (_route: ActivatedRouteSnapshot, state: RouterStateSnapshot) => {
   const userService = inject(MssApiService);
   const user = userService.getUser();
-  
+
   return inject(MssApiRestResourceService).obtenerListadoPlataformas({token_usuario: user.token!});
 }
 
 export const GenerosResolver: ResolveFn<Observable<RespuestaBean>> = (_route: ActivatedRouteSnapshot, state: RouterStateSnapshot) => {
   const userService = inject(MssApiService);
   const user = userService.getUser();
-  
+
   return inject(MssApiRestResourceService).obtenerListadoGenerosContenido({token_usuario: user.token!});
 }
 
 export const PublicistasResolver: ResolveFn<Observable<RespuestaBean>> = (_route: ActivatedRouteSnapshot, state: RouterStateSnapshot) => {
   const userService = inject(MssApiService);
   const user = userService.getUser();
-  
+
   return inject(MssApiRestResourceService).obtenerListadoPublicistas({token_usuario: user.token!});
 }
